@@ -1,5 +1,6 @@
 module Helpers exposing (..)
 
+import Array
 import Matrix exposing (Matrix)
 import Random.Pcg as Random exposing (Seed)
 import Types exposing (Cell(Cell), Grid, InnerCell(Hint, Mine))
@@ -33,6 +34,16 @@ minNumMines =
 maxNumMines : number -> number -> number
 maxNumMines width height =
     width * height - 1
+
+
+cellWidth : number
+cellWidth =
+    50
+
+
+cellHeight : number
+cellHeight =
+    50
 
 
 emptyCell : Cell
@@ -98,3 +109,10 @@ cellToString cell =
 
         Cell (Hint num) _ ->
             toString num
+
+
+matrixToListsOfLists : Matrix a -> List (List a)
+matrixToListsOfLists matrix =
+    List.range 0 (Matrix.height matrix - 1)
+        |> List.filterMap (\rowIndex -> Matrix.getRow rowIndex matrix)
+        |> List.map Array.toList

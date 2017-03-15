@@ -20,11 +20,14 @@ body {
 }
 
 .Grid {
-  display: grid;
+  table-layout: fixed;
 }
 
 .Cell {
   padding: 0;
+  border: none;
+  border-radius: none;
+  background: #eee;
 }
 
 .Form {

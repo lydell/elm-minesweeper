@@ -1,59 +1,102 @@
 module View exposing (view)
 
-import Array
 import Helpers
-import Html exposing (Html, button, div, input, span, text)
-import Html.Attributes exposing (attribute, class, defaultValue, style, type_)
+import Html
+    exposing
+        ( Html
+        , button
+        , div
+        , input
+        , span
+        , table
+        , tbody
+        , td
+        , text
+        , tr
+        )
+import Html.Attributes
+    exposing
+        ( attribute
+        , class
+        , defaultValue
+        , style
+        , type_
+        )
 import Html.Events exposing (onInput)
 import Matrix
-import Types exposing (Cell, Model, Msg(HeightInput, NumMinesInput, WidthInput))
+import Types
+    exposing
+        ( Cell
+        , Grid
+        , Model
+        , Msg
+            ( HeightInput
+            , NumMinesInput
+            , WidthInput
+            )
+        )
 
 
 view : Model -> Html Msg
 view model =
+    div [ class "Container" ]
+        [ viewGrid model.grid
+        , viewForm model
+        ]
+
+
+viewGrid : Grid -> Html Msg
+viewGrid grid =
+    table [ class "Grid" ]
+        [ tbody []
+            (List.map viewRow (Helpers.matrixToListsOfLists grid))
+        ]
+
+
+viewRow : List Cell -> Html Msg
+viewRow row =
+    tr []
+        (List.map viewCell row)
+
+
+viewCell : Cell -> Html msg
+viewCell cell =
+    let
+        styles =
+            [ ( "width", (toString Helpers.cellWidth) ++ "px" )
+            , ( "height", (toString Helpers.cellHeight) ++ "px" )
+            ]
+    in
+        td []
+            [ button [ type_ "button", class "Cell", style styles ]
+                [ text (Helpers.cellToString cell) ]
+            ]
+
+
+viewForm : Model -> Html Msg
+viewForm model =
     let
         width =
             Matrix.width model.grid
 
         height =
             Matrix.height model.grid
-
-        size =
-            "50px"
-
-        columns =
-            "repeat(" ++ (toString width) ++ ", " ++ size ++ ")"
-
-        rows =
-            "repeat(" ++ (toString height) ++ ", " ++ size ++ ")"
-
-        styles =
-            [ ( "grid-template-columns", columns )
-            , ( "grid-template-rows", rows )
-            ]
     in
-        div [ class "Container" ]
-            [ div [ class "Grid", style styles ]
-                (Matrix.toIndexedArray model.grid
-                    |> Array.toList
-                    |> List.map (\( _, cell ) -> viewCell cell)
-                )
-            , div [ class "Form" ]
-                [ viewNumberInput width
-                    Helpers.minWidth
-                    Helpers.maxWidth
-                    WidthInput
-                , text "×"
-                , viewNumberInput height
-                    Helpers.minHeight
-                    Helpers.maxHeight
-                    HeightInput
-                , text "with"
-                , viewNumberInput model.numMines
-                    Helpers.minNumMines
-                    (Helpers.maxNumMines width height)
-                    NumMinesInput
-                ]
+        div [ class "Form" ]
+            [ viewNumberInput width
+                Helpers.minWidth
+                Helpers.maxWidth
+                WidthInput
+            , text "×"
+            , viewNumberInput height
+                Helpers.minHeight
+                Helpers.maxHeight
+                HeightInput
+            , text "with"
+            , viewNumberInput model.numMines
+                Helpers.minNumMines
+                (Helpers.maxNumMines width height)
+                NumMinesInput
             ]
 
 
@@ -76,9 +119,3 @@ viewNumberInput defaultValue_ minValue maxValue tagger =
                 []
             , text (toString minValue ++ "–" ++ toString maxValue)
             ]
-
-
-viewCell : Cell -> Html msg
-viewCell cell =
-    button [ type_ "button", class "Cell" ]
-        [ text (Helpers.cellToString cell) ]
