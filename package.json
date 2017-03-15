@@ -5,6 +5,11 @@
   },
   "devDependencies": {
     "elm": "^0.18.0",
-    "elm-live": "^2.7.4"
+    "elm-live": "^2.7.4",
+    "eslint": "^3.17.1",
+    "eslint-config-prettier": "^1.5.0",
+    "eslint-config-strict": "^13.0.0",
+    "eslint-plugin-prettier": "^2.0.1",
+    "prettier": "^0.22.0"
   }
 }

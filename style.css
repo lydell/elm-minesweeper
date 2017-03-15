@@ -1,5 +1,5 @@
 *, *:before, *:after {
-  box-sizing: inherit;
+  box-sizing: border-box;
 }
 
 html {
@@ -8,4 +8,41 @@ html {
 
 body {
   margin: 0;
+}
+
+.Container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 100px;
+}
+
+.Grid {
+  display: grid;
+}
+
+.Cell {
+  padding: 0;
+}
+
+.Form {
+  display: flex;
+  align-items: baseline;
+  margin-top: 200px;
+}
+
+.NumberInput {
+  display: flex;
+  flex-direction: column;
+}
+
+.NumberInput-input {
+  min-width: 100%;
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid;
+  border-radius: 0;
+  text-align: center;
 }
