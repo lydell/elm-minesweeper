@@ -130,21 +130,13 @@ gridState grid =
 
 
 isGridEmpty : Grid -> Bool
-isGridEmpty grid =
-    let
-        nonEmptyElements =
-            Matrix.filter (\(Cell _ cellState) -> cellState /= Unrevealed) grid
-    in
-        Array.length nonEmptyElements == 0
+isGridEmpty =
+    matrixCheckEveryElement (\(Cell _ cellState) -> cellState == Unrevealed)
 
 
 isGridFinished : Grid -> Bool
-isGridFinished grid =
-    let
-        unfinshedElements =
-            Matrix.filter (not << isCellFinished) grid
-    in
-        Array.length unfinshedElements == 0
+isGridFinished =
+    matrixCheckEveryElement isCellFinished
 
 
 isCellFinished : Cell -> Bool
@@ -158,6 +150,15 @@ isCellFinished (Cell innerCell cellState) =
 
         _ ->
             False
+
+
+matrixCheckEveryElement : (a -> Bool) -> Matrix a -> Bool
+matrixCheckEveryElement fn matrix =
+    let
+        nonMatchingElements =
+            Matrix.filter (not << fn) matrix
+    in
+        Array.length nonMatchingElements == 0
 
 
 matrixToListsOfLists : Matrix a -> List (List a)
