@@ -187,7 +187,7 @@ recursivelyRevealHelper visitedCoords columnNum rowNum grid =
                 Matrix.get columnNum rowNum grid
         in
             case maybeCell of
-                Just (Cell (Hint 0) _) ->
+                Just (Cell (Hint number) _) ->
                     let
                         newGrid =
                             Matrix.update columnNum rowNum markRevealed grid
@@ -201,7 +201,10 @@ recursivelyRevealHelper visitedCoords columnNum rowNum grid =
                         markNeighbour ( ( x, y ), _ ) ( icoords, igrid ) =
                             recursivelyRevealHelper icoords x y igrid
                     in
-                        List.foldl markNeighbour ( newVisitedCoords, newGrid ) neighbours
+                        if number == 0 then
+                            List.foldl markNeighbour ( newVisitedCoords, newGrid ) neighbours
+                        else
+                            ( newVisitedCoords, newGrid )
 
                 _ ->
                     ( visitedCoords, grid )
