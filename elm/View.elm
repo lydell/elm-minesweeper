@@ -1,5 +1,6 @@
 module View exposing (view)
 
+import Constants
 import Helpers exposing (onChange, onMouseDown, onMouseMove)
 import Html
     exposing
@@ -79,7 +80,7 @@ viewGrid : Grid -> Html Msg
 viewGrid grid =
     let
         styles =
-            [ ( "border-spacing", (toString Helpers.cellSpacing) ++ "px" ) ]
+            [ ( "border-spacing", (toString Constants.cellSpacing) ++ "px" ) ]
     in
         table [ class "Grid", style styles ]
             [ tbody []
@@ -97,7 +98,7 @@ viewCell : Cell -> Html msg
 viewCell cell =
     let
         size =
-            (toString Helpers.cellSize) ++ "px"
+            (toString Constants.cellSize) ++ "px"
 
         styles =
             [ ( "width", size )
@@ -139,13 +140,13 @@ viewSizer grid sizer maybePointerPosition =
                 |> Helpers.clampSizerHeight
 
         styles =
-            [ ( "top", toString -Helpers.sizerOffset ++ "px" )
+            [ ( "top", toString -Constants.sizerOffset ++ "px" )
             , ( "width", toString newWidth ++ "px" )
             , ( "height", toString newHeight ++ "px" )
             ]
 
         buttonSize =
-            toString Helpers.cellSize ++ "px"
+            toString Constants.cellSize ++ "px"
 
         buttonStyles =
             [ ( "width", buttonSize )
@@ -171,7 +172,7 @@ viewMinesInfo : Int -> Html Msg
 viewMinesInfo numMines =
     let
         absoluteMaxNumMines =
-            Helpers.maxNumMines Helpers.maxWidth Helpers.maxHeight
+            Helpers.maxNumMines Constants.maxWidth Constants.maxHeight
 
         maxWidth =
             absoluteMaxNumMines |> toString |> String.length

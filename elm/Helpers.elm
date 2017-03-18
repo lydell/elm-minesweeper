@@ -1,6 +1,7 @@
 module Helpers exposing (..)
 
 import Array
+import Constants
 import Html exposing (Attribute)
 import Html.Events
 import Json.Decode exposing (Decoder)
@@ -17,79 +18,45 @@ import Types
         )
 
 
-minWidth : number
-minWidth =
-    2
-
-
-maxWidth : number
-maxWidth =
-    32
-
-
-minHeight : number
-minHeight =
-    2
-
-
-maxHeight : number
-maxHeight =
-    32
-
-
-minNumMines : number
-minNumMines =
-    1
-
-
 maxNumMines : number -> number -> number
 maxNumMines width height =
     width * height - 1
 
 
-cellSize : number
-cellSize =
-    25
-
-
-cellSpacing : number
-cellSpacing =
-    2
-
-
-sizerOffset : Int
-sizerOffset =
-    cellSize // 2
-
-
 clampWidth : Int -> Int
 clampWidth =
-    clamp minWidth maxWidth
+    clamp Constants.minWidth Constants.maxWidth
 
 
 clampHeight : Int -> Int
 clampHeight =
-    clamp minHeight maxHeight
+    clamp Constants.minHeight Constants.maxHeight
 
 
 clampNumMines : Int -> Int -> Int -> Int
 clampNumMines width height =
-    clamp minNumMines (maxNumMines width height)
+    clamp Constants.minNumMines (maxNumMines width height)
 
 
 clampSizerWidth : Int -> Int
 clampSizerWidth =
-    clamp (calculateSizerSize minWidth) (calculateSizerSize maxWidth)
+    clamp
+        (calculateSizerSize Constants.minWidth)
+        (calculateSizerSize Constants.maxWidth)
 
 
 clampSizerHeight : Int -> Int
 clampSizerHeight =
-    clamp (calculateSizerSize minHeight) (calculateSizerSize maxHeight)
+    clamp
+        (calculateSizerSize Constants.minHeight)
+        (calculateSizerSize Constants.maxHeight)
 
 
 calculateSizerSize : Int -> Int
 calculateSizerSize size =
-    size * (cellSize + cellSpacing) + cellSpacing + sizerOffset * 2
+    (size * (Constants.cellSize + Constants.cellSpacing))
+        + Constants.cellSpacing
+        + (Constants.sizerOffset * 2)
 
 
 emptyCell : Cell
@@ -184,7 +151,7 @@ calculatePointerMovement sizer maybePointerPosition =
 
 calculateSize : Int -> Int -> Int
 calculateSize size movement =
-    size + floor ((toFloat movement) / (cellSize + cellSpacing))
+    size + floor ((toFloat movement) / (Constants.cellSize + Constants.cellSpacing))
 
 
 onMouseDown : (PointerPosition -> msg) -> Attribute msg
