@@ -25,7 +25,7 @@ init flags =
             Random.initialSeed flags.randomSeed
 
         numMines =
-            5
+            10
 
         emptyGrid =
             Helpers.createEmptyGrid 9 9
