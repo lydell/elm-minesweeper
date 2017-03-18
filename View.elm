@@ -67,10 +67,7 @@ view model =
                 ]
     in
         div ([ classes ] ++ events)
-            [ div [ class "MinesInfo" ]
-                [ text "0 / "
-                , viewNumberInput model.numMines NumMinesChange
-                ]
+            [ viewMinesInfo model.numMines
             , div [ class "GridContainer" ]
                 [ viewGrid model.grid
                 , viewSizer model.grid model.sizer model.pointerPosition
@@ -170,11 +167,27 @@ viewSizer grid sizer maybePointerPosition =
             ]
 
 
-viewNumberInput : Int -> (String -> Msg) -> Html Msg
-viewNumberInput value_ tagger =
-    input
-        [ type_ "tel"
-        , value (toString value_)
-        , onChange tagger
-        ]
-        []
+viewMinesInfo : Int -> Html Msg
+viewMinesInfo numMines =
+    let
+        absoluteMaxNumMines =
+            Helpers.maxNumMines Helpers.maxWidth Helpers.maxHeight
+
+        maxWidth =
+            absoluteMaxNumMines |> toString |> String.length
+
+        styles =
+            [ ( "box-sizing", "content-box" )
+            , ( "width", toString maxWidth ++ "ch" )
+            ]
+    in
+        div [ class "MinesInfo" ]
+            [ text "0 / "
+            , input
+                [ type_ "tel"
+                , value (toString numMines)
+                , onChange NumMinesChange
+                , style styles
+                ]
+                []
+            ]
