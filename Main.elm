@@ -120,9 +120,13 @@ update msg model =
 
                 grid =
                     Helpers.createEmptyGrid newWidth newHeight
+
+                numMines =
+                    Helpers.clampNumMines newWidth newHeight model.numMines
             in
                 ( { model
                     | grid = grid
+                    , numMines = numMines
                     , pointerPosition = Just pointerPosition
                   }
                 , Cmd.none
