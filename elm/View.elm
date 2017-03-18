@@ -34,6 +34,9 @@ import Types exposing (..)
 view : Model -> Html Msg
 view model =
     let
+        gridState =
+            Helpers.gridState model.grid
+
         isDragging =
             case model.sizer of
                 Dragging _ ->
@@ -60,53 +63,72 @@ view model =
                 [ viewGrid model.grid
                 , viewSizer model.grid model.sizer model.pointerPosition
                 ]
+            , viewBottom gridState
             ]
 
 
 viewGrid : Grid -> Html Msg
 viewGrid grid =
     let
+        gridState =
+            Helpers.gridState grid
+
         styles =
             [ ( "border-spacing", (toString Constants.cellSpacing) ++ "px" ) ]
     in
         table [ class "Grid", style styles ]
             [ tbody []
-                (List.indexedMap viewRow (Helpers.matrixToListsOfLists grid))
+                (List.indexedMap (viewRow gridState) (Helpers.matrixToListsOfLists grid))
             ]
 
 
-viewRow : Int -> List Cell -> Html Msg
-viewRow rowNum row =
+viewRow : GridState -> Int -> List Cell -> Html Msg
+viewRow gridState rowNum row =
     tr []
         (List.indexedMap
-            (\columnNum cell -> viewCell columnNum rowNum cell)
+            (\columnNum cell -> viewCell gridState columnNum rowNum cell)
             row
         )
 
 
-viewCell : Int -> Int -> Cell -> Html Msg
-viewCell columnNum rowNum ((Cell _ cellState) as cell) =
+viewCell : GridState -> Int -> Int -> Cell -> Html Msg
+viewCell gridState columnNum rowNum ((Cell _ cellState) as cell) =
     let
+        isClickable =
+            (gridState == NewGrid || gridState == OngoingGrid)
+                && (cellState == Unrevealed || cellState == Flagged)
+
         size =
             (toString Constants.cellSize) ++ "px"
 
-        styles =
-            [ ( "width", size )
-            , ( "height", size )
-            ]
-    in
-        td []
-            [ button
-                [ type_ "button"
-                , classList
-                    [ ( "Cell", True )
-                    , ( "Cell--revealed", cellState == Revealed )
-                    ]
-                , style styles
-                , onClick (CellClick columnNum rowNum)
+        classes =
+            classList
+                [ ( "Cell", True )
+                , ( "Cell--revealed", cellState == Revealed )
                 ]
-                [ text (Helpers.cellToString cell) ]
-            ]
+
+        styles =
+            style
+                [ ( "width", size )
+                , ( "height", size )
+                ]
+
+        textContent =
+            text (Helpers.cellToString cell)
+
+        innerElement =
+            if isClickable then
+                button
+                    [ type_ "button"
+                    , classes
+                    , styles
+                    , onClick (CellClick columnNum rowNum)
+                    ]
+                    [ textContent ]
+            else
+                span [ classes, styles ] [ textContent ]
+    in
+        td [] [ innerElement ]
 
 
 viewSizer : Grid -> Sizer -> Maybe PointerPosition -> Html Msg
@@ -190,3 +212,23 @@ viewMinesInfo numMines =
                 ]
                 []
             ]
+
+
+viewBottom : GridState -> Html Msg
+viewBottom gridState =
+    let
+        message =
+            case gridState of
+                NewGrid ->
+                    "New game"
+
+                OngoingGrid ->
+                    "TODO give up"
+
+                WonGrid ->
+                    "You won!"
+
+                LostGrid ->
+                    "You lost!"
+    in
+        p [ class "Bottom" ] [ text message ]

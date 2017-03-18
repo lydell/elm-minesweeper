@@ -67,7 +67,8 @@ type InnerCell
 type GridState
     = NewGrid
     | OngoingGrid
-    | FinishedGrid
+    | WonGrid
+    | LostGrid
 
 
 type Sizer

@@ -54,11 +54,8 @@ update msg model =
             case Helpers.gridState model.grid of
                 NewGrid ->
                     let
-                        markRevealed (Cell innerCell _) =
-                            Cell innerCell Revealed
-
                         newGrid =
-                            Matrix.update columnNum rowNum markRevealed model.grid
+                            Matrix.update columnNum rowNum Helpers.markRevealed model.grid
 
                         ( seed, gridWithMines ) =
                             Helpers.addRandomMinesAndUpdateNumbers
@@ -69,10 +66,14 @@ update msg model =
                         ( { model | seed = seed, grid = gridWithMines }, Cmd.none )
 
                 OngoingGrid ->
-                    Debug.crash "TODO OngoingGrid"
+                    let
+                        newGrid =
+                            Matrix.update columnNum rowNum Helpers.markRevealed model.grid
+                    in
+                        ( { model | grid = newGrid }, Cmd.none )
 
-                FinishedGrid ->
-                    Debug.crash "TODO FinishedGrid"
+                _ ->
+                    ( model, Cmd.none )
 
         NumMinesChange string ->
             let

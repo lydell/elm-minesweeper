@@ -60,10 +60,14 @@ input::-moz-focus-inner {
 }
 
 .Cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 0;
   border: none;
   border-radius: 0;
   background: #eee;
+  text-align: center;
   vertical-align: top;
 }
 
@@ -143,6 +147,10 @@ input::-moz-focus-inner {
 .MinesInfo {
   margin-bottom: 30px;
   text-align: center;
+}
+
+.Bottom {
+  margin-top: 30px;
 }
 
 .u-srOnly {

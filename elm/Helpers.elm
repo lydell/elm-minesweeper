@@ -145,6 +145,11 @@ calculateCellNumber columnNumber rowNumber grid =
         |> List.length
 
 
+markRevealed : Cell -> Cell
+markRevealed (Cell innerCell _) =
+    Cell innerCell Revealed
+
+
 isMine : Cell -> Bool
 isMine cell =
     case cell of
@@ -153,6 +158,16 @@ isMine cell =
 
         _ ->
             False
+
+
+isUnrevealed : Cell -> Bool
+isUnrevealed (Cell _ cellState) =
+    cellState == Unrevealed
+
+
+isFailed : Cell -> Bool
+isFailed (Cell innerCell cellState) =
+    innerCell == Mine && cellState == Revealed
 
 
 cellToString : Cell -> String
@@ -173,14 +188,21 @@ gridState grid =
     if isGridEmpty grid then
         NewGrid
     else if isGridFinished grid then
-        FinishedGrid
+        WonGrid
+    else if isGridFailed grid then
+        LostGrid
     else
         OngoingGrid
 
 
 isGridEmpty : Grid -> Bool
 isGridEmpty =
-    matrixCheckEveryElement (\(Cell _ cellState) -> cellState == Unrevealed)
+    matrixCheckEveryElement isUnrevealed
+
+
+isGridFailed : Grid -> Bool
+isGridFailed =
+    matrixCheckAnyElement isFailed
 
 
 isGridFinished : Grid -> Bool
@@ -201,13 +223,18 @@ isCellFinished (Cell innerCell cellState) =
             False
 
 
-matrixCheckEveryElement : (a -> Bool) -> Matrix a -> Bool
-matrixCheckEveryElement fn matrix =
+matrixCheckAnyElement : (a -> Bool) -> Matrix a -> Bool
+matrixCheckAnyElement fn matrix =
     let
-        nonMatchingElements =
-            Matrix.filter (not << fn) matrix
+        matchingElements =
+            Matrix.filter fn matrix
     in
-        Array.length nonMatchingElements == 0
+        Array.length matchingElements > 0
+
+
+matrixCheckEveryElement : (a -> Bool) -> Matrix a -> Bool
+matrixCheckEveryElement fn =
+    not << matrixCheckAnyElement (not << fn)
 
 
 matrixToListsOfLists : Matrix a -> List (List a)
