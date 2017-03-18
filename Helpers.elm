@@ -1,14 +1,25 @@
 module Helpers exposing (..)
 
 import Array
+import Html exposing (Attribute)
+import Html.Events
+import Json.Decode exposing (Decoder)
 import Matrix exposing (Matrix)
 import Random.Pcg as Random exposing (Seed)
-import Types exposing (Cell(Cell), Grid, InnerCell(Hint, Mine))
+import Types
+    exposing
+        ( Cell(Cell)
+        , Grid
+        , InnerCell(Hint, Mine)
+        , PointerMovement
+        , PointerPosition
+        , Sizer(Dragging)
+        )
 
 
 minWidth : number
 minWidth =
-    1
+    2
 
 
 maxWidth : number
@@ -18,7 +29,7 @@ maxWidth =
 
 minHeight : number
 minHeight =
-    1
+    2
 
 
 maxHeight : number
@@ -28,7 +39,7 @@ maxHeight =
 
 minNumMines : number
 minNumMines =
-    0
+    1
 
 
 maxNumMines : number -> number -> number
@@ -36,14 +47,49 @@ maxNumMines width height =
     width * height - 1
 
 
-cellWidth : number
-cellWidth =
-    50
+cellSize : number
+cellSize =
+    25
 
 
-cellHeight : number
-cellHeight =
-    50
+cellSpacing : number
+cellSpacing =
+    2
+
+
+sizerOffset : Int
+sizerOffset =
+    cellSize // 2
+
+
+clampWidth : Int -> Int
+clampWidth =
+    clamp minWidth maxWidth
+
+
+clampHeight : Int -> Int
+clampHeight =
+    clamp minHeight maxHeight
+
+
+clampNumMines : Int -> Int -> Int -> Int
+clampNumMines width height =
+    clamp minNumMines (maxNumMines width height)
+
+
+clampSizerWidth : Int -> Int
+clampSizerWidth =
+    clamp (calculateSizerSize minWidth) (calculateSizerSize maxWidth)
+
+
+clampSizerHeight : Int -> Int
+clampSizerHeight =
+    clamp (calculateSizerSize minHeight) (calculateSizerSize maxHeight)
+
+
+calculateSizerSize : Int -> Int
+calculateSizerSize size =
+    size * (cellSize + cellSpacing) + cellSpacing + sizerOffset * 2
 
 
 emptyCell : Cell
@@ -116,3 +162,51 @@ matrixToListsOfLists matrix =
     List.range 0 (Matrix.height matrix - 1)
         |> List.filterMap (\rowIndex -> Matrix.getRow rowIndex matrix)
         |> List.map Array.toList
+
+
+calculatePointerMovement : Sizer -> Maybe PointerPosition -> PointerMovement
+calculatePointerMovement sizer maybePointerPosition =
+    case ( sizer, maybePointerPosition ) of
+        ( Dragging dragStartData, Just pointerPosition ) ->
+            let
+                startPosition =
+                    dragStartData.pointerPosition
+            in
+                { dx = (pointerPosition.screenX - startPosition.screenX) * 2
+                , dy = (pointerPosition.screenY - startPosition.screenY)
+                }
+
+        _ ->
+            { dx = 0
+            , dy = 0
+            }
+
+
+calculateSize : Int -> Int -> Int
+calculateSize size movement =
+    size + floor ((toFloat movement) / (cellSize + cellSpacing))
+
+
+onMouseDown : (PointerPosition -> msg) -> Attribute msg
+onMouseDown tagger =
+    Html.Events.on "mousedown"
+        (Json.Decode.map tagger pointerPositionDecoder)
+
+
+onMouseMove : (PointerPosition -> msg) -> Attribute msg
+onMouseMove tagger =
+    Html.Events.on "mousemove"
+        (Json.Decode.map tagger pointerPositionDecoder)
+
+
+pointerPositionDecoder : Decoder PointerPosition
+pointerPositionDecoder =
+    Json.Decode.map2 PointerPosition
+        (Json.Decode.field "screenX" Json.Decode.int)
+        (Json.Decode.field "screenY" Json.Decode.int)
+
+
+onChange : (String -> msg) -> Attribute msg
+onChange tagger =
+    Html.Events.on "change"
+        (Json.Decode.map tagger Html.Events.targetValue)

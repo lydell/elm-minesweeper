@@ -35,6 +35,8 @@ type alias Model =
     , seed : Seed
     , numMines : Int
     , grid : Matrix Cell
+    , sizer : Sizer
+    , pointerPosition : Maybe PointerPosition
     }
 
 
@@ -62,7 +64,32 @@ type InnerCell
     | Hint Int
 
 
+type Sizer
+    = Idle
+    | Dragging DragStartData
+
+
+type alias DragStartData =
+    { pointerPosition : PointerPosition
+    , width : Int
+    , height : Int
+    }
+
+
+type alias PointerPosition =
+    { screenX : Int
+    , screenY : Int
+    }
+
+
+type alias PointerMovement =
+    { dx : Int
+    , dy : Int
+    }
+
+
 type Msg
-    = WidthInput String
-    | HeightInput String
-    | NumMinesInput String
+    = NumMinesChange String
+    | MouseDown PointerPosition
+    | MouseUp
+    | MouseMove PointerPosition

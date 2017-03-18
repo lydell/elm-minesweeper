@@ -34,14 +34,9 @@ function setupNumberInputs() {
     const input = event.target;
     const { value } = input;
     const newValue = removeNonDigits(value);
-    const number = newValue === "" ? 0 : Number(value);
-    const min = input.dataset.min ? Number(input.dataset.min) : -Infinity;
-    const max = input.dataset.max ? Number(input.dataset.max) : Infinity;
-    const newNumber = Math.max(min, Math.min(max, number));
-    const finalValue = String(newNumber);
 
-    if (finalValue !== value) {
-      input.value = finalValue;
+    if (newValue !== value) {
+      input.value = newValue;
     }
   });
 }

@@ -1,12 +1,13 @@
 module View exposing (view)
 
-import Helpers
+import Helpers exposing (onChange, onMouseDown, onMouseMove)
 import Html
     exposing
         ( Html
         , button
         , div
         , input
+        , p
         , span
         , table
         , tbody
@@ -18,11 +19,13 @@ import Html.Attributes
     exposing
         ( attribute
         , class
-        , defaultValue
+        , classList
         , style
+        , title
         , type_
+        , value
         )
-import Html.Events exposing (onInput)
+import Html.Events exposing (onInput, onMouseUp)
 import Matrix
 import Types
     exposing
@@ -30,27 +33,61 @@ import Types
         , Grid
         , Model
         , Msg
-            ( HeightInput
-            , NumMinesInput
-            , WidthInput
+            ( MouseDown
+            , MouseMove
+            , MouseUp
+            , NumMinesChange
             )
+        , PointerPosition
+        , Sizer(Dragging)
         )
 
 
 view : Model -> Html Msg
 view model =
-    div [ class "Container" ]
-        [ viewGrid model.grid
-        , viewForm model
-        ]
+    let
+        isDragging =
+            case model.sizer of
+                Dragging _ ->
+                    True
+
+                _ ->
+                    False
+
+        events =
+            if isDragging then
+                [ onMouseMove MouseMove, onMouseUp MouseUp ]
+            else
+                []
+
+        classes =
+            classList
+                [ ( "Container", True )
+                , ( "is-dragging", isDragging )
+                ]
+    in
+        div ([ classes ] ++ events)
+            [ div [ class "MinesInfo" ]
+                [ text "0 / "
+                , viewNumberInput model.numMines NumMinesChange
+                ]
+            , div [ class "GridContainer" ]
+                [ viewGrid model.grid
+                , viewSizer model.grid model.sizer model.pointerPosition
+                ]
+            ]
 
 
 viewGrid : Grid -> Html Msg
 viewGrid grid =
-    table [ class "Grid" ]
-        [ tbody []
-            (List.map viewRow (Helpers.matrixToListsOfLists grid))
-        ]
+    let
+        styles =
+            [ ( "border-spacing", (toString Helpers.cellSpacing) ++ "px" ) ]
+    in
+        table [ class "Grid", style styles ]
+            [ tbody []
+                (List.map viewRow (Helpers.matrixToListsOfLists grid))
+            ]
 
 
 viewRow : List Cell -> Html Msg
@@ -62,9 +99,12 @@ viewRow row =
 viewCell : Cell -> Html msg
 viewCell cell =
     let
+        size =
+            (toString Helpers.cellSize) ++ "px"
+
         styles =
-            [ ( "width", (toString Helpers.cellWidth) ++ "px" )
-            , ( "height", (toString Helpers.cellHeight) ++ "px" )
+            [ ( "width", size )
+            , ( "height", size )
             ]
     in
         td []
@@ -73,49 +113,68 @@ viewCell cell =
             ]
 
 
-viewForm : Model -> Html Msg
-viewForm model =
+viewSizer : Grid -> Sizer -> Maybe PointerPosition -> Html Msg
+viewSizer grid sizer maybePointerPosition =
     let
-        width =
-            Matrix.width model.grid
+        gridWidth =
+            Matrix.width grid
 
-        height =
-            Matrix.height model.grid
-    in
-        div [ class "Form" ]
-            [ viewNumberInput width
-                Helpers.minWidth
-                Helpers.maxWidth
-                WidthInput
-            , text "×"
-            , viewNumberInput height
-                Helpers.minHeight
-                Helpers.maxHeight
-                HeightInput
-            , text "with"
-            , viewNumberInput model.numMines
-                Helpers.minNumMines
-                (Helpers.maxNumMines width height)
-                NumMinesInput
+        gridHeight =
+            Matrix.height grid
+
+        { width, height } =
+            case sizer of
+                Dragging { width, height } ->
+                    { width = width, height = height }
+
+                _ ->
+                    { width = gridWidth, height = gridHeight }
+
+        pointerMovement =
+            Helpers.calculatePointerMovement sizer maybePointerPosition
+
+        newWidth =
+            (Helpers.calculateSizerSize width + pointerMovement.dx)
+                |> Helpers.clampSizerWidth
+
+        newHeight =
+            (Helpers.calculateSizerSize height + pointerMovement.dy)
+                |> Helpers.clampSizerHeight
+
+        styles =
+            [ ( "top", toString -Helpers.sizerOffset ++ "px" )
+            , ( "width", toString newWidth ++ "px" )
+            , ( "height", toString newHeight ++ "px" )
             ]
 
+        buttonSize =
+            toString Helpers.cellSize ++ "px"
 
-viewNumberInput : Int -> Int -> Int -> (String -> Msg) -> Html Msg
-viewNumberInput defaultValue_ minValue maxValue tagger =
-    let
-        styles =
-            [ ( "width", toString (String.length (toString defaultValue_)) ++ "ch" ) ]
+        buttonStyles =
+            [ ( "width", buttonSize )
+            , ( "height", buttonSize )
+            ]
     in
-        span [ class "NumberInput" ]
-            [ input
-                [ type_ "tel"
-                , defaultValue (toString defaultValue_)
-                , attribute "data-min" (toString minValue)
-                , attribute "data-max" (toString maxValue)
-                , onInput tagger
-                , class "NumberInput-input"
-                , style styles
+        div [ class "Sizer", style styles ]
+            [ p [ class "Sizer-dimensions" ]
+                [ text (toString gridWidth ++ "×" ++ toString gridHeight)
+                ]
+            , button
+                [ type_ "button"
+                , class "Sizer-button"
+                , title "Drag to resize the grid"
+                , style buttonStyles
+                , onMouseDown MouseDown
                 ]
                 []
-            , text (toString minValue ++ "–" ++ toString maxValue)
             ]
+
+
+viewNumberInput : Int -> (String -> Msg) -> Html Msg
+viewNumberInput value_ tagger =
+    input
+        [ type_ "tel"
+        , value (toString value_)
+        , onChange tagger
+        ]
+        []

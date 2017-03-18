@@ -12,7 +12,13 @@ import Types
         , Grid
         , InnerCell(Hint, Mine)
         , Model
-        , Msg(HeightInput, NumMinesInput, WidthInput)
+        , Msg
+            ( NumMinesChange
+            , MouseDown
+            , MouseUp
+            , MouseMove
+            )
+        , Sizer(Dragging, Idle)
         )
 import View exposing (view)
 
@@ -47,6 +53,8 @@ init flags =
             , seed = newSeed
             , numMines = numMines
             , grid = grid
+            , sizer = Idle
+            , pointerPosition = Nothing
             }
     in
         ( initialModel, Cmd.none )
@@ -55,35 +63,7 @@ init flags =
 update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
     case msg of
-        WidthInput string ->
-            let
-                width =
-                    Result.withDefault 0 (String.toInt string)
-                        |> clamp Helpers.minWidth Helpers.maxWidth
-
-                height =
-                    Matrix.height model.grid
-
-                grid =
-                    Helpers.createEmptyGrid width height
-            in
-                ( { model | grid = grid }, Cmd.none )
-
-        HeightInput string ->
-            let
-                width =
-                    Matrix.width model.grid
-
-                height =
-                    Result.withDefault 0 (String.toInt string)
-                        |> clamp Helpers.minHeight Helpers.maxHeight
-
-                grid =
-                    Helpers.createEmptyGrid width height
-            in
-                ( { model | grid = grid }, Cmd.none )
-
-        NumMinesInput string ->
+        NumMinesChange string ->
             let
                 width =
                     Matrix.width model.grid
@@ -93,6 +73,57 @@ update msg model =
 
                 numMines =
                     Result.withDefault 0 (String.toInt string)
-                        |> clamp Helpers.minNumMines (Helpers.maxNumMines width height)
+                        |> Helpers.clampNumMines width height
             in
                 ( { model | numMines = numMines }, Cmd.none )
+
+        MouseDown pointerPosition ->
+            ( { model
+                | sizer =
+                    Dragging
+                        { pointerPosition = pointerPosition
+                        , width = Matrix.width model.grid
+                        , height = Matrix.height model.grid
+                        }
+                , pointerPosition = Just pointerPosition
+              }
+            , Cmd.none
+            )
+
+        MouseUp ->
+            ( { model | sizer = Idle, pointerPosition = Nothing }, Cmd.none )
+
+        MouseMove pointerPosition ->
+            let
+                { width, height } =
+                    case model.sizer of
+                        Dragging { width, height } ->
+                            { width = width, height = height }
+
+                        _ ->
+                            { width = Matrix.width model.grid
+                            , height = Matrix.height model.grid
+                            }
+
+                pointerMovement =
+                    Helpers.calculatePointerMovement
+                        model.sizer
+                        (Just pointerPosition)
+
+                newWidth =
+                    Helpers.calculateSize width pointerMovement.dx
+                        |> Helpers.clampWidth
+
+                newHeight =
+                    Helpers.calculateSize height pointerMovement.dy
+                        |> Helpers.clampHeight
+
+                grid =
+                    Helpers.createEmptyGrid newWidth newHeight
+            in
+                ( { model
+                    | grid = grid
+                    , pointerPosition = Just pointerPosition
+                  }
+                , Cmd.none
+                )

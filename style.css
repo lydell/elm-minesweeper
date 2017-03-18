@@ -10,42 +10,144 @@ body {
   margin: 0;
 }
 
+p {
+  margin: 0;
+}
+
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
 .Container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   padding: 100px;
 }
 
+.Container.is-dragging {
+  cursor: nwse-resize;
+}
+
+.GridContainer {
+  position: relative;
+}
+
 .Grid {
   table-layout: fixed;
+  position: relative;
+  z-index: 2;
+}
+
+.Grid td {
+  padding: 0;
 }
 
 .Cell {
   padding: 0;
   border: none;
-  border-radius: none;
+  border-radius: 0;
   background: #eee;
 }
 
-.Form {
-  display: flex;
-  align-items: baseline;
-  margin-top: 200px;
+.Sizer {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1px solid currentColor;
+  color: #eee;
+  overflow: hidden;
+  transition-property: color, border-color;
+  transition-duration: 200ms;
 }
 
-.NumberInput {
-  display: flex;
-  flex-direction: column;
+.Container:not(.is-dragging) .Sizer {
+  transition-property: width, height;
+  transition-duration: 400ms;
 }
 
-.NumberInput-input {
-  min-width: 100%;
+.Container.is-dragging .Sizer {
+  z-index: 4;
+}
+
+.Sizer-dimensions {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0.5em 1em;
+  background-color: white;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 200ms;
+}
+
+.Container.is-dragging .Sizer-dimensions {
+  opacity: 1;
+}
+
+.Sizer-button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: translate(50%, 50%) rotate(45deg);
   padding: 0;
+  margin: 0;
   border: none;
-  border-bottom: 1px solid;
   border-radius: 0;
+  background: none;
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      currentColor,
+      currentColor 8.33%,
+      transparent 0,
+      transparent 16.66%
+    );
+  color: inherit;
+  cursor: nwse-resize;
+  transition-property: color;
+  transition-duration: 200ms;
+}
+
+.Container.is-dragging .Sizer,
+.Sizer-button:hover,
+.Sizer-button:focus,
+.Sizer-button:active {
+  color: black;
+  outline: none;
+}
+
+.MinesInfo {
+  margin-bottom: 30px;
   text-align: center;
+}
+
+.u-srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: none;
+  white-space: nowrap;
 }
