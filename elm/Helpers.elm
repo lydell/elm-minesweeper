@@ -8,6 +8,7 @@ import Json.Decode exposing (Decoder)
 import Matrix exposing (Matrix)
 import Matrix.Extra
 import Random.Pcg as Random exposing (Seed)
+import Set exposing (Set)
 import Types exposing (..)
 
 
@@ -145,9 +146,65 @@ calculateCellNumber columnNumber rowNumber grid =
         |> List.length
 
 
+reveal : Int -> Int -> Grid -> Grid
+reveal columnNum rowNum grid =
+    let
+        maybeCell =
+            Matrix.get columnNum rowNum grid
+    in
+        case maybeCell of
+            Just (Cell (Hint 0) _) ->
+                recursivelyReveal columnNum rowNum grid
+
+            Just _ ->
+                Matrix.update columnNum rowNum markRevealed grid
+
+            Nothing ->
+                grid
+
+
 markRevealed : Cell -> Cell
 markRevealed (Cell innerCell _) =
     Cell innerCell Revealed
+
+
+recursivelyReveal : Int -> Int -> Grid -> Grid
+recursivelyReveal columnNum rowNum grid =
+    let
+        ( _, newGrid ) =
+            recursivelyRevealHelper Set.empty columnNum rowNum grid
+    in
+        newGrid
+
+
+recursivelyRevealHelper : Set ( Int, Int ) -> Int -> Int -> Grid -> ( Set ( Int, Int ), Grid )
+recursivelyRevealHelper visitedCoords columnNum rowNum grid =
+    if Set.member ( columnNum, rowNum ) visitedCoords then
+        ( visitedCoords, grid )
+    else
+        let
+            maybeCell =
+                Matrix.get columnNum rowNum grid
+        in
+            case maybeCell of
+                Just (Cell (Hint 0) _) ->
+                    let
+                        newGrid =
+                            Matrix.update columnNum rowNum markRevealed grid
+
+                        newVisitedCoords =
+                            Set.insert ( columnNum, rowNum ) visitedCoords
+
+                        neighbours =
+                            Matrix.Extra.indexedNeighbours columnNum rowNum newGrid
+
+                        markNeighbour ( ( x, y ), _ ) ( icoords, igrid ) =
+                            recursivelyRevealHelper icoords x y igrid
+                    in
+                        List.foldl markNeighbour ( newVisitedCoords, newGrid ) neighbours
+
+                _ ->
+                    ( visitedCoords, grid )
 
 
 isMine : Cell -> Bool

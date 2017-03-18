@@ -62,13 +62,16 @@ update msg model =
                                 model.numMines
                                 model.seed
                                 newGrid
+
+                        finalGrid =
+                            Helpers.reveal columnNum rowNum gridWithMines
                     in
-                        ( { model | seed = seed, grid = gridWithMines }, Cmd.none )
+                        ( { model | seed = seed, grid = finalGrid }, Cmd.none )
 
                 OngoingGrid ->
                     let
                         newGrid =
-                            Matrix.update columnNum rowNum Helpers.markRevealed model.grid
+                            Helpers.reveal columnNum rowNum model.grid
                     in
                         ( { model | grid = newGrid }, Cmd.none )
 
