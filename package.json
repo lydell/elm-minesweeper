@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "elm-live Main.elm --output=elm.js --open -- --debug"
+    "start": "elm-live elm/Main.elm --output=elm.js --open -- --debug"
   },
   "devDependencies": {
     "elm": "^0.18.0",
