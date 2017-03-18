@@ -7,15 +7,7 @@ import Html.Events
 import Json.Decode exposing (Decoder)
 import Matrix exposing (Matrix)
 import Random.Pcg as Random exposing (Seed)
-import Types
-    exposing
-        ( Cell(Cell)
-        , Grid
-        , InnerCell(Hint, Mine)
-        , PointerMovement
-        , PointerPosition
-        , Sizer(Dragging)
-        )
+import Types exposing (..)
 
 
 maxNumMines : number -> number -> number

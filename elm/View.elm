@@ -28,20 +28,7 @@ import Html.Attributes
         )
 import Html.Events exposing (onInput, onMouseUp)
 import Matrix
-import Types
-    exposing
-        ( Cell
-        , Grid
-        , Model
-        , Msg
-            ( MouseDown
-            , MouseMove
-            , MouseUp
-            , NumMinesChange
-            )
-        , PointerPosition
-        , Sizer(Dragging)
-        )
+import Types exposing (..)
 
 
 view : Model -> Html Msg

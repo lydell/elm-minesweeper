@@ -4,22 +4,7 @@ import Helpers
 import Html
 import Matrix
 import Random.Pcg as Random
-import Types
-    exposing
-        ( Cell(Cell)
-        , Flags
-        , GameState(NewGame)
-        , Grid
-        , InnerCell(Hint, Mine)
-        , Model
-        , Msg
-            ( NumMinesChange
-            , MouseDown
-            , MouseUp
-            , MouseMove
-            )
-        , Sizer(Dragging, Idle)
-        )
+import Types exposing (..)
 import View exposing (view)
 
 
