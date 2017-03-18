@@ -32,7 +32,8 @@ input::-moz-focus-inner {
   border: 0;
   padding: 0;
 }
-.Container {
+
+.Root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -41,7 +42,7 @@ input::-moz-focus-inner {
   padding: 100px;
 }
 
-.Container.is-dragging {
+.Root.is-dragging {
   cursor: nwse-resize;
 }
 
@@ -87,12 +88,12 @@ input::-moz-focus-inner {
   transition-duration: 200ms;
 }
 
-.Container:not(.is-dragging) .Sizer {
+.Root:not(.is-dragging) .Sizer {
   transition-property: width, height;
   transition-duration: 400ms;
 }
 
-.Container.is-dragging .Sizer {
+.Root.is-dragging .Sizer {
   z-index: 4;
 }
 
@@ -104,12 +105,6 @@ input::-moz-focus-inner {
   padding: 0.5em 1em;
   background-color: white;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
-  opacity: 0;
-  transition: opacity 200ms;
-}
-
-.Container.is-dragging .Sizer-dimensions {
-  opacity: 1;
 }
 
 .Sizer-button {
@@ -136,7 +131,7 @@ input::-moz-focus-inner {
   transition-duration: 200ms;
 }
 
-.Container.is-dragging .Sizer,
+.Root.is-dragging .Sizer,
 .Sizer-button:hover,
 .Sizer-button:focus,
 .Sizer-button:active {

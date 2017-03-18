@@ -1,11 +1,16 @@
 module Main exposing (..)
 
-import Helpers
+import Grid
 import Html
 import Matrix
 import Random.Pcg as Random
 import Types exposing (..)
 import View exposing (view)
+
+
+type alias Flags =
+    { randomSeed : Int
+    }
 
 
 main : Program Flags Model Msg
@@ -28,12 +33,12 @@ init flags =
             10
 
         emptyGrid =
-            Helpers.createEmptyGrid 9 9
+            Grid.defaultGrid 9 9
 
         -- It is not needed to add mines and all at this point, but it makes
         -- debugging easier.
         ( newSeed, grid ) =
-            Helpers.addRandomMinesAndUpdateNumbers numMines seed emptyGrid
+            Grid.addRandomMinesAndUpdateNumbers numMines seed emptyGrid
 
         initialModel =
             { state = RegularGame
@@ -50,28 +55,28 @@ init flags =
 update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
     case msg of
-        CellClick columnNum rowNum ->
-            case Helpers.gridState model.grid of
+        CellClick x y ->
+            case Grid.gridState model.grid of
                 NewGrid ->
                     let
                         newGrid =
-                            Matrix.update columnNum rowNum Helpers.markRevealed model.grid
+                            Grid.revealSingle x y model.grid
 
                         ( seed, gridWithMines ) =
-                            Helpers.addRandomMinesAndUpdateNumbers
+                            Grid.addRandomMinesAndUpdateNumbers
                                 model.numMines
                                 model.seed
                                 newGrid
 
                         finalGrid =
-                            Helpers.reveal columnNum rowNum gridWithMines
+                            Grid.reveal x y gridWithMines
                     in
                         ( { model | seed = seed, grid = finalGrid }, Cmd.none )
 
                 OngoingGrid ->
                     let
                         newGrid =
-                            Helpers.reveal columnNum rowNum model.grid
+                            Grid.reveal x y model.grid
                     in
                         ( { model | grid = newGrid }, Cmd.none )
 
@@ -88,7 +93,7 @@ update msg model =
 
                 numMines =
                     Result.withDefault 0 (String.toInt string)
-                        |> Helpers.clampNumMines width height
+                        |> Grid.clampNumMines width height
             in
                 ( { model | numMines = numMines }, Cmd.none )
 
@@ -121,23 +126,23 @@ update msg model =
                             }
 
                 pointerMovement =
-                    Helpers.calculatePointerMovement
+                    Grid.pointerMovement
                         model.sizer
                         (Just pointerPosition)
 
                 newWidth =
-                    Helpers.calculateSize width pointerMovement.dx
-                        |> Helpers.clampWidth
+                    Grid.gridSize width pointerMovement.dx
+                        |> Grid.clampWidth
 
                 newHeight =
-                    Helpers.calculateSize height pointerMovement.dy
-                        |> Helpers.clampHeight
+                    Grid.gridSize height pointerMovement.dy
+                        |> Grid.clampHeight
 
                 grid =
-                    Helpers.createEmptyGrid newWidth newHeight
+                    Grid.defaultGrid newWidth newHeight
 
                 numMines =
-                    Helpers.clampNumMines newWidth newHeight model.numMines
+                    Grid.clampNumMines newWidth newHeight model.numMines
             in
                 ( { model
                     | grid = grid

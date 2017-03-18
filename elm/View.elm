@@ -1,7 +1,6 @@
 module View exposing (view)
 
-import Constants
-import Helpers exposing (onChange, onMouseDown, onMouseMove)
+import Grid
 import Html
     exposing
         ( Html
@@ -27,7 +26,15 @@ import Html.Attributes
         , value
         )
 import Html.Events exposing (onClick, onInput, onMouseUp)
+import Html.Events.Custom
+    exposing
+        ( onChange
+        , onMouseDown
+        , onMouseMove
+        , PointerPosition
+        )
 import Matrix
+import Matrix.Custom
 import Types exposing (..)
 
 
@@ -35,15 +42,10 @@ view : Model -> Html Msg
 view model =
     let
         gridState =
-            Helpers.gridState model.grid
+            Grid.gridState model.grid
 
         isDragging =
-            case model.sizer of
-                Dragging _ ->
-                    True
-
-                _ ->
-                    False
+            Grid.isDragging model.sizer
 
         events =
             if isDragging then
@@ -53,7 +55,7 @@ view model =
 
         classes =
             classList
-                [ ( "Container", True )
+                [ ( "Root", True )
                 , ( "is-dragging", isDragging )
                 ]
     in
@@ -71,35 +73,38 @@ viewGrid : Grid -> Html Msg
 viewGrid grid =
     let
         gridState =
-            Helpers.gridState grid
+            Grid.gridState grid
 
         styles =
-            [ ( "border-spacing", (toString Constants.cellSpacing) ++ "px" ) ]
+            [ ( "border-spacing", toString Grid.cellSpacing ++ "px" ) ]
     in
         table [ class "Grid", style styles ]
             [ tbody []
-                (List.indexedMap (viewRow gridState) (Helpers.matrixToListsOfLists grid))
+                (List.indexedMap
+                    (viewRow gridState)
+                    (Matrix.Custom.toListOfLists grid)
+                )
             ]
 
 
 viewRow : GridState -> Int -> List Cell -> Html Msg
-viewRow gridState rowNum row =
+viewRow gridState y row =
     tr []
         (List.indexedMap
-            (\columnNum cell -> viewCell gridState columnNum rowNum cell)
+            (\x cell -> viewCell gridState x y cell)
             row
         )
 
 
 viewCell : GridState -> Int -> Int -> Cell -> Html Msg
-viewCell gridState columnNum rowNum ((Cell _ cellState) as cell) =
+viewCell gridState x y ((Cell cellState _) as cell) =
     let
         isClickable =
             (gridState == NewGrid || gridState == OngoingGrid)
                 && (cellState == Unrevealed || cellState == Flagged)
 
         size =
-            (toString Constants.cellSize) ++ "px"
+            toString Grid.cellSize ++ "px"
 
         classes =
             classList
@@ -114,7 +119,7 @@ viewCell gridState columnNum rowNum ((Cell _ cellState) as cell) =
                 ]
 
         textContent =
-            text (Helpers.cellToString cell)
+            text (Grid.cellToString cell)
 
         innerElement =
             if isClickable then
@@ -122,7 +127,7 @@ viewCell gridState columnNum rowNum ((Cell _ cellState) as cell) =
                     [ type_ "button"
                     , classes
                     , styles
-                    , onClick (CellClick columnNum rowNum)
+                    , onClick (CellClick x y)
                     ]
                     [ textContent ]
             else
@@ -134,6 +139,9 @@ viewCell gridState columnNum rowNum ((Cell _ cellState) as cell) =
 viewSizer : Grid -> Sizer -> Maybe PointerPosition -> Html Msg
 viewSizer grid sizer maybePointerPosition =
     let
+        isDragging =
+            Grid.isDragging sizer
+
         gridWidth =
             Matrix.width grid
 
@@ -149,35 +157,41 @@ viewSizer grid sizer maybePointerPosition =
                     { width = gridWidth, height = gridHeight }
 
         pointerMovement =
-            Helpers.calculatePointerMovement sizer maybePointerPosition
+            Grid.pointerMovement sizer maybePointerPosition
 
         newWidth =
-            (Helpers.calculateSizerSize width + pointerMovement.dx)
-                |> Helpers.clampSizerWidth
+            (Grid.sizerSize width + pointerMovement.dx)
+                |> Grid.clampSizerWidth
 
         newHeight =
-            (Helpers.calculateSizerSize height + pointerMovement.dy)
-                |> Helpers.clampSizerHeight
+            (Grid.sizerSize height + pointerMovement.dy)
+                |> Grid.clampSizerHeight
 
         styles =
-            [ ( "top", toString -Constants.sizerOffset ++ "px" )
+            [ ( "top", toString -Grid.sizerOffset ++ "px" )
             , ( "width", toString newWidth ++ "px" )
             , ( "height", toString newHeight ++ "px" )
             ]
 
+        dimensions =
+            if isDragging then
+                [ p [ class "Sizer-dimensions", attribute "aria-label" "Grid size" ]
+                    [ text (toString gridWidth ++ "×" ++ toString gridHeight)
+                    ]
+                ]
+            else
+                []
+
         buttonSize =
-            toString Constants.cellSize ++ "px"
+            toString Grid.cellSize ++ "px"
 
         buttonStyles =
             [ ( "width", buttonSize )
             , ( "height", buttonSize )
             ]
-    in
-        div [ class "Sizer", style styles ]
-            [ p [ class "Sizer-dimensions" ]
-                [ text (toString gridWidth ++ "×" ++ toString gridHeight)
-                ]
-            , button
+
+        resizerButton =
+            button
                 [ type_ "button"
                 , class "Sizer-button"
                 , title "Drag to resize the grid"
@@ -185,14 +199,16 @@ viewSizer grid sizer maybePointerPosition =
                 , onMouseDown MouseDown
                 ]
                 []
-            ]
+    in
+        div [ class "Sizer", style styles ]
+            (dimensions ++ [ resizerButton ])
 
 
 viewMinesInfo : Int -> Html Msg
 viewMinesInfo numMines =
     let
         absoluteMaxNumMines =
-            Helpers.maxNumMines Constants.maxWidth Constants.maxHeight
+            Grid.maxNumMines Grid.maxWidth Grid.maxHeight
 
         maxWidth =
             absoluteMaxNumMines |> toString |> String.length
