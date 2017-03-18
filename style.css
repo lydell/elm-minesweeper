@@ -64,6 +64,11 @@ input::-moz-focus-inner {
   border: none;
   border-radius: 0;
   background: #eee;
+  vertical-align: top;
+}
+
+.Cell--revealed {
+  background-color: transparent;
 }
 
 .Sizer {

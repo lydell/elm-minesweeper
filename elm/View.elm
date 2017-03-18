@@ -26,7 +26,7 @@ import Html.Attributes
         , type_
         , value
         )
-import Html.Events exposing (onInput, onMouseUp)
+import Html.Events exposing (onClick, onInput, onMouseUp)
 import Matrix
 import Types exposing (..)
 
@@ -71,18 +71,21 @@ viewGrid grid =
     in
         table [ class "Grid", style styles ]
             [ tbody []
-                (List.map viewRow (Helpers.matrixToListsOfLists grid))
+                (List.indexedMap viewRow (Helpers.matrixToListsOfLists grid))
             ]
 
 
-viewRow : List Cell -> Html Msg
-viewRow row =
+viewRow : Int -> List Cell -> Html Msg
+viewRow rowNum row =
     tr []
-        (List.map viewCell row)
+        (List.indexedMap
+            (\columnNum cell -> viewCell columnNum rowNum cell)
+            row
+        )
 
 
-viewCell : Cell -> Html msg
-viewCell cell =
+viewCell : Int -> Int -> Cell -> Html Msg
+viewCell columnNum rowNum ((Cell _ cellState) as cell) =
     let
         size =
             (toString Constants.cellSize) ++ "px"
@@ -93,7 +96,15 @@ viewCell cell =
             ]
     in
         td []
-            [ button [ type_ "button", class "Cell", style styles ]
+            [ button
+                [ type_ "button"
+                , classList
+                    [ ( "Cell", True )
+                    , ( "Cell--revealed", cellState == Revealed )
+                    ]
+                , style styles
+                , onClick (CellClick columnNum rowNum)
+                ]
                 [ text (Helpers.cellToString cell) ]
             ]
 

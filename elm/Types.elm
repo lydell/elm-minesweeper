@@ -41,9 +41,8 @@ type alias Model =
 
 
 type GameState
-    = NewGame
-    | OngoingGame
-    | FinishedGame Bool
+    = RegularGame
+    | GivenUp
 
 
 type alias Grid =
@@ -51,17 +50,24 @@ type alias Grid =
 
 
 type Cell
-    = Cell InnerCell CellData
+    = Cell InnerCell CellState
 
 
-type alias CellData =
-    { revealed : Bool
-    }
+type CellState
+    = Unrevealed
+    | Revealed
+    | Flagged
 
 
 type InnerCell
     = Mine
     | Hint Int
+
+
+type GridState
+    = NewGrid
+    | OngoingGrid
+    | FinishedGrid
 
 
 type Sizer
@@ -93,3 +99,4 @@ type Msg
     | MouseDown PointerPosition
     | MouseUp
     | MouseMove PointerPosition
+    | CellClick Int Int

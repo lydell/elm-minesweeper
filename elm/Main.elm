@@ -30,14 +30,11 @@ init flags =
         emptyGrid =
             Helpers.createEmptyGrid 9 9
 
-        ( newSeed, grid ) =
-            Helpers.addRandomMines numMines seed emptyGrid
-
         initialModel =
-            { state = NewGame
-            , seed = newSeed
+            { state = RegularGame
+            , seed = seed
             , numMines = numMines
-            , grid = grid
+            , grid = emptyGrid
             , sizer = Idle
             , pointerPosition = Nothing
             }
@@ -48,6 +45,27 @@ init flags =
 update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
     case msg of
+        CellClick columnNum rowNum ->
+            case Helpers.gridState model.grid of
+                NewGrid ->
+                    let
+                        markRevealed (Cell innerCell _) =
+                            Cell innerCell Revealed
+
+                        newGrid =
+                            Matrix.update columnNum rowNum markRevealed model.grid
+
+                        ( seed, gridWithMines ) =
+                            Helpers.addRandomMines model.numMines model.seed newGrid
+                    in
+                        ( { model | seed = seed, grid = gridWithMines }, Cmd.none )
+
+                OngoingGrid ->
+                    Debug.crash "TODO OngoingGrid"
+
+                FinishedGrid ->
+                    Debug.crash "TODO FinishedGrid"
+
         NumMinesChange string ->
             let
                 width =

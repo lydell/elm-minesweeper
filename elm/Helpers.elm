@@ -53,7 +53,7 @@ calculateSizerSize size =
 
 emptyCell : Cell
 emptyCell =
-    Cell (Hint 0) { revealed = False }
+    Cell (Hint 0) Unrevealed
 
 
 createEmptyGrid : Int -> Int -> Grid
@@ -78,7 +78,7 @@ addRandomMine seed grid =
     let
         isAvailable ( x, y ) =
             case Matrix.get x y grid of
-                Just (Cell (Hint _) _) ->
+                Just (Cell (Hint _) Unrevealed) ->
                     True
 
                 _ ->
@@ -113,7 +113,51 @@ cellToString cell =
             "X"
 
         Cell (Hint num) _ ->
-            toString num
+            if num == 0 then
+                ""
+            else
+                toString num
+
+
+gridState : Grid -> GridState
+gridState grid =
+    if isGridEmpty grid then
+        NewGrid
+    else if isGridFinished grid then
+        FinishedGrid
+    else
+        OngoingGrid
+
+
+isGridEmpty : Grid -> Bool
+isGridEmpty grid =
+    let
+        nonEmptyElements =
+            Matrix.filter (\(Cell _ cellState) -> cellState /= Unrevealed) grid
+    in
+        Array.length nonEmptyElements == 0
+
+
+isGridFinished : Grid -> Bool
+isGridFinished grid =
+    let
+        unfinshedElements =
+            Matrix.filter (not << isCellFinished) grid
+    in
+        Array.length unfinshedElements == 0
+
+
+isCellFinished : Cell -> Bool
+isCellFinished (Cell innerCell cellState) =
+    case ( innerCell, cellState ) of
+        ( Mine, Flagged ) ->
+            True
+
+        ( Hint _, Revealed ) ->
+            True
+
+        _ ->
+            False
 
 
 matrixToListsOfLists : Matrix a -> List (List a)
