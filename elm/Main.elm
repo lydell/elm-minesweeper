@@ -30,11 +30,16 @@ init flags =
         emptyGrid =
             Helpers.createEmptyGrid 9 9
 
+        -- It is not needed to add mines and all at this point, but it makes
+        -- debugging easier.
+        ( newSeed, grid ) =
+            Helpers.addRandomMinesAndUpdateNumbers numMines seed emptyGrid
+
         initialModel =
             { state = RegularGame
-            , seed = seed
+            , seed = newSeed
             , numMines = numMines
-            , grid = emptyGrid
+            , grid = grid
             , sizer = Idle
             , pointerPosition = Nothing
             }
@@ -56,7 +61,10 @@ update msg model =
                             Matrix.update columnNum rowNum markRevealed model.grid
 
                         ( seed, gridWithMines ) =
-                            Helpers.addRandomMines model.numMines model.seed newGrid
+                            Helpers.addRandomMinesAndUpdateNumbers
+                                model.numMines
+                                model.seed
+                                newGrid
                     in
                         ( { model | seed = seed, grid = gridWithMines }, Cmd.none )
 

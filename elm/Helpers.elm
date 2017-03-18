@@ -6,6 +6,7 @@ import Html exposing (Attribute)
 import Html.Events
 import Json.Decode exposing (Decoder)
 import Matrix exposing (Matrix)
+import Matrix.Extra
 import Random.Pcg as Random exposing (Seed)
 import Types exposing (..)
 
@@ -104,6 +105,54 @@ addRandomMine seed grid =
             Matrix.update x y turnToMine grid
     in
         ( newSeed, newGrid )
+
+
+addRandomMinesAndUpdateNumbers : Int -> Seed -> Grid -> ( Seed, Grid )
+addRandomMinesAndUpdateNumbers numMines seed grid =
+    let
+        ( newSeed, gridWithMines ) =
+            addRandomMines numMines seed grid
+
+        finalGrid =
+            updateGridNumbers gridWithMines
+    in
+        ( newSeed, finalGrid )
+
+
+updateGridNumbers : Grid -> Grid
+updateGridNumbers grid =
+    Matrix.indexedMap (updateCellNumber grid) grid
+
+
+updateCellNumber : Grid -> Int -> Int -> Cell -> Cell
+updateCellNumber grid columnNumber rowNumber cell =
+    case cell of
+        Cell Mine _ ->
+            cell
+
+        Cell (Hint _) cellState ->
+            let
+                number =
+                    calculateCellNumber columnNumber rowNumber grid
+            in
+                Cell (Hint number) cellState
+
+
+calculateCellNumber : Int -> Int -> Grid -> Int
+calculateCellNumber columnNumber rowNumber grid =
+    Matrix.Extra.neighbours columnNumber rowNumber grid
+        |> List.filter isMine
+        |> List.length
+
+
+isMine : Cell -> Bool
+isMine cell =
+    case cell of
+        Cell Mine _ ->
+            True
+
+        _ ->
+            False
 
 
 cellToString : Cell -> String
