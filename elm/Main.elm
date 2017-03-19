@@ -76,7 +76,7 @@ update msg model =
                             Grid.addRandomMinesAndUpdateNumbers
                                 model.numMines
                                 (Set.singleton ( x, y ))
-                                ( model.seed, model.grid )
+                                ( model.seed, Grid.reset model.grid )
 
                         finalGrid =
                             Grid.reveal x y gridWithMines
@@ -102,7 +102,7 @@ update msg model =
                             Grid.addRandomMinesAndUpdateNumbers
                                 model.numMines
                                 (Set.singleton ( x, y ))
-                                ( model.seed, model.grid )
+                                ( model.seed, Grid.reset model.grid )
                     in
                         ( { model | seed = seed, grid = gridWithMines }, Cmd.none )
 
