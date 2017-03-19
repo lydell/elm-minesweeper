@@ -39,6 +39,44 @@ maxNumMines width height =
     width * height - 1
 
 
+{-| Suggests a number of mines for a given size of the grid.
+
+The original game has these presets:
+
+preset       | width | height | # cells | # mines
+:------------|------:|-------:|--------:|-------:
+Beginner     |     9 |      9 |      81 |     10
+Intermediate |    16 |     16 |     256 |     40
+Expert       |    30 |     16 |     480 |     99
+
+The number of mines can be described as a function of the number of cells:
+
+    y(x) = ax² + bx + c
+
+Solving the following equation system gives the values of a, b and c:
+
+    y(81) = 10
+    y(256) = 40
+    y(480) = 99
+-}
+suggestNumMines : Int -> Int -> Int
+suggestNumMines width height =
+    let
+        a =
+            103 / 446880
+
+        b =
+            41897 / 446880
+
+        c =
+            832 / 931
+
+        x =
+            toFloat (width * height)
+    in
+        a * x ^ 2 + b * x + c |> round |> clampNumMines width height
+
+
 cellSize : Int
 cellSize =
     25

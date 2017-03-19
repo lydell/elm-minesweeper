@@ -29,11 +29,17 @@ init flags =
         seed =
             Random.initialSeed flags.randomSeed
 
+        width =
+            9
+
+        height =
+            9
+
         numMines =
-            10
+            Grid.suggestNumMines width height
 
         emptyGrid =
-            Grid.defaultGrid 9 9
+            Grid.defaultGrid width height
 
         -- It is not needed to add mines and all at this point, but it makes
         -- debugging easier.
@@ -142,7 +148,7 @@ update msg model =
                     Grid.defaultGrid newWidth newHeight
 
                 numMines =
-                    Grid.clampNumMines newWidth newHeight model.numMines
+                    Grid.suggestNumMines newWidth newHeight
             in
                 ( { model
                     | grid = grid
