@@ -37,7 +37,7 @@ type CellInner
 
 
 type alias CellContent =
-    ( String, Html Msg, Bool )
+    ( String, Html Msg )
 
 
 type GridState

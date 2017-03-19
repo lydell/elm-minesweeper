@@ -22,166 +22,6 @@ import Html.Events.Custom exposing (onRightClick)
 import Types exposing (..)
 
 
-mineEmoji : String
-mineEmoji =
-    "💣"
-
-
-flagEmoji : String
-flagEmoji =
-    "🚩"
-
-
-questionMarkEmoji : String
-questionMarkEmoji =
-    "❓"
-
-
-whiteQuestionMarkEmoji : String
-whiteQuestionMarkEmoji =
-    "❔"
-
-
-crossEmoji : String
-crossEmoji =
-    "❌"
-
-
-secret : CellContent
-secret =
-    ( "Secret", text "", False )
-
-
-hint : Int -> CellContent
-hint number =
-    ( toString number, text (toString number), False )
-
-
-flag : CellContent
-flag =
-    ( "Flag", text flagEmoji, True )
-
-
-correctFlag : CellContent
-correctFlag =
-    ( "Correct flag", overlay mineEmoji flagEmoji, True )
-
-
-incorrectFlag : CellContent
-incorrectFlag =
-    ( "Incorrect flag", overlay mineEmoji crossEmoji, True )
-
-
-questionMark : CellContent
-questionMark =
-    ( "Unsure", text questionMarkEmoji, True )
-
-
-correctQuestionMark : CellContent
-correctQuestionMark =
-    ( "Correct question mark", overlay mineEmoji whiteQuestionMarkEmoji, True )
-
-
-inCorrectQuestionMark : CellContent
-inCorrectQuestionMark =
-    ( "Inorrect question mark", text whiteQuestionMarkEmoji, True )
-
-
-mine : CellContent
-mine =
-    ( "Mine", text mineEmoji, True )
-
-
-detonatedMine : CellContent
-detonatedMine =
-    ( "Detonated mine", text mineEmoji, True )
-
-
-overlay : String -> String -> Html Msg
-overlay backgroundText foregroundText =
-    span []
-        [ text backgroundText
-        , span [ class "Cell-overlay" ] [ text foregroundText ]
-        ]
-
-
-view : Bool -> GridState -> Int -> Int -> Cell -> Html Msg
-view debug gridState x y ((Cell cellState cellInner) as cell) =
-    let
-        isGameEnd =
-            gridState == WonGrid || gridState == LostGrid
-
-        isClickable =
-            (gridState == NewGrid || gridState == OngoingGrid)
-                && (cellState == Unrevealed || cellState == Flagged || cellState == QuestionMarked)
-
-        ( titleText, display, isEmoji ) =
-            content debug isGameEnd cell
-
-        useHoverTitle =
-            not (cellState == Unrevealed || cellState == Revealed)
-                || (cellInner == Mine)
-
-        titleAttribute =
-            if isGameEnd && useHoverTitle then
-                title titleText
-            else
-                attribute "aria-label" titleText
-
-        classes =
-            classList
-                [ ( "Cell", True )
-                , ( "Cell--emoji", isEmoji )
-                , ( "Cell--unrevealed", cellState == Unrevealed )
-                , ( "Cell--revealedMine", cellState == Revealed && cellInner == Mine )
-                ]
-
-        size =
-            toString Grid.cellSize ++ "px"
-
-        styles =
-            style
-                [ ( "width", size )
-                , ( "height", size )
-                , ( "color", color cell )
-                ]
-    in
-        if isClickable then
-            button
-                [ type_ "button"
-                , titleAttribute
-                , classes
-                , styles
-                , onClick (CellClick x y)
-                , onRightClick (CellRightClick x y)
-                ]
-                [ display ]
-        else
-            span
-                [ titleAttribute
-                , classes
-                , styles
-                , attribute "oncontextmenu" "return false"
-                ]
-                [ display ]
-
-
-color : Cell -> String
-color cell =
-    case cell of
-        Cell Flagged _ ->
-            "#ff0000"
-
-        Cell QuestionMarked _ ->
-            "inherit"
-
-        Cell _ (Hint number) ->
-            numberColor number
-
-        _ ->
-            "inherit"
-
-
 numberColor : Int -> String
 numberColor number =
     case number of
@@ -213,7 +53,159 @@ numberColor number =
             "inherit"
 
 
-content : Bool -> Bool -> Cell -> ( String, Html Msg, Bool )
+mineEmoji : Html Msg
+mineEmoji =
+    text "💣"
+
+
+flagEmoji : Html Msg
+flagEmoji =
+    colored "🚩" "#ff0000"
+
+
+questionMarkEmoji : Html Msg
+questionMarkEmoji =
+    text "❓"
+
+
+whiteQuestionMarkEmoji : Html Msg
+whiteQuestionMarkEmoji =
+    text "❔"
+
+
+crossEmoji : Html Msg
+crossEmoji =
+    colored "❌" "#ff0000"
+
+
+secret : CellContent
+secret =
+    ( "Secret", text "" )
+
+
+hint : Int -> CellContent
+hint number =
+    ( toString number
+    , span
+        [ style [ ( "font-weight", "bold" ), ( "color", numberColor number ) ]
+        ]
+        [ text (toString number) ]
+    )
+
+
+flag : CellContent
+flag =
+    ( "Flag", flagEmoji )
+
+
+correctFlag : CellContent
+correctFlag =
+    ( "Correct flag", overlay mineEmoji flagEmoji )
+
+
+incorrectFlag : CellContent
+incorrectFlag =
+    ( "Incorrect flag", overlay mineEmoji crossEmoji )
+
+
+questionMark : CellContent
+questionMark =
+    ( "Unsure", questionMarkEmoji )
+
+
+correctQuestionMark : CellContent
+correctQuestionMark =
+    ( "Correct question mark", overlay mineEmoji whiteQuestionMarkEmoji )
+
+
+inCorrectQuestionMark : CellContent
+inCorrectQuestionMark =
+    ( "Inorrect question mark", whiteQuestionMarkEmoji )
+
+
+mine : CellContent
+mine =
+    ( "Mine", mineEmoji )
+
+
+detonatedMine : CellContent
+detonatedMine =
+    ( "Detonated mine", mineEmoji )
+
+
+colored : String -> String -> Html Msg
+colored emoji color =
+    span [ style [ ( "color", color ) ] ] [ text emoji ]
+
+
+overlay : Html Msg -> Html Msg -> Html Msg
+overlay background foreground =
+    span [ class "Cell-overlayContainer" ]
+        [ background
+        , span [ class "Cell-overlay" ] [ foreground ]
+        ]
+
+
+view : Bool -> GridState -> Int -> Int -> Cell -> Html Msg
+view debug gridState x y ((Cell cellState cellInner) as cell) =
+    let
+        isGameEnd =
+            gridState == WonGrid || gridState == LostGrid
+
+        isClickable =
+            (gridState == NewGrid || gridState == OngoingGrid)
+                && (cellState == Unrevealed || cellState == Flagged || cellState == QuestionMarked)
+
+        ( titleText, display ) =
+            content debug isGameEnd cell
+
+        useHoverTitle =
+            not (cellState == Unrevealed || cellState == Revealed)
+                || (cellInner == Mine)
+
+        titleAttribute =
+            if isGameEnd && useHoverTitle then
+                title titleText
+            else
+                attribute "aria-label" titleText
+
+        classes =
+            classList
+                [ ( "Cell", True )
+                , ( "Cell--unrevealed", cellState == Unrevealed )
+                , ( "Cell--revealedMine", cellState == Revealed && cellInner == Mine )
+                ]
+
+        size =
+            toString Grid.cellSize ++ "px"
+
+        styles =
+            style
+                [ ( "width", size )
+                , ( "height", size )
+                ]
+    in
+        if isClickable then
+            button
+                [ type_ "button"
+                , titleAttribute
+                , classes
+                , styles
+                , onClick (CellClick x y)
+                , onRightClick (CellRightClick x y)
+                ]
+                [ display ]
+        else
+            span
+                [ titleAttribute
+                , classes
+                , styles
+                , attribute "oncontextmenu" "return false"
+                ]
+                [ display ]
+
+
+content : Bool -> Bool -> Cell -> CellContent
 content debug isGameEnd cell =
     case cell of
         Cell Flagged cellInner ->
