@@ -81,7 +81,12 @@ update msg model =
                         ( { model | seed = seed, grid = finalGrid }, Cmd.none )
 
                 OngoingGrid ->
-                    ( { model | grid = Grid.reveal x y model.grid }, Cmd.none )
+                    case Matrix.get x y model.grid of
+                        Just (Cell Unrevealed _) ->
+                            ( { model | grid = Grid.reveal x y model.grid }, Cmd.none )
+
+                        _ ->
+                            ( model, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
