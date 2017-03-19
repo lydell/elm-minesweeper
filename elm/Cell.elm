@@ -118,8 +118,12 @@ view debug gridState x y ((Cell cellState cellInner) as cell) =
         ( titleText, display, isEmoji ) =
             content debug isGameEnd cell
 
+        useHoverTitle =
+            not (cellState == Unrevealed || cellState == Revealed)
+                || (cellInner == Mine)
+
         titleAttribute =
-            if isGameEnd then
+            if isGameEnd && useHoverTitle then
                 title titleText
             else
                 attribute "aria-label" titleText
