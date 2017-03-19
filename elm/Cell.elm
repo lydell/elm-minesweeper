@@ -64,24 +64,12 @@ flag =
 
 correctFlag : CellContent
 correctFlag =
-    ( "Correct flag"
-    , span []
-        [ text mineEmoji
-        , span [ class "Cell-overlay" ] [ text flagEmoji ]
-        ]
-    , True
-    )
+    ( "Correct flag", overlay mineEmoji flagEmoji, True )
 
 
 incorrectFlag : CellContent
 incorrectFlag =
-    ( "Incorrect flag"
-    , span []
-        [ text mineEmoji
-        , span [ class "Cell-overlay" ] [ text crossEmoji ]
-        ]
-    , True
-    )
+    ( "Incorrect flag", overlay mineEmoji crossEmoji, True )
 
 
 questionMark : CellContent
@@ -91,13 +79,7 @@ questionMark =
 
 correctQuestionMark : CellContent
 correctQuestionMark =
-    ( "Correct question mark"
-    , span []
-        [ text mineEmoji
-        , span [ class "Cell-overlay" ] [ text whiteQuestionMarkEmoji ]
-        ]
-    , True
-    )
+    ( "Correct question mark", overlay mineEmoji whiteQuestionMarkEmoji, True )
 
 
 inCorrectQuestionMark : CellContent
@@ -113,6 +95,14 @@ mine =
 detonatedMine : CellContent
 detonatedMine =
     ( "Detonated mine", text mineEmoji, True )
+
+
+overlay : String -> String -> Html Msg
+overlay backgroundText foregroundText =
+    span []
+        [ text backgroundText
+        , span [ class "Cell-overlay" ] [ text foregroundText ]
+        ]
 
 
 view : Bool -> GridState -> Int -> Int -> Cell -> Html Msg
