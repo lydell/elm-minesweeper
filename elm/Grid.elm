@@ -373,7 +373,7 @@ cellToString : Cell -> String
 cellToString cell =
     case cell of
         Cell _ Mine ->
-            "X"
+            "💣"
 
         Cell _ (Hint num) ->
             if num == 0 then
