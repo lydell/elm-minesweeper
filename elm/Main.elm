@@ -5,6 +5,7 @@ import Html
 import Html.Events.Custom exposing (Button(LeftButton))
 import Matrix
 import Random.Pcg as Random
+import Regex exposing (Regex, HowMany(All))
 import Types exposing (..)
 import View exposing (view)
 
@@ -114,7 +115,9 @@ update msg model =
                     Matrix.height model.grid
 
                 numMines =
-                    Result.withDefault 0 (String.toInt string)
+                    removeNonDigits string
+                        |> String.toInt
+                        |> Result.withDefault model.numMines
                         |> Grid.clampNumMines width height
             in
                 ( { model | numMines = numMines }, Cmd.none )
@@ -178,3 +181,13 @@ update msg model =
                   }
                 , Cmd.none
                 )
+
+
+nonDigitRegex : Regex
+nonDigitRegex =
+    Regex.regex "\\D"
+
+
+removeNonDigits : String -> String
+removeNonDigits =
+    Regex.replace All nonDigitRegex (always "")
