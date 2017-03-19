@@ -1,7 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "start": "elm-live elm/Main.elm --output=elm.js --open -- --debug"
+    "start": "elm-live elm/Main.elm --output=elm.js --open -- --debug",
+    "build:elm": "elm-make elm/Main.elm --output=elm.temp.js",
+    "build:minify": "google-closure-compiler-js elm.temp.js > elm.js",
+    "build": "npm run build:elm && npm run build:minify"
   },
   "devDependencies": {
     "elm": "^0.18.0",
@@ -10,6 +13,7 @@
     "eslint-config-prettier": "^1.5.0",
     "eslint-config-strict": "^13.0.0",
     "eslint-plugin-prettier": "^2.0.1",
+    "google-closure-compiler-js": "^20170218.0.0",
     "prettier": "^0.22.0"
   }
 }
