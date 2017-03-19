@@ -68,6 +68,7 @@ input::-moz-focus-inner {
   border: none;
   border-radius: 0;
   background: #eee;
+  font-weight: bold;
   text-align: center;
   vertical-align: top;
 }

@@ -116,6 +116,7 @@ viewCell gridState x y ((Cell cellState _) as cell) =
             style
                 [ ( "width", size )
                 , ( "height", size )
+                , ( "color", numberColor cell )
                 ]
 
         textContent =
@@ -134,6 +135,42 @@ viewCell gridState x y ((Cell cellState _) as cell) =
                 span [ classes, styles ] [ textContent ]
     in
         td [] [ innerElement ]
+
+
+numberColor : Cell -> String
+numberColor cell =
+    case cell of
+        Cell _ (Hint number) ->
+            case number of
+                1 ->
+                    "#0000ff"
+
+                2 ->
+                    "#007b00"
+
+                3 ->
+                    "#ff0000"
+
+                4 ->
+                    "#00007b"
+
+                5 ->
+                    "#7b0000"
+
+                6 ->
+                    "#007b7b"
+
+                7 ->
+                    "#000000"
+
+                8 ->
+                    "#7b7b7b"
+
+                _ ->
+                    "inherit"
+
+        _ ->
+            "inherit"
 
 
 viewSizer : Grid -> Sizer -> Maybe PointerPosition -> Html Msg
