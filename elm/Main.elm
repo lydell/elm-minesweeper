@@ -98,11 +98,14 @@ update msg model =
             case Grid.gridState model.grid of
                 NewGrid ->
                     let
+                        newGrid =
+                            Grid.flag x y (Grid.reset model.grid)
+
                         ( seed, gridWithMines ) =
                             Grid.addRandomMinesAndUpdateNumbers
                                 model.numMines
                                 (Set.singleton ( x, y ))
-                                ( model.seed, Grid.reset model.grid )
+                                ( model.seed, newGrid )
                     in
                         ( { model | seed = seed, grid = gridWithMines }, Cmd.none )
 
