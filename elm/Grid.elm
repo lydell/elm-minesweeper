@@ -160,29 +160,22 @@ reset grid =
     defaultGrid (Matrix.width grid) (Matrix.height grid)
 
 
-addRandomMinesAndUpdateNumbers : Int -> Seed -> Grid -> ( Seed, Grid )
-addRandomMinesAndUpdateNumbers numMines seed grid =
+addRandomMinesAndUpdateNumbers : Int -> ( Seed, Grid ) -> ( Seed, Grid )
+addRandomMinesAndUpdateNumbers numMines ( seed, grid ) =
     let
         ( newSeed, newGrid ) =
-            addRandomMines numMines seed grid
+            addRandomMines numMines ( seed, grid )
     in
         ( newSeed, setGridNumbers newGrid )
 
 
-addRandomMines : Int -> Seed -> Grid -> ( Seed, Grid )
-addRandomMines numMines seed grid =
-    if numMines <= 0 then
-        ( seed, grid )
-    else
-        let
-            ( newSeed, newGrid ) =
-                addRandomMine seed grid
-        in
-            addRandomMines (numMines - 1) newSeed newGrid
+addRandomMines : Int -> ( Seed, Grid ) -> ( Seed, Grid )
+addRandomMines numMines ( seed, grid ) =
+    List.foldl (always addRandomMine) ( seed, grid ) (List.range 1 numMines)
 
 
-addRandomMine : Seed -> Grid -> ( Seed, Grid )
-addRandomMine seed grid =
+addRandomMine : ( Seed, Grid ) -> ( Seed, Grid )
+addRandomMine ( seed, grid ) =
     let
         isAvailable ( x, y ) =
             case Matrix.get x y grid of

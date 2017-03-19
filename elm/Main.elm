@@ -45,7 +45,7 @@ init flags =
         -- It is not needed to add mines and all at this point, but it makes
         -- debugging easier.
         ( newSeed, grid ) =
-            Grid.addRandomMinesAndUpdateNumbers numMines seed emptyGrid
+            Grid.addRandomMinesAndUpdateNumbers numMines ( seed, emptyGrid )
 
         initialModel =
             { state = RegularGame
@@ -72,8 +72,7 @@ update msg model =
                         ( seed, gridWithMines ) =
                             Grid.addRandomMinesAndUpdateNumbers
                                 model.numMines
-                                model.seed
-                                newGrid
+                                ( model.seed, newGrid )
 
                         finalGrid =
                             Grid.reveal x y gridWithMines
@@ -96,8 +95,7 @@ update msg model =
                         ( seed, gridWithMines ) =
                             Grid.addRandomMinesAndUpdateNumbers
                                 model.numMines
-                                model.seed
-                                newGrid
+                                ( model.seed, newGrid )
                     in
                         ( { model | seed = seed, grid = gridWithMines }, Cmd.none )
 
