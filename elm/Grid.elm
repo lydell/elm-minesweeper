@@ -343,13 +343,8 @@ isGridWon =
 
 
 isCellMine : Cell -> Bool
-isCellMine cell =
-    case cell of
-        Cell _ Mine ->
-            True
-
-        _ ->
-            False
+isCellMine (Cell _ cellInner) =
+    cellInner == Mine
 
 
 isCellRevealedMine : Cell -> Bool
