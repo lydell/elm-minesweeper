@@ -6,6 +6,7 @@ import Html.Events.Custom exposing (Button(LeftButton))
 import Matrix
 import Random.Pcg as Random
 import Regex exposing (Regex, HowMany(All))
+import Set
 import Types exposing (..)
 import View exposing (view)
 
@@ -47,7 +48,10 @@ init flags =
         -- It is not needed to add mines and all at this point, but it makes
         -- debugging easier.
         ( newSeed, grid ) =
-            Grid.addRandomMinesAndUpdateNumbers numMines ( seed, emptyGrid )
+            Grid.addRandomMinesAndUpdateNumbers
+                numMines
+                Set.empty
+                ( seed, emptyGrid )
 
         initialModel =
             { debug = flags.debug
@@ -68,13 +72,11 @@ update msg model =
             case Grid.gridState model.grid of
                 NewGrid ->
                     let
-                        newGrid =
-                            Grid.revealSingle x y (Grid.reset model.grid)
-
                         ( seed, gridWithMines ) =
                             Grid.addRandomMinesAndUpdateNumbers
                                 model.numMines
-                                ( model.seed, newGrid )
+                                (Set.singleton ( x, y ))
+                                ( model.seed, model.grid )
 
                         finalGrid =
                             Grid.reveal x y gridWithMines
@@ -96,13 +98,11 @@ update msg model =
             case Grid.gridState model.grid of
                 NewGrid ->
                     let
-                        newGrid =
-                            Grid.flag x y (Grid.reset model.grid)
-
                         ( seed, gridWithMines ) =
                             Grid.addRandomMinesAndUpdateNumbers
                                 model.numMines
-                                ( model.seed, newGrid )
+                                (Set.singleton ( x, y ))
+                                ( model.seed, model.grid )
                     in
                         ( { model | seed = seed, grid = gridWithMines }, Cmd.none )
 

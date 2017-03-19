@@ -160,27 +160,34 @@ reset grid =
     defaultGrid (Matrix.width grid) (Matrix.height grid)
 
 
-addRandomMinesAndUpdateNumbers : Int -> ( Seed, Grid ) -> ( Seed, Grid )
-addRandomMinesAndUpdateNumbers numMines ( seed, grid ) =
+addRandomMinesAndUpdateNumbers :
+    Int
+    -> Set ( Int, Int )
+    -> ( Seed, Grid )
+    -> ( Seed, Grid )
+addRandomMinesAndUpdateNumbers numMines excludedCoords ( seed, grid ) =
     let
         ( newSeed, newGrid ) =
-            addRandomMines numMines ( seed, grid )
+            addRandomMines numMines excludedCoords ( seed, grid )
     in
         ( newSeed, setGridNumbers newGrid )
 
 
-addRandomMines : Int -> ( Seed, Grid ) -> ( Seed, Grid )
-addRandomMines numMines ( seed, grid ) =
-    List.foldl (always addRandomMine) ( seed, grid ) (List.range 1 numMines)
+addRandomMines : Int -> Set ( Int, Int ) -> ( Seed, Grid ) -> ( Seed, Grid )
+addRandomMines numMines excludedCoords ( seed, grid ) =
+    List.foldl
+        (always (addRandomMine excludedCoords))
+        ( seed, grid )
+        (List.range 1 numMines)
 
 
-addRandomMine : ( Seed, Grid ) -> ( Seed, Grid )
-addRandomMine ( seed, grid ) =
+addRandomMine : Set ( Int, Int ) -> ( Seed, Grid ) -> ( Seed, Grid )
+addRandomMine excludedCoords ( seed, grid ) =
     let
         isAvailable ( x, y ) =
             case Matrix.get x y grid of
                 Just (Cell Unrevealed (Hint _)) ->
-                    True
+                    not (Set.member ( x, y ) excludedCoords)
 
                 _ ->
                     False
