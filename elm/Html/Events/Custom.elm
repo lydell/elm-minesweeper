@@ -1,16 +1,18 @@
 module Html.Events.Custom
     exposing
-        ( onChange
+        ( Button(..)
+        , PointerPosition
+        , onChange
         , onMouseDown
         , onMouseMove
-        , PointerPosition
+        , onRightClick
         )
 
 {-|
 Custom HTML events.
 
 # Mouse Helpers
-@docs PointerPosition onMouseDown, onMouseMove
+@docs Button, PointerPosition, onRightClick, onMouseDown, onMouseMove
 
 # Form Helpers
 @docs onChange
@@ -19,6 +21,17 @@ Custom HTML events.
 import Html exposing (Attribute)
 import Html.Events
 import Json.Decode exposing (Decoder)
+
+
+{-| The different types of mouse buttons that may be recognized by browsers.
+-}
+type Button
+    = LeftButton
+    | Wheel
+    | RightButton
+    | BackButton
+    | ForwardButton
+    | UnknownButton
 
 
 {-| The position on the screen of a mouse pointer or a finger (in case of touch
@@ -30,12 +43,21 @@ type alias PointerPosition =
     }
 
 
-{-| Like the standard `onMouseDown`, but with the pointer position passed along.
+{-| -}
+onRightClick : msg -> Attribute msg
+onRightClick tagger =
+    Html.Events.onWithOptions "contextmenu"
+        { stopPropagation = True, preventDefault = True }
+        (Json.Decode.succeed tagger)
+
+
+{-| Like the standard `onMouseDown`, but with the clicked button and the pointer
+position passed along.
 -}
-onMouseDown : (PointerPosition -> msg) -> Attribute msg
+onMouseDown : (Button -> PointerPosition -> msg) -> Attribute msg
 onMouseDown tagger =
     Html.Events.on "mousedown"
-        (Json.Decode.map tagger pointerPositionDecoder)
+        (Json.Decode.map2 tagger buttonDecoder pointerPositionDecoder)
 
 
 {-| -}
@@ -43,6 +65,34 @@ onMouseMove : (PointerPosition -> msg) -> Attribute msg
 onMouseMove tagger =
     Html.Events.on "mousemove"
         (Json.Decode.map tagger pointerPositionDecoder)
+
+
+buttonDecoder : Decoder Button
+buttonDecoder =
+    Json.Decode.field "button" Json.Decode.int
+        |> Json.Decode.map parseButtonNumber
+
+
+parseButtonNumber : Int -> Button
+parseButtonNumber number =
+    case number of
+        0 ->
+            LeftButton
+
+        1 ->
+            Wheel
+
+        2 ->
+            RightButton
+
+        3 ->
+            BackButton
+
+        4 ->
+            ForwardButton
+
+        _ ->
+            UnknownButton
 
 
 pointerPositionDecoder : Decoder PointerPosition

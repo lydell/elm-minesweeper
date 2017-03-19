@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Grid
 import Html
+import Html.Events.Custom exposing (Button(LeftButton))
 import Matrix
 import Random.Pcg as Random
 import Types exposing (..)
@@ -66,7 +67,7 @@ update msg model =
                 NewGrid ->
                     let
                         newGrid =
-                            Grid.revealSingle x y model.grid
+                            Grid.revealSingle x y (Grid.reset model.grid)
 
                         ( seed, gridWithMines ) =
                             Grid.addRandomMinesAndUpdateNumbers
@@ -80,11 +81,28 @@ update msg model =
                         ( { model | seed = seed, grid = finalGrid }, Cmd.none )
 
                 OngoingGrid ->
+                    ( { model | grid = Grid.reveal x y model.grid }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        CellRightClick x y ->
+            case Grid.gridState model.grid of
+                NewGrid ->
                     let
                         newGrid =
-                            Grid.reveal x y model.grid
+                            Grid.flag x y (Grid.reset model.grid)
+
+                        ( seed, gridWithMines ) =
+                            Grid.addRandomMinesAndUpdateNumbers
+                                model.numMines
+                                model.seed
+                                newGrid
                     in
-                        ( { model | grid = newGrid }, Cmd.none )
+                        ( { model | seed = seed, grid = gridWithMines }, Cmd.none )
+
+                OngoingGrid ->
+                    ( { model | grid = Grid.flag x y model.grid }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -103,18 +121,23 @@ update msg model =
             in
                 ( { model | numMines = numMines }, Cmd.none )
 
-        MouseDown pointerPosition ->
-            ( { model
-                | sizer =
-                    Dragging
-                        { pointerPosition = pointerPosition
-                        , width = Matrix.width model.grid
-                        , height = Matrix.height model.grid
-                        }
-                , pointerPosition = Just pointerPosition
-              }
-            , Cmd.none
-            )
+        MouseDown button pointerPosition ->
+            case button of
+                LeftButton ->
+                    ( { model
+                        | sizer =
+                            Dragging
+                                { pointerPosition = pointerPosition
+                                , width = Matrix.width model.grid
+                                , height = Matrix.height model.grid
+                                }
+                        , pointerPosition = Just pointerPosition
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
 
         MouseUp ->
             ( { model | sizer = Idle, pointerPosition = Nothing }, Cmd.none )

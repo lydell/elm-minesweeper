@@ -155,6 +155,11 @@ defaultCell =
     Cell Unrevealed (Hint 0)
 
 
+reset : Grid -> Grid
+reset grid =
+    defaultGrid (Matrix.width grid) (Matrix.height grid)
+
+
 addRandomMinesAndUpdateNumbers : Int -> Seed -> Grid -> ( Seed, Grid )
 addRandomMinesAndUpdateNumbers numMines seed grid =
     let
@@ -243,12 +248,7 @@ reveal x y grid =
 
 revealSingle : Int -> Int -> Grid -> Grid
 revealSingle x y grid =
-    Matrix.update x y revealCell grid
-
-
-revealCell : Cell -> Cell
-revealCell (Cell _ innerCell) =
-    Cell Revealed innerCell
+    Matrix.update x y (setCellState Revealed) grid
 
 
 revealRecursively : Int -> Int -> Grid -> Grid
@@ -270,7 +270,7 @@ revealRecursivelyHelper x y ( visitedCoords, grid ) =
         ( visitedCoords, grid )
     else
         case Matrix.get x y grid of
-            Just (Cell _ (Hint number)) ->
+            Just (Cell Unrevealed (Hint number)) ->
                 let
                     newGrid =
                         revealSingle x y grid
@@ -292,6 +292,27 @@ revealRecursivelyHelper x y ( visitedCoords, grid ) =
 
             _ ->
                 ( visitedCoords, grid )
+
+
+flag : Int -> Int -> Grid -> Grid
+flag x y grid =
+    case Matrix.get x y grid of
+        Just (Cell Unrevealed _) ->
+            Matrix.update x y (setCellState Flagged) grid
+
+        Just (Cell Flagged _) ->
+            Matrix.update x y (setCellState QuestionMarked) grid
+
+        Just (Cell QuestionMarked _) ->
+            Matrix.update x y (setCellState Unrevealed) grid
+
+        _ ->
+            grid
+
+
+setCellState : CellState -> Cell -> Cell
+setCellState cellState (Cell _ innerCell) =
+    Cell cellState innerCell
 
 
 gridState : Grid -> GridState
@@ -372,6 +393,12 @@ isDragging sizer =
 cellToString : Cell -> String
 cellToString cell =
     case cell of
+        Cell Flagged _ ->
+            "🚩"
+
+        Cell QuestionMarked _ ->
+            "?"
+
         Cell _ Mine ->
             "💣"
 

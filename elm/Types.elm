@@ -1,6 +1,6 @@
 module Types exposing (..)
 
-import Html.Events.Custom exposing (PointerPosition)
+import Html.Events.Custom exposing (Button, PointerPosition)
 import Matrix exposing (Matrix)
 import Random.Pcg exposing (Seed)
 
@@ -32,6 +32,7 @@ type CellState
     = Unrevealed
     | Revealed
     | Flagged
+    | QuestionMarked
 
 
 type CellInner
@@ -66,7 +67,8 @@ type alias PointerMovement =
 
 type Msg
     = NumMinesChange String
-    | MouseDown PointerPosition
+    | MouseDown Button PointerPosition
     | MouseUp
     | MouseMove PointerPosition
     | CellClick Int Int
+    | CellRightClick Int Int

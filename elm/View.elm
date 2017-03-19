@@ -32,6 +32,7 @@ import Html.Events.Custom
         ( onChange
         , onMouseDown
         , onMouseMove
+        , onRightClick
         , PointerPosition
         )
 import Matrix
@@ -110,7 +111,7 @@ viewCell gridState x y ((Cell cellState _) as cell) =
     let
         isClickable =
             (gridState == NewGrid || gridState == OngoingGrid)
-                && (cellState == Unrevealed || cellState == Flagged)
+                && (cellState == Unrevealed || cellState == Flagged || cellState == QuestionMarked)
 
         size =
             toString Grid.cellSize ++ "px"
@@ -138,6 +139,7 @@ viewCell gridState x y ((Cell cellState _) as cell) =
                     , classes
                     , styles
                     , onClick (CellClick x y)
+                    , onRightClick (CellRightClick x y)
                     ]
                     [ textContent ]
             else
@@ -149,6 +151,12 @@ viewCell gridState x y ((Cell cellState _) as cell) =
 numberColor : Cell -> String
 numberColor cell =
     case cell of
+        Cell Flagged _ ->
+            "#ff0000"
+
+        Cell QuestionMarked _ ->
+            "inherit"
+
         Cell _ (Hint number) ->
             case number of
                 1 ->
