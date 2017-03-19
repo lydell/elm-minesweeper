@@ -82,11 +82,6 @@ cellSize =
     25
 
 
-cellSpacing : Int
-cellSpacing =
-    2
-
-
 sizerOffset : Int
 sizerOffset =
     cellSize // 2
@@ -94,14 +89,12 @@ sizerOffset =
 
 sizerSize : Int -> Int
 sizerSize size =
-    (size * (cellSize + cellSpacing))
-        + cellSpacing
-        + (sizerOffset * 2)
+    size * cellSize + sizerOffset * 2
 
 
 gridSize : Int -> Int -> Int
 gridSize size movement =
-    size + floor (toFloat movement / toFloat (cellSize + cellSpacing))
+    size + floor (toFloat movement / toFloat cellSize)
 
 
 pointerMovement : Sizer -> Maybe PointerPosition -> PointerMovement

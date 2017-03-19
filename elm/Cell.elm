@@ -163,7 +163,13 @@ view debug gridState x y ((Cell cellState cellInner) as cell) =
                 ]
                 [ display ]
         else
-            span [ titleAttribute, classes, styles ] [ display ]
+            span
+                [ titleAttribute
+                , classes
+                , styles
+                , attribute "oncontextmenu" "return false"
+                ]
+                [ display ]
 
 
 color : Cell -> String

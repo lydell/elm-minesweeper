@@ -90,20 +90,13 @@ view model =
 
 viewGrid : Bool -> Grid -> Html Msg
 viewGrid debug grid =
-    let
-        gridState =
-            Grid.gridState grid
-
-        styles =
-            [ ( "border-spacing", toString Grid.cellSpacing ++ "px" ) ]
-    in
-        table [ class "Grid", style styles ]
-            [ tbody []
-                (List.indexedMap
-                    (viewRow debug gridState)
-                    (Matrix.Custom.toListOfLists grid)
-                )
-            ]
+    table [ class "Grid" ]
+        [ tbody []
+            (List.indexedMap
+                (viewRow debug (Grid.gridState grid))
+                (Matrix.Custom.toListOfLists grid)
+            )
+        ]
 
 
 viewRow : Bool -> GridState -> Int -> List Cell -> Html Msg
