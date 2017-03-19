@@ -311,8 +311,8 @@ flag x y grid =
 
 
 setCellState : CellState -> Cell -> Cell
-setCellState cellState (Cell _ innerCell) =
-    Cell cellState innerCell
+setCellState cellState (Cell _ cellInner) =
+    Cell cellState cellInner
 
 
 gridState : Grid -> GridState
@@ -353,8 +353,8 @@ isCellMine cell =
 
 
 isCellRevealedMine : Cell -> Bool
-isCellRevealedMine (Cell cellState innerCell) =
-    cellState == Revealed && innerCell == Mine
+isCellRevealedMine (Cell cellState cellInner) =
+    cellState == Revealed && cellInner == Mine
 
 
 isCellUnrevealed : Cell -> Bool
@@ -368,8 +368,8 @@ isCellFlagged (Cell cellState _) =
 
 
 isCellCorrectlyMarked : Cell -> Bool
-isCellCorrectlyMarked (Cell cellState innerCell) =
-    case ( cellState, innerCell ) of
+isCellCorrectlyMarked (Cell cellState cellInner) =
+    case ( cellState, cellInner ) of
         ( Flagged, Mine ) ->
             True
 
