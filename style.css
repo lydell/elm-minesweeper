@@ -81,6 +81,12 @@ input::-moz-focus-inner {
   position: relative;
 }
 
+.Cell:hover,
+.Cell:focus,
+.Cell:active {
+  outline: none;
+}
+
 .Cell--emoji {
   font-weight: normal;
 }
@@ -209,4 +215,10 @@ input::-moz-focus-inner {
   border-radius: 0;
   border: none;
   background: #eee;
+}
+
+.BottomButton:hover,
+.BottomButton:focus,
+.BottomButton:active {
+  outline: none;
 }
