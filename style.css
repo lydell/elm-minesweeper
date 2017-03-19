@@ -142,12 +142,12 @@ input::-moz-focus-inner {
 }
 
 .MinesInfo {
-  margin-bottom: 11px;
+  position: relative;
+  z-index: 3;
+  top: 1px;
   text-align: center;
   font-weight: bold;
   font-size: 1.5em;
-  position: relative;
-  z-index: 5;
 }
 
 .MinesInfo-input {

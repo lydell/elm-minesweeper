@@ -260,8 +260,12 @@ viewMinesInfo numMines grid =
 
                 _ ->
                     viewMinesCount numMines grid
+
+        styles =
+            [ ( "margin-bottom", toString Grid.sizerOffset ++ "px" )
+            ]
     in
-        div [ class "MinesInfo" ] [ content ]
+        div [ class "MinesInfo", style styles ] [ content ]
 
 
 viewMinesInput : Int -> Html Msg
