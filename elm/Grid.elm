@@ -341,6 +341,11 @@ isCellUnrevealed (Cell cellState _) =
     cellState == Unrevealed
 
 
+isCellFlagged : Cell -> Bool
+isCellFlagged (Cell cellState _) =
+    cellState == Flagged
+
+
 isCellCorrectlyMarked : Cell -> Bool
 isCellCorrectlyMarked (Cell cellState innerCell) =
     case ( cellState, innerCell ) of

@@ -54,6 +54,7 @@ input::-moz-focus-inner {
   table-layout: fixed;
   position: relative;
   z-index: 2;
+  cursor: pointer;
 }
 
 .Grid td {
@@ -141,8 +142,36 @@ input::-moz-focus-inner {
 }
 
 .MinesInfo {
-  margin-bottom: 30px;
+  margin-bottom: 11px;
   text-align: center;
+  font-weight: bold;
+  font-size: 1.5em;
+  position: relative;
+  z-index: 5;
+}
+
+.MinesInfo-input {
+  border-radius: 0;
+  text-align: inherit;
+  font-weight: inherit;
+  transition: border-color 200ms;
+}
+
+.MinesInfo-input,
+.MinesInfo-count {
+  border: 1px solid #eee;
+  padding: 5px;
+}
+
+.MinesInfo-count {
+  border-color: transparent;
+}
+
+.MinesInfo-input:hover,
+.MinesInfo-input:focus,
+.MinesInfo-input:active {
+  border-color: black;
+  outline: none;
 }
 
 .Bottom {

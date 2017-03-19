@@ -1,5 +1,6 @@
 module View exposing (view)
 
+import Array
 import Grid
 import Html
     exposing
@@ -58,15 +59,23 @@ view model =
                 [ ( "Root", True )
                 , ( "is-dragging", isDragging )
                 ]
+
+        sizer =
+            if gridState == NewGrid then
+                [ viewSizer model.grid model.sizer model.pointerPosition ]
+            else
+                []
+
+        bottom =
+            viewBottom gridState
     in
         div ([ classes ] ++ events)
-            [ viewMinesInfo model.numMines
-            , div [ class "GridContainer" ]
-                [ viewGrid model.grid
-                , viewSizer model.grid model.sizer model.pointerPosition
-                ]
-            , viewBottom gridState
-            ]
+            ([ viewMinesInfo model.numMines model.grid
+             , div [ class "GridContainer" ]
+                ([ viewGrid model.grid ] ++ sizer)
+             ]
+                ++ bottom
+            )
 
 
 viewGrid : Grid -> Html Msg
@@ -241,8 +250,22 @@ viewSizer grid sizer maybePointerPosition =
             (dimensions ++ [ resizerButton ])
 
 
-viewMinesInfo : Int -> Html Msg
-viewMinesInfo numMines =
+viewMinesInfo : Int -> Grid -> Html Msg
+viewMinesInfo numMines grid =
+    let
+        content =
+            case Grid.gridState grid of
+                NewGrid ->
+                    viewMinesInput numMines
+
+                _ ->
+                    viewMinesCount numMines grid
+    in
+        div [ class "MinesInfo" ] [ content ]
+
+
+viewMinesInput : Int -> Html Msg
+viewMinesInput numMines =
     let
         absoluteMaxNumMines =
             Grid.maxNumMines Grid.maxWidth Grid.maxHeight
@@ -255,33 +278,53 @@ viewMinesInfo numMines =
             , ( "width", toString maxWidth ++ "ch" )
             ]
     in
-        div [ class "MinesInfo" ]
-            [ text "0 / "
-            , input
-                [ type_ "tel"
-                , value (toString numMines)
-                , onChange NumMinesChange
-                , style styles
-                ]
-                []
+        input
+            [ type_ "tel"
+            , value (toString numMines)
+            , title "Number of mines (click to edit)"
+            , onChange NumMinesChange
+            , class "MinesInfo-input"
+            , style styles
             ]
+            []
 
 
-viewBottom : GridState -> Html Msg
+viewMinesCount : Int -> Grid -> Html Msg
+viewMinesCount numMines grid =
+    let
+        flagged =
+            Matrix.filter Grid.isCellFlagged grid
+
+        count =
+            numMines - Array.length flagged
+    in
+        p [ class "MinesInfo-count", title "Number of mines left to mark" ]
+            [ text (toString count) ]
+
+
+viewBottom : GridState -> List (Html Msg)
 viewBottom gridState =
     let
-        message =
+        maybeMessage =
             case gridState of
                 NewGrid ->
-                    "New game"
+                    Nothing
 
                 OngoingGrid ->
-                    "TODO give up"
+                    -- TODO: "I give up" button.
+                    Nothing
 
                 WonGrid ->
-                    "You won!"
+                    -- TODO: "Play again" button.
+                    Just "You won!"
 
                 LostGrid ->
-                    "You lost!"
+                    -- TODO: "Play again" button.
+                    Just "You lost!"
     in
-        p [ class "Bottom" ] [ text message ]
+        case maybeMessage of
+            Just message ->
+                [ p [ class "Bottom" ] [ text message ] ]
+
+            Nothing ->
+                []
