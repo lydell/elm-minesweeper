@@ -1,6 +1,8 @@
 # elm-minesweeper
 
-The classic game MineSweeper made with Elm.
+The classic game MineSweeper made with Elm. **[Play it.][play]**
+
+[play]: https://lydell.github.io/elm-minesweeper/
 
 ## Development
 
