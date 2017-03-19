@@ -1,23 +1,19 @@
 module Types exposing (..)
 
+import Html exposing (Html)
 import Html.Events.Custom exposing (Button, PointerPosition)
 import Matrix exposing (Matrix)
 import Random.Pcg exposing (Seed)
 
 
 type alias Model =
-    { state : GameState
+    { debug : Bool
     , seed : Seed
     , numMines : Int
     , grid : Matrix Cell
     , sizer : Sizer
     , pointerPosition : Maybe PointerPosition
     }
-
-
-type GameState
-    = RegularGame
-    | GivenUp
 
 
 type alias Grid =
@@ -38,6 +34,10 @@ type CellState
 type CellInner
     = Mine
     | Hint Int
+
+
+type alias CellContent =
+    ( String, Html Msg, Bool )
 
 
 type GridState
@@ -72,3 +72,5 @@ type Msg
     | MouseMove PointerPosition
     | CellClick Int Int
     | CellRightClick Int Int
+    | GiveUpButtonClick
+    | PlayAgainButtonClick

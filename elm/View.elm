@@ -1,6 +1,7 @@
 module View exposing (view)
 
 import Array
+import Cell
 import Grid
 import Html
     exposing
@@ -9,7 +10,6 @@ import Html
         , div
         , input
         , p
-        , span
         , table
         , tbody
         , td
@@ -32,7 +32,6 @@ import Html.Events.Custom
         ( onChange
         , onMouseDown
         , onMouseMove
-        , onRightClick
         , PointerPosition
         )
 import Matrix
@@ -68,19 +67,29 @@ view model =
                 []
 
         bottom =
-            viewBottom gridState
+            case viewBottomButton gridState of
+                Just content ->
+                    let
+                        styles =
+                            [ ( "margin-top", toString Grid.sizerOffset ++ "px" )
+                            ]
+                    in
+                        [ div [ style styles ] [ content ] ]
+
+                Nothing ->
+                    []
     in
         div ([ classes ] ++ events)
             ([ viewMinesInfo model.numMines model.grid
              , div [ class "GridContainer" ]
-                ([ viewGrid model.grid ] ++ sizer)
+                ([ viewGrid model.debug model.grid ] ++ sizer)
              ]
                 ++ bottom
             )
 
 
-viewGrid : Grid -> Html Msg
-viewGrid grid =
+viewGrid : Bool -> Grid -> Html Msg
+viewGrid debug grid =
     let
         gridState =
             Grid.gridState grid
@@ -91,103 +100,24 @@ viewGrid grid =
         table [ class "Grid", style styles ]
             [ tbody []
                 (List.indexedMap
-                    (viewRow gridState)
+                    (viewRow debug gridState)
                     (Matrix.Custom.toListOfLists grid)
                 )
             ]
 
 
-viewRow : GridState -> Int -> List Cell -> Html Msg
-viewRow gridState y row =
+viewRow : Bool -> GridState -> Int -> List Cell -> Html Msg
+viewRow debug gridState y row =
     tr []
         (List.indexedMap
-            (\x cell -> viewCell gridState x y cell)
+            (\x cell -> viewCell debug gridState x y cell)
             row
         )
 
 
-viewCell : GridState -> Int -> Int -> Cell -> Html Msg
-viewCell gridState x y ((Cell cellState _) as cell) =
-    let
-        isClickable =
-            (gridState == NewGrid || gridState == OngoingGrid)
-                && (cellState == Unrevealed || cellState == Flagged || cellState == QuestionMarked)
-
-        size =
-            toString Grid.cellSize ++ "px"
-
-        classes =
-            classList
-                [ ( "Cell", True )
-                , ( "Cell--revealed", cellState == Revealed )
-                ]
-
-        styles =
-            style
-                [ ( "width", size )
-                , ( "height", size )
-                , ( "color", numberColor cell )
-                ]
-
-        textContent =
-            text (Grid.cellToString cell)
-
-        innerElement =
-            if isClickable then
-                button
-                    [ type_ "button"
-                    , classes
-                    , styles
-                    , onClick (CellClick x y)
-                    , onRightClick (CellRightClick x y)
-                    ]
-                    [ textContent ]
-            else
-                span [ classes, styles ] [ textContent ]
-    in
-        td [] [ innerElement ]
-
-
-numberColor : Cell -> String
-numberColor cell =
-    case cell of
-        Cell Flagged _ ->
-            "#ff0000"
-
-        Cell QuestionMarked _ ->
-            "inherit"
-
-        Cell _ (Hint number) ->
-            case number of
-                1 ->
-                    "#0000ff"
-
-                2 ->
-                    "#007b00"
-
-                3 ->
-                    "#ff0000"
-
-                4 ->
-                    "#00007b"
-
-                5 ->
-                    "#7b0000"
-
-                6 ->
-                    "#007b7b"
-
-                7 ->
-                    "#000000"
-
-                8 ->
-                    "#7b7b7b"
-
-                _ ->
-                    "inherit"
-
-        _ ->
-            "inherit"
+viewCell : Bool -> GridState -> Int -> Int -> Cell -> Html Msg
+viewCell debug gridState x y cell =
+    td [] [ Cell.view debug gridState x y cell ]
 
 
 viewSizer : Grid -> Sizer -> Maybe PointerPosition -> Html Msg
@@ -266,8 +196,14 @@ viewMinesInfo numMines grid =
                 NewGrid ->
                     viewMinesInput numMines
 
-                _ ->
+                OngoingGrid ->
                     viewMinesCount numMines grid
+
+                WonGrid ->
+                    viewGameEndMessage True
+
+                LostGrid ->
+                    viewGameEndMessage False
 
         styles =
             [ ( "margin-bottom", toString Grid.sizerOffset ++ "px" )
@@ -310,33 +246,54 @@ viewMinesCount numMines grid =
         count =
             numMines - Array.length flagged
     in
-        p [ class "MinesInfo-count", title "Number of mines left to mark" ]
+        p [ class "MinesInfo-text", title "Number of mines left to mark" ]
             [ text (toString count) ]
 
 
-viewBottom : GridState -> List (Html Msg)
-viewBottom gridState =
+viewGameEndMessage : Bool -> Html Msg
+viewGameEndMessage won =
     let
-        maybeMessage =
-            case gridState of
-                NewGrid ->
-                    Nothing
-
-                OngoingGrid ->
-                    -- TODO: "I give up" button.
-                    Nothing
-
-                WonGrid ->
-                    -- TODO: "Play again" button.
-                    Just "You won!"
-
-                LostGrid ->
-                    -- TODO: "Play again" button.
-                    Just "You lost!"
+        ( titleText, emoji ) =
+            if won then
+                ( "You won!", "🎉" )
+            else
+                ( "You lost!", "☢️" )
     in
-        case maybeMessage of
-            Just message ->
-                [ p [ class "Bottom" ] [ text message ] ]
+        p [ class "MinesInfo-text MinesInfo-text--emoji", title titleText ]
+            [ text emoji ]
 
-            Nothing ->
-                []
+
+viewBottomButton : GridState -> Maybe (Html Msg)
+viewBottomButton gridState =
+    case gridState of
+        NewGrid ->
+            Nothing
+
+        OngoingGrid ->
+            Just giveUpButton
+
+        WonGrid ->
+            Just playAgainButton
+
+        LostGrid ->
+            Just playAgainButton
+
+
+giveUpButton : Html Msg
+giveUpButton =
+    button
+        [ type_ "button"
+        , class "BottomButton"
+        , onClick GiveUpButtonClick
+        ]
+        [ text "I give up!" ]
+
+
+playAgainButton : Html Msg
+playAgainButton =
+    button
+        [ type_ "button"
+        , class "BottomButton"
+        , onClick PlayAgainButtonClick
+        ]
+        [ text "Play again" ]

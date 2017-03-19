@@ -8,6 +8,7 @@ module.exports = {
   },
   globals: {
     Elm: false,
-    document: false
+    document: false,
+    window: false
   }
 };

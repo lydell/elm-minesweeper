@@ -287,6 +287,21 @@ revealRecursivelyHelper x y ( visitedCoords, grid ) =
                 ( visitedCoords, grid )
 
 
+detonateAll : Grid -> Grid
+detonateAll =
+    Matrix.map detonateCell
+
+
+detonateCell : Cell -> Cell
+detonateCell cell =
+    case cell of
+        Cell Unrevealed Mine ->
+            Cell Revealed Mine
+
+        _ ->
+            cell
+
+
 flag : Int -> Int -> Grid -> Grid
 flag x y grid =
     case Matrix.get x y grid of
@@ -376,22 +391,3 @@ isDragging sizer =
 
         _ ->
             False
-
-
-cellToString : Cell -> String
-cellToString cell =
-    case cell of
-        Cell Flagged _ ->
-            "🚩"
-
-        Cell QuestionMarked _ ->
-            "?"
-
-        Cell _ Mine ->
-            "💣"
-
-        Cell _ (Hint num) ->
-            if num == 0 then
-                ""
-            else
-                toString num

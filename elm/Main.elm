@@ -11,7 +11,8 @@ import View exposing (view)
 
 
 type alias Flags =
-    { randomSeed : Int
+    { debug : Bool
+    , randomSeed : Int
     }
 
 
@@ -49,7 +50,7 @@ init flags =
             Grid.addRandomMinesAndUpdateNumbers numMines ( seed, emptyGrid )
 
         initialModel =
-            { state = RegularGame
+            { debug = flags.debug
             , seed = newSeed
             , numMines = numMines
             , grid = grid
@@ -110,6 +111,12 @@ update msg model =
 
                 _ ->
                     ( model, Cmd.none )
+
+        GiveUpButtonClick ->
+            ( { model | grid = Grid.detonateAll model.grid }, Cmd.none )
+
+        PlayAgainButtonClick ->
+            ( { model | grid = Grid.reset model.grid }, Cmd.none )
 
         NumMinesChange string ->
             let
