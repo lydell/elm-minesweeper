@@ -105,8 +105,8 @@ pointerMovement sizer maybePointerPosition =
                 startPosition =
                     dragStartData.pointerPosition
             in
-                { dx = (pointerPosition.screenX - startPosition.screenX) * 2
-                , dy = (pointerPosition.screenY - startPosition.screenY)
+                { dx = (pointerPosition.clientX - startPosition.clientX) * 2
+                , dy = (pointerPosition.clientY - startPosition.clientY)
                 }
 
         _ ->

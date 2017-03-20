@@ -38,8 +38,8 @@ type Button
 screens.)
 -}
 type alias PointerPosition =
-    { screenX : Int
-    , screenY : Int
+    { clientX : Int
+    , clientY : Int
     }
 
 
@@ -98,8 +98,8 @@ parseButtonNumber number =
 pointerPositionDecoder : Decoder PointerPosition
 pointerPositionDecoder =
     Json.Decode.map2 PointerPosition
-        (Json.Decode.field "screenX" Json.Decode.int)
-        (Json.Decode.field "screenY" Json.Decode.int)
+        (Json.Decode.field "clientX" Json.Decode.int)
+        (Json.Decode.field "clientY" Json.Decode.int)
 
 
 {-| Like `onInput`, but only afte the input has been blurred.
