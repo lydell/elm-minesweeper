@@ -20,6 +20,7 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick)
 import Html.Events.Custom exposing (onRightClick)
+import Icon exposing (Icon)
 import Types exposing (..)
 
 
@@ -54,29 +55,24 @@ numberColor number =
             "inherit"
 
 
-mineEmoji : Html Msg
-mineEmoji =
-    text "💣"
+mineIcon : Icon
+mineIcon =
+    Icon.new "💣"
 
 
-flagEmoji : Html Msg
-flagEmoji =
-    colored "🚩" "#ff0000"
+flagIcon : Icon
+flagIcon =
+    Icon.new "🚩" |> Icon.color "#ff0000"
 
 
-questionMarkEmoji : Html Msg
-questionMarkEmoji =
-    text "❓"
+questionMarkIcon : Icon
+questionMarkIcon =
+    Icon.new "❓"
 
 
-whiteQuestionMarkEmoji : Html Msg
-whiteQuestionMarkEmoji =
-    text "❔"
-
-
-crossEmoji : Html Msg
-crossEmoji =
-    colored "❌" "#ff0000"
+crossIcon : Icon
+crossIcon =
+    Icon.new "❌" |> Icon.color "#ff0000"
 
 
 secret : CellContent
@@ -96,54 +92,49 @@ hint number =
 
 flag : CellContent
 flag =
-    ( "Flag", flagEmoji )
+    ( "Flag", Icon.toHtml flagIcon )
 
 
 correctFlag : CellContent
 correctFlag =
-    ( "Correct flag", overlay mineEmoji flagEmoji )
+    ( "Correct flag", overlay (Icon.opacity 0.5 mineIcon) flagIcon )
 
 
 incorrectFlag : CellContent
 incorrectFlag =
-    ( "Incorrect flag", overlay mineEmoji crossEmoji )
+    ( "Incorrect flag", overlay flagIcon crossIcon )
 
 
 questionMark : CellContent
 questionMark =
-    ( "Unsure", questionMarkEmoji )
+    ( "Unsure", Icon.toHtml questionMarkIcon )
 
 
 correctQuestionMark : CellContent
 correctQuestionMark =
-    ( "Correct question mark", overlay mineEmoji whiteQuestionMarkEmoji )
+    ( "Correct question mark", overlay mineIcon questionMarkIcon )
 
 
 inCorrectQuestionMark : CellContent
 inCorrectQuestionMark =
-    ( "Inorrect question mark", whiteQuestionMarkEmoji )
+    ( "Inorrect question mark", overlay questionMarkIcon crossIcon )
 
 
 mine : CellContent
 mine =
-    ( "Mine", mineEmoji )
+    ( "Mine", Icon.toHtml mineIcon )
 
 
 detonatedMine : CellContent
 detonatedMine =
-    ( "Detonated mine", mineEmoji )
+    ( "Detonated mine", Icon.toHtml mineIcon )
 
 
-colored : String -> String -> Html Msg
-colored emoji color =
-    span [ style [ ( "color", color ) ] ] [ text emoji ]
-
-
-overlay : Html Msg -> Html Msg -> Html Msg
+overlay : Icon -> Icon -> Html Msg
 overlay background foreground =
     span [ class "Cell-overlayContainer" ]
-        [ background
-        , span [ class "Cell-overlay" ] [ foreground ]
+        [ Icon.toHtml background
+        , span [ class "Cell-overlay" ] [ Icon.toHtml foreground ]
         ]
 
 
