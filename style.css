@@ -199,9 +199,10 @@ input::-moz-focus-inner {
   border-color: transparent;
 }
 
-.MinesInfo-text--emoji {
+.MinesInfo-emoji {
+  display: inline-block;
   font-weight: normal;
-  transform: scale(2);
+  transform: translateY(-25%) scale(2);
 }
 
 .MinesInfo-input:hover,

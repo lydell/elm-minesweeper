@@ -10,6 +10,7 @@ import Html
         , div
         , input
         , p
+        , span
         , table
         , tbody
         , td
@@ -252,8 +253,8 @@ viewGameEndMessage won =
             else
                 ( "You lost!", "☢️" )
     in
-        p [ class "MinesInfo-text MinesInfo-text--emoji", title titleText ]
-            [ text emoji ]
+        p [ class "MinesInfo-text", title titleText ]
+            [ span [ class "MinesInfo-emoji" ] [ text emoji ] ]
 
 
 viewBottomButton : GridState -> Maybe (Html Msg)
