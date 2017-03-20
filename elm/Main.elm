@@ -160,15 +160,13 @@ update msg model =
 
         MouseMove pointerPosition ->
             let
-                { width, height } =
+                ( width, height ) =
                     case model.sizer of
                         Dragging { width, height } ->
-                            { width = width, height = height }
+                            ( width, height )
 
                         _ ->
-                            { width = Matrix.width model.grid
-                            , height = Matrix.height model.grid
-                            }
+                            ( Matrix.width model.grid, Matrix.height model.grid )
 
                 pointerMovement =
                     Grid.pointerMovement

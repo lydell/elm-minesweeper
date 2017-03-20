@@ -6,6 +6,7 @@ import Html
         ( Html
         , button
         , span
+        , strong
         , text
         )
 import Html.Attributes
@@ -86,8 +87,8 @@ secret =
 hint : Int -> CellContent
 hint number =
     ( toString number
-    , span
-        [ style [ ( "font-weight", "bold" ), ( "color", numberColor number ) ]
+    , strong
+        [ style [ ( "color", numberColor number ) ]
         ]
         [ text (toString number) ]
     )
@@ -153,7 +154,7 @@ view debug gridState x y ((Cell cellState cellInner) as cell) =
             gridState == WonGrid || gridState == LostGrid
 
         isClickable =
-            (gridState == NewGrid || gridState == OngoingGrid)
+            not isGameEnd
                 && (cellState == Unrevealed || cellState == Flagged || cellState == QuestionMarked)
 
         ( titleText, display ) =

@@ -125,13 +125,13 @@ viewSizer grid sizer maybePointerPosition =
         gridHeight =
             Matrix.height grid
 
-        { width, height } =
+        ( width, height ) =
             case sizer of
                 Dragging { width, height } ->
-                    { width = width, height = height }
+                    ( width, height )
 
                 _ ->
-                    { width = gridWidth, height = gridHeight }
+                    ( gridWidth, gridHeight )
 
         pointerMovement =
             Grid.pointerMovement sizer maybePointerPosition

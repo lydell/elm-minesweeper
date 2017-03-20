@@ -371,12 +371,12 @@ isCellFlagged (Cell cellState _) =
 
 
 isCellCorrectlyMarked : Cell -> Bool
-isCellCorrectlyMarked (Cell cellState cellInner) =
-    case ( cellState, cellInner ) of
-        ( Flagged, Mine ) ->
+isCellCorrectlyMarked cell =
+    case cell of
+        Cell Flagged Mine ->
             True
 
-        ( Revealed, Hint _ ) ->
+        Cell Revealed (Hint _) ->
             True
 
         _ ->
