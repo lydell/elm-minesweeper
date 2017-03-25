@@ -1,6 +1,5 @@
 module Cell exposing (..)
 
-import Grid
 import Html
     exposing
         ( Html
@@ -97,7 +96,9 @@ flag =
 
 correctFlag : CellContent
 correctFlag =
-    ( "Correct flag", overlay (Icon.opacity 0.5 mineIcon) flagIcon )
+    ( "Correct flag"
+    , overlay (Icon.opacity 0.5 mineIcon) (Icon.opacity 0.5 flagIcon)
+    )
 
 
 incorrectFlag : CellContent
@@ -167,22 +168,12 @@ view debug gridState x y ((Cell cellState cellInner) as cell) =
                 , ( "Cell--unrevealed", cellState == Unrevealed )
                 , ( "Cell--revealedMine", cellState == Revealed && cellInner == Mine )
                 ]
-
-        size =
-            toString Grid.cellSize ++ "px"
-
-        styles =
-            style
-                [ ( "width", size )
-                , ( "height", size )
-                ]
     in
         if isClickable then
             button
                 [ type_ "button"
                 , titleAttribute
                 , classes
-                , styles
                 , onClick (CellClick x y)
                 , onRightClick (CellRightClick x y)
                 ]
@@ -191,7 +182,6 @@ view debug gridState x y ((Cell cellState cellInner) as cell) =
             span
                 [ titleAttribute
                 , classes
-                , styles
                 , attribute "oncontextmenu" "return false"
                 ]
                 [ display ]

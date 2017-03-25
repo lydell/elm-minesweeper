@@ -1,6 +1,5 @@
 module Grid exposing (..)
 
-import Html.Events.Custom exposing (PointerPosition)
 import Matrix
 import Matrix.Custom
 import Matrix.Extra
@@ -11,7 +10,7 @@ import Types exposing (..)
 
 minWidth : Int
 minWidth =
-    2
+    9
 
 
 maxWidth : Int
@@ -21,7 +20,7 @@ maxWidth =
 
 minHeight : Int
 minHeight =
-    2
+    9
 
 
 maxHeight : Int
@@ -77,42 +76,6 @@ suggestNumMines width height =
         a * x ^ 2 + b * x + c |> round |> clampNumMines width height
 
 
-cellSize : Int
-cellSize =
-    25
-
-
-sizerOffset : Int
-sizerOffset =
-    cellSize // 2
-
-
-sizerSize : Int -> Int
-sizerSize size =
-    size * cellSize + sizerOffset * 2
-
-
-gridSize : Int -> Int -> Int
-gridSize size movement =
-    size + floor (toFloat movement / toFloat cellSize)
-
-
-pointerMovement : Sizer -> Maybe PointerPosition -> PointerMovement
-pointerMovement sizer maybePointerPosition =
-    case ( sizer, maybePointerPosition ) of
-        ( Dragging dragStartData, Just pointerPosition ) ->
-            let
-                startPosition =
-                    dragStartData.pointerPosition
-            in
-                { dx = (pointerPosition.clientX - startPosition.clientX) * 2
-                , dy = (pointerPosition.clientY - startPosition.clientY)
-                }
-
-        _ ->
-            { dx = 0, dy = 0 }
-
-
 clampWidth : Int -> Int
 clampWidth =
     clamp minWidth maxWidth
@@ -126,16 +89,6 @@ clampHeight =
 clampNumMines : Int -> Int -> Int -> Int
 clampNumMines width height =
     clamp minNumMines (maxNumMines width height)
-
-
-clampSizerWidth : Int -> Int
-clampSizerWidth =
-    clamp (sizerSize minWidth) (sizerSize maxWidth)
-
-
-clampSizerHeight : Int -> Int
-clampSizerHeight =
-    clamp (sizerSize minHeight) (sizerSize maxHeight)
 
 
 defaultGrid : Int -> Int -> Grid
@@ -377,16 +330,6 @@ isCellCorrectlyMarked cell =
             True
 
         Cell Revealed (Hint _) ->
-            True
-
-        _ ->
-            False
-
-
-isDragging : Sizer -> Bool
-isDragging sizer =
-    case sizer of
-        Dragging _ ->
             True
 
         _ ->

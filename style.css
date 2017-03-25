@@ -3,8 +3,16 @@
 }
 
 html {
-  background: white;
-  color: black;
+  --g-grey-leia: #f6f6f6;
+  --g-grey-luke: #ececec;
+  --g-grey-lando: #a1a1a1;
+  --g-white: white;
+  --g-black: black;
+  --g-blue: #0000ff;
+  --g-red: #ff0000;
+
+  background: var(--g-grey-leia);
+  color: var(--g-black);
   font: menu;
 }
 
@@ -26,6 +34,7 @@ textarea {
 }
 
 button {
+  color: inherit;
   cursor: pointer;
 }
 
@@ -35,36 +44,35 @@ input::-moz-focus-inner {
   padding: 0;
 }
 
+select:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 var(--g-black);
+}
+
 .Root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
-  padding: 100px;
-}
-
-.Root.is-dragging {
-  cursor: nwse-resize;
-}
-
-.GridContainer {
-  position: relative;
-}
-
-.Grid {
-  table-layout: fixed;
-  border-spacing: 0;
-  position: relative;
-  z-index: 2;
-  cursor: default;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none
 }
 
+.Grid {
+  table-layout: fixed;
+  border-spacing: 0;
+  border: 1px solid var(--g-grey-lando);
+  padding: 1px;
+  background-color: var(--g-white);
+  cursor: default;
+}
+
 .Grid td {
+  width: 1em;
+  height: 1em;
   padding: 0;
 }
 
@@ -72,12 +80,15 @@ input::-moz-focus-inner {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  height: 100%;
   padding: 1px;
   border: none;
   border-radius: 0;
-  background: #fcfcfc;
+  background: none;
   background-clip: content-box;
   font-weight: normal;
+  font-size: 0.7em;
   line-height: 1;
   text-align: center;
   vertical-align: top;
@@ -91,11 +102,11 @@ input::-moz-focus-inner {
 }
 
 .Cell--unrevealed {
-  background-color: #eee;
+  background-color: var(--g-grey-luke);
 }
 
 .Cell--revealedMine {
-  background-color: #ff0000;
+  text-shadow: 0 0 0.5em var(--g-red);
 }
 
 .Cell-overlayContainer {
@@ -106,123 +117,138 @@ input::-moz-focus-inner {
 .Cell-overlay {
   position: absolute;
   z-index: 1;
-  top: 1px;
-  left: 1px;
+  top: 0;
+  left: 0;
 }
 
-.Sizer {
-  position: absolute;
-  z-index: 1;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 1px solid currentColor;
-  color: #eee;
-  overflow: hidden;
-  transition-property: color, border-color;
-  transition-duration: 200ms;
+.Controls {
+  padding-bottom: 0.2em;
 }
 
-.Root:not(.is-dragging) .Sizer {
-  transition-property: width, height;
-  transition-duration: 400ms;
+.Controls-inner {
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+  font-size: 0.7em;
+  line-height: 1;
 }
 
-.Root.is-dragging .Sizer {
-  z-index: 4;
+.Controls-inner > * {
+  display: flex;
 }
 
-.Sizer-dimensions {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 0.5em 1em;
-  background-color: white;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+.Controls-emoji {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2em;
 }
 
-.Sizer-button {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  transform: translate(50%, 50%) rotate(45deg);
-  padding: 0;
+.MultiplicationSign {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1em;
+}
+
+.Button {
   margin: 0;
-  border: none;
+  padding: 0.1em 1em;
+  border: 1px solid var(--g-grey-lando);
   border-radius: 0;
+  background: var(--g-grey-luke);
+  box-shadow: inset 0 0 0 2px var(--g-white);
+}
+
+.Button:hover,
+.Button:focus,
+.Button:active {
+  outline: none;
+  border-color: var(--g-blue);
+}
+
+.Button--muted {
+  font-size: 0.5em;
+}
+
+.Button--muted:not(:hover):not(:focus):not(:active) {
   background: none;
-  background-image:
-    repeating-linear-gradient(
-      to right,
-      currentColor,
-      currentColor 8.33%,
-      transparent 0,
-      transparent 16.66%
-    );
-  color: inherit;
-  cursor: nwse-resize;
-  transition-property: color;
-  transition-duration: 200ms;
 }
 
-.Root.is-dragging .Sizer,
-.Sizer-button:hover,
-.Sizer-button:focus,
-.Sizer-button:active {
-  color: black;
-  outline: none;
-}
-
-.MinesInfo {
-  position: relative;
-  z-index: 3;
-  top: 1px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 1.5em;
-}
-
-.MinesInfo-input {
-  border-radius: 0;
-  text-align: inherit;
-  font-weight: inherit;
-  transition: border-color 200ms;
-}
-
-.MinesInfo-input,
-.MinesInfo-text {
-  border: 1px solid #eee;
-  padding: 0.33em;
-}
-
-.MinesInfo-text {
-  border-color: transparent;
-}
-
-.MinesInfo-emoji {
-  display: inline-block;
-  font-weight: normal;
-  transform: translateY(-25%) scale(2);
-}
-
-.MinesInfo-input:hover,
-.MinesInfo-input:focus,
-.MinesInfo-input:active {
-  border-color: black;
-  outline: none;
-}
-
-.BottomButton {
+.Select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   margin: 0;
-  margin-top: 1em;
-  padding: 0.33em 1em;
+  padding: 0.1em;
+  padding-right: 0.9em;
+  border: 1px solid var(--g-grey-lando);
   border-radius: 0;
-  border: none;
-  background: #eee;
+  background: var(--g-white);
+  background-image: url('data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20%3F%3E%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020.52%2010.88%22%3E%3Cpolygon%20points%3D%2220.52%202.31%2018.59%200%2010.26%206.97%201.93%200%200%202.31%2010.26%2010.88%2010.26%2010.88%2010.26%2010.88%2020.52%202.31%22%20fill%3D%22%23000%22%2F%3E%3C%2Fsvg%3E');
+  background-size: auto 0.25em;
+  background-position: right 0.25em center;
+  background-repeat: no-repeat;
+  text-align: right;
+  text-align-last: right;
+  /*font-weight: bold;*/
 }
 
-.BottomButton:hover,
-.BottomButton:focus,
-.BottomButton:active {
+.Select:hover,
+.Select:focus,
+.Select:active {
+  border-color: var(--g-blue);
+}
+
+.InputWithIcon {
+  display: flex;
+  margin: 0;
+  padding: 0.1em;
+  border: 1px solid var(--g-grey-lando);
+  background: var(--g-white);
+  cursor: text;
+}
+
+.InputWithIcon:hover,
+.InputWithIcon:focus,
+.InputWithIcon:active {
   outline: none;
+}
+
+.InputWithIcon:hover,
+.InputWithIcon:focus-within {
+  border-color: var(--g-blue);
+}
+
+.InputWithIcon-input {
+  margin: 0;
+  margin-right: 0.1em;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: right;
+  font-weight: bold;
+}
+
+.InputWithIcon-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.TextWithIcon {
+  display: flex;
+  padding: calc(0.1em + 1px);
+}
+
+.TextWithIcon-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.TextWithIcon-text {
+  margin-right: 0.1em;
+  font-weight: bold;
+  text-align: right;
 }

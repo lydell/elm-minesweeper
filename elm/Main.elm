@@ -2,13 +2,14 @@ module Main exposing (..)
 
 import Grid
 import Html
-import Html.Events.Custom exposing (Button(LeftButton))
 import Matrix
 import Random.Pcg as Random
 import Regex exposing (Regex, HowMany(All))
 import Set
+import Task
 import Types exposing (..)
 import View exposing (view)
+import Window
 
 
 type alias Flags =
@@ -23,21 +24,21 @@ main =
         { init = init
         , update = update
         , view = view
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         }
 
 
-init : Flags -> ( Model, Cmd msg )
+init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         seed =
             Random.initialSeed flags.randomSeed
 
         width =
-            9
+            Grid.minWidth
 
         height =
-            9
+            Grid.minHeight
 
         numMines =
             Grid.suggestNumMines width height
@@ -58,11 +59,18 @@ init flags =
             , seed = newSeed
             , numMines = numMines
             , grid = grid
-            , sizer = Idle
-            , pointerPosition = Nothing
+            , windowSize = { width = 0, height = 0 }
             }
+
+        initialCmd =
+            Task.perform WindowSize Window.size
     in
-        ( initialModel, Cmd.none )
+        ( initialModel, initialCmd )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Window.resizes WindowSize
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
@@ -121,79 +129,84 @@ update msg model =
         PlayAgainButtonClick ->
             ( { model | grid = Grid.reset model.grid }, Cmd.none )
 
-        NumMinesChange string ->
+        WidthChange string ->
+            let
+                width =
+                    parseWidth model string
+
+                height =
+                    Matrix.height model.grid
+            in
+                ( updateGridSize width height model, Cmd.none )
+
+        HeightChange string ->
             let
                 width =
                     Matrix.width model.grid
 
                 height =
-                    Matrix.height model.grid
+                    parseHeight model string
+            in
+                ( updateGridSize width height model, Cmd.none )
 
+        NumMinesChange string ->
+            let
                 numMines =
-                    removeNonDigits string
-                        |> String.toInt
-                        |> Result.withDefault model.numMines
-                        |> Grid.clampNumMines width height
+                    parseNumDigits model string
             in
                 ( { model | numMines = numMines }, Cmd.none )
 
-        MouseDown button pointerPosition ->
-            case button of
-                LeftButton ->
-                    ( { model
-                        | sizer =
-                            Dragging
-                                { pointerPosition = pointerPosition
-                                , width = Matrix.width model.grid
-                                , height = Matrix.height model.grid
-                                }
-                        , pointerPosition = Just pointerPosition
-                      }
-                    , Cmd.none
-                    )
+        WindowSize size ->
+            ( { model | windowSize = size }, Cmd.none )
 
-                _ ->
-                    ( model, Cmd.none )
 
-        MouseUp ->
-            ( { model | sizer = Idle, pointerPosition = Nothing }, Cmd.none )
+parseWidth : Model -> String -> Int
+parseWidth model string =
+    removeNonDigits string
+        |> String.toInt
+        |> Result.withDefault (Matrix.width model.grid)
+        |> Grid.clampWidth
 
-        MouseMove pointerPosition ->
-            let
-                ( width, height ) =
-                    case model.sizer of
-                        Dragging { width, height } ->
-                            ( width, height )
 
-                        _ ->
-                            ( Matrix.width model.grid, Matrix.height model.grid )
+parseHeight : Model -> String -> Int
+parseHeight model string =
+    removeNonDigits string
+        |> String.toInt
+        |> Result.withDefault (Matrix.height model.grid)
+        |> Grid.clampHeight
 
-                pointerMovement =
-                    Grid.pointerMovement
-                        model.sizer
-                        (Just pointerPosition)
 
-                newWidth =
-                    Grid.gridSize width pointerMovement.dx
-                        |> Grid.clampWidth
+parseNumDigits : Model -> String -> Int
+parseNumDigits model string =
+    let
+        width =
+            Matrix.width model.grid
 
-                newHeight =
-                    Grid.gridSize height pointerMovement.dy
-                        |> Grid.clampHeight
+        height =
+            Matrix.height model.grid
+    in
+        removeNonDigits string
+            |> String.toInt
+            |> Result.withDefault model.numMines
+            |> Grid.clampNumMines width height
 
-                grid =
-                    Grid.defaultGrid newWidth newHeight
 
-                numMines =
-                    Grid.suggestNumMines newWidth newHeight
-            in
-                ( { model
-                    | grid = grid
-                    , numMines = numMines
-                    , pointerPosition = Just pointerPosition
-                  }
-                , Cmd.none
-                )
+updateGridSize : Int -> Int -> Model -> Model
+updateGridSize width height model =
+    let
+        clampedWidth =
+            Grid.clampWidth width
+
+        clampedHeight =
+            Grid.clampHeight height
+
+        grid =
+            Grid.defaultGrid clampedWidth clampedHeight
+
+        numMines =
+            Grid.suggestNumMines clampedWidth clampedHeight
+    in
+        { model | grid = grid, numMines = numMines }
 
 
 nonDigitRegex : Regex
