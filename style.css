@@ -101,6 +101,10 @@ select:-moz-focusring {
   outline: none;
 }
 
+button.Cell--unrevealed:active {
+  opacity: 0.5;
+}
+
 .Cell--unrevealed {
   background-color: var(--g-grey-luke);
 }
