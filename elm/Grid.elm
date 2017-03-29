@@ -262,9 +262,6 @@ flag x y grid =
             Matrix.update x y (setCellState Flagged) grid
 
         Just (Cell Flagged _) ->
-            Matrix.update x y (setCellState QuestionMarked) grid
-
-        Just (Cell QuestionMarked _) ->
             Matrix.update x y (setCellState Unrevealed) grid
 
         _ ->

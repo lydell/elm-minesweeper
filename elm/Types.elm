@@ -27,7 +27,6 @@ type CellState
     = Unrevealed
     | Revealed
     | Flagged
-    | QuestionMarked
 
 
 type CellInner

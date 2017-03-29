@@ -64,11 +64,6 @@ flagIcon =
     Icon.new "🚩" |> Icon.color "#ff0000"
 
 
-questionMarkIcon : Icon
-questionMarkIcon =
-    Icon.new "❓"
-
-
 crossIcon : Icon
 crossIcon =
     Icon.new "❌" |> Icon.color "#ff0000"
@@ -106,21 +101,6 @@ incorrectFlag =
     ( "Incorrect flag", overlay flagIcon crossIcon )
 
 
-questionMark : CellContent
-questionMark =
-    ( "Unsure", Icon.toHtml questionMarkIcon )
-
-
-correctQuestionMark : CellContent
-correctQuestionMark =
-    ( "Correct question mark", overlay mineIcon questionMarkIcon )
-
-
-inCorrectQuestionMark : CellContent
-inCorrectQuestionMark =
-    ( "Inorrect question mark", overlay questionMarkIcon crossIcon )
-
-
 mine : CellContent
 mine =
     ( "Mine", Icon.toHtml mineIcon )
@@ -147,7 +127,7 @@ view debug gridState x y ((Cell cellState cellInner) as cell) =
 
         isClickable =
             not isGameEnd
-                && (cellState == Unrevealed || cellState == Flagged || cellState == QuestionMarked)
+                && (cellState == Unrevealed || cellState == Flagged)
 
         ( titleText, display ) =
             content debug isGameEnd cell
@@ -198,15 +178,6 @@ content debug isGameEnd cell =
                     incorrectFlag
             else
                 flag
-
-        Cell QuestionMarked cellInner ->
-            if isGameEnd then
-                if cellInner == Mine then
-                    correctQuestionMark
-                else
-                    inCorrectQuestionMark
-            else
-                questionMark
 
         Cell cellState Mine ->
             if cellState == Revealed then
