@@ -131,7 +131,7 @@ view : Bool -> GridState -> Int -> Int -> Cell -> Html Msg
 view debug gridState x y ((Cell cellState cellInner) as cell) =
     let
         isGameEnd =
-            gridState == WonGrid || gridState == LostGrid
+            gridState == WonGrid || gridState == LostGrid || gridState == GivenUpGrid
 
         isClickable =
             not isGameEnd && (cellState == Unrevealed || cellState == Flagged)
@@ -178,7 +178,11 @@ content : Bool -> GridState -> Cell -> CellContent
 content debug gridState cell =
     case cell of
         Cell Flagged cellInner ->
-            if gridState == WonGrid || gridState == LostGrid then
+            if
+                (gridState == WonGrid)
+                    || (gridState == LostGrid)
+                    || (gridState == GivenUpGrid)
+            then
                 if cellInner == Mine then
                     correctFlag
                 else
@@ -191,7 +195,7 @@ content debug gridState cell =
                 detonatedMine
             else if gridState == WonGrid then
                 autoFlaggedMine
-            else if gridState == LostGrid || debug then
+            else if gridState == LostGrid || gridState == GivenUpGrid || debug then
                 mine
             else
                 secret

@@ -240,21 +240,6 @@ revealRecursivelyHelper x y ( visitedCoords, grid ) =
                 ( visitedCoords, grid )
 
 
-detonateAll : Grid -> Grid
-detonateAll =
-    Matrix.map detonateCell
-
-
-detonateCell : Cell -> Cell
-detonateCell cell =
-    case cell of
-        Cell Unrevealed Mine ->
-            Cell Revealed Mine
-
-        _ ->
-            cell
-
-
 flag : Int -> Int -> Grid -> Grid
 flag x y grid =
     case Matrix.get x y grid of
@@ -273,9 +258,11 @@ setCellState cellState (Cell _ cellInner) =
     Cell cellState cellInner
 
 
-gridState : Grid -> GridState
-gridState grid =
-    if isGridNew grid then
+gridState : Bool -> Grid -> GridState
+gridState givenUp grid =
+    if givenUp then
+        GivenUpGrid
+    else if isGridNew grid then
         NewGrid
     else if isGridWon grid then
         WonGrid

@@ -59,6 +59,7 @@ init flags =
             , seed = newSeed
             , numMines = numMines
             , grid = grid
+            , givenUp = False
             , windowSize = { width = 0, height = 0 }
             }
 
@@ -77,7 +78,7 @@ update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
     case msg of
         CellClick x y ->
-            case Grid.gridState model.grid of
+            case Grid.gridState model.givenUp model.grid of
                 NewGrid ->
                     let
                         ( seed, gridWithMines ) =
@@ -103,7 +104,7 @@ update msg model =
                     ( model, Cmd.none )
 
         CellRightClick x y ->
-            case Grid.gridState model.grid of
+            case Grid.gridState model.givenUp model.grid of
                 NewGrid ->
                     let
                         newGrid =
@@ -124,10 +125,15 @@ update msg model =
                     ( model, Cmd.none )
 
         GiveUpButtonClick ->
-            ( { model | grid = Grid.detonateAll model.grid }, Cmd.none )
+            ( { model | givenUp = True }, Cmd.none )
 
         PlayAgainButtonClick ->
-            ( { model | grid = Grid.reset model.grid }, Cmd.none )
+            ( { model
+                | grid = Grid.reset model.grid
+                , givenUp = False
+              }
+            , Cmd.none
+            )
 
         WidthChange string ->
             let

@@ -93,18 +93,18 @@ view model =
     in
         div [ class "Root", style styles ]
             [ div []
-                [ viewControls model.numMines model.grid
-                , viewGrid model.debug model.grid
+                [ viewControls model.givenUp model.numMines model.grid
+                , viewGrid model.debug model.givenUp model.grid
                 ]
             ]
 
 
-viewGrid : Bool -> Grid -> Html Msg
-viewGrid debug grid =
+viewGrid : Bool -> Bool -> Grid -> Html Msg
+viewGrid debug givenUp grid =
     table [ class "Grid" ]
         [ tbody []
             (List.indexedMap
-                (viewRow debug (Grid.gridState grid))
+                (viewRow debug (Grid.gridState givenUp grid))
                 (Matrix.Custom.toListOfLists grid)
             )
         ]
@@ -124,22 +124,19 @@ viewCell debug gridState x y cell =
     td [] [ Cell.view debug gridState x y cell ]
 
 
-viewControls : Int -> Grid -> Html Msg
-viewControls numMines grid =
+viewControls : Bool -> Int -> Grid -> Html Msg
+viewControls givenUp numMines grid =
     let
         ( leftContent, rightContent ) =
-            case Grid.gridState grid of
+            case Grid.gridState givenUp grid of
                 NewGrid ->
                     ( sizeControls grid, viewMinesInput numMines )
 
                 OngoingGrid ->
                     ( giveUpButton, viewMinesCount numMines grid )
 
-                WonGrid ->
-                    ( playAgainButton, viewGameEndMessage True )
-
-                LostGrid ->
-                    ( playAgainButton, viewGameEndMessage False )
+                gridState ->
+                    ( playAgainButton, viewGameEndMessage gridState )
 
         styles =
             [ ( "height", toString controlsHeight ++ "em" )
@@ -199,16 +196,24 @@ viewMinesCount numMines grid =
             ]
 
 
-viewGameEndMessage : Bool -> Html Msg
-viewGameEndMessage won =
+viewGameEndMessage : GridState -> Html Msg
+viewGameEndMessage gridState =
     let
         ( titleText, emoji ) =
-            if won then
-                ( "You won!", "🎉" )
-            else
-                ( "You lost!", "☢️" )
+            case gridState of
+                WonGrid ->
+                    ( "You won!", "🎉" )
+
+                LostGrid ->
+                    ( "You lost!", "☢️" )
+
+                GivenUpGrid ->
+                    ( "You gave up!", "🏳" )
+
+                _ ->
+                    ( "You managed to break the game!", "❓" )
     in
-        span [ class "Controls-emoji" ] [ text emoji ]
+        span [ class "Controls-emoji", title titleText ] [ text emoji ]
 
 
 sizeControls : Grid -> Html Msg

@@ -11,6 +11,7 @@ type alias Model =
     , seed : Seed
     , numMines : Int
     , grid : Matrix Cell
+    , givenUp : Bool
     , windowSize : Size
     }
 
@@ -43,6 +44,7 @@ type GridState
     | OngoingGrid
     | WonGrid
     | LostGrid
+    | GivenUpGrid
 
 
 type Msg
