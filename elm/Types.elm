@@ -1,5 +1,6 @@
 module Types exposing (..)
 
+import Dom
 import Html exposing (Html)
 import Matrix exposing (Matrix)
 import Random.Pcg exposing (Seed)
@@ -55,4 +56,5 @@ type Msg
     | CellRightClick Int Int
     | GiveUpButtonClick
     | PlayAgainButtonClick
+    | PlayAgainButtonFocus (Result Dom.Error ())
     | WindowSize Size

@@ -8,7 +8,7 @@ import Regex exposing (Regex, HowMany(All))
 import Set
 import Task
 import Types exposing (..)
-import View exposing (view)
+import View
 import Window
 
 
@@ -23,7 +23,7 @@ main =
     Html.programWithFlags
         { init = init
         , update = update
-        , view = view
+        , view = View.view
         , subscriptions = subscriptions
         }
 
@@ -74,7 +74,7 @@ subscriptions model =
     Window.resizes WindowSize
 
 
-update : Msg -> Model -> ( Model, Cmd msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         CellClick x y ->
@@ -90,12 +90,20 @@ update msg model =
                         finalGrid =
                             Grid.reveal x y gridWithMines
                     in
-                        ( { model | seed = seed, grid = finalGrid }, Cmd.none )
+                        ( { model | seed = seed, grid = finalGrid }
+                        , View.focusPlayAgainButton
+                        )
 
                 OngoingGrid ->
                     case Matrix.get x y model.grid of
                         Just (Cell Unrevealed _) ->
-                            ( { model | grid = Grid.reveal x y model.grid }, Cmd.none )
+                            let
+                                newGrid =
+                                    Grid.reveal x y model.grid
+                            in
+                                ( { model | grid = newGrid }
+                                , View.focusPlayAgainButton
+                                )
 
                         _ ->
                             ( model, Cmd.none )
@@ -116,16 +124,24 @@ update msg model =
                                 (Set.singleton ( x, y ))
                                 ( model.seed, newGrid )
                     in
-                        ( { model | seed = seed, grid = gridWithMines }, Cmd.none )
+                        ( { model | seed = seed, grid = gridWithMines }
+                        , View.focusPlayAgainButton
+                        )
 
                 OngoingGrid ->
-                    ( { model | grid = Grid.flag x y model.grid }, Cmd.none )
+                    let
+                        newGrid =
+                            Grid.flag x y model.grid
+                    in
+                        ( { model | grid = newGrid }
+                        , View.focusPlayAgainButton
+                        )
 
                 _ ->
                     ( model, Cmd.none )
 
         GiveUpButtonClick ->
-            ( { model | givenUp = True }, Cmd.none )
+            ( { model | givenUp = True }, View.focusPlayAgainButton )
 
         PlayAgainButtonClick ->
             ( { model
@@ -134,6 +150,12 @@ update msg model =
               }
             , Cmd.none
             )
+
+        PlayAgainButtonFocus _ ->
+            -- It doesn't matter if the focus fails. In fact, the button is
+            -- attempted to be focused even if it is not present! Perhaps a bit
+            -- ugly, but simple.
+            ( model, Cmd.none )
 
         WidthChange string ->
             let

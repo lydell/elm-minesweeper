@@ -1,6 +1,7 @@
-module View exposing (view)
+module View exposing (view, focusPlayAgainButton)
 
 import Array
+import Dom
 import Cell
 import Grid
 import Html
@@ -25,6 +26,7 @@ import Html.Attributes
         ( attribute
         , class
         , classList
+        , id
         , selected
         , style
         , title
@@ -36,6 +38,7 @@ import Html.Events.Custom exposing (onChange)
 import Icon
 import Matrix
 import Matrix.Custom
+import Task
 import Types exposing (..)
 
 
@@ -262,11 +265,22 @@ giveUpButton =
         [ text "I give up!" ]
 
 
+playAgainButtonId : String
+playAgainButtonId =
+    "playAgainButton"
+
+
 playAgainButton : Html Msg
 playAgainButton =
     button
         [ type_ "button"
+        , id playAgainButtonId
         , class "Button"
         , onClick PlayAgainButtonClick
         ]
         [ text "Play again" ]
+
+
+focusPlayAgainButton : Cmd Msg
+focusPlayAgainButton =
+    Task.attempt PlayAgainButtonFocus (Dom.focus playAgainButtonId)
