@@ -64,6 +64,11 @@ flagIcon =
     Icon.new "🚩" |> Icon.color "#ff0000"
 
 
+correctFlagIconHtml : Html Msg
+correctFlagIconHtml =
+    overlay (Icon.opacity 0.5 mineIcon) (Icon.opacity 0.5 flagIcon)
+
+
 crossIcon : Icon
 crossIcon =
     Icon.new "❌" |> Icon.color "#ff0000"
@@ -91,9 +96,7 @@ flag =
 
 correctFlag : CellContent
 correctFlag =
-    ( "Correct flag"
-    , overlay (Icon.opacity 0.5 mineIcon) (Icon.opacity 0.5 flagIcon)
-    )
+    ( "Correct flag", correctFlagIconHtml )
 
 
 incorrectFlag : CellContent
@@ -111,6 +114,11 @@ detonatedMine =
     ( "Detonated mine", Icon.toHtml mineIcon )
 
 
+autoFlaggedMine : CellContent
+autoFlaggedMine =
+    ( "Automatically flagged mine", correctFlagIconHtml )
+
+
 overlay : Icon -> Icon -> Html Msg
 overlay background foreground =
     span [ class "Cell-overlayContainer" ]
@@ -126,11 +134,10 @@ view debug gridState x y ((Cell cellState cellInner) as cell) =
             gridState == WonGrid || gridState == LostGrid
 
         isClickable =
-            not isGameEnd
-                && (cellState == Unrevealed || cellState == Flagged)
+            not isGameEnd && (cellState == Unrevealed || cellState == Flagged)
 
         ( titleText, display ) =
-            content debug isGameEnd cell
+            content debug gridState cell
 
         useHoverTitle =
             not (cellState == Unrevealed || cellState == Revealed)
@@ -167,11 +174,11 @@ view debug gridState x y ((Cell cellState cellInner) as cell) =
                 [ display ]
 
 
-content : Bool -> Bool -> Cell -> CellContent
-content debug isGameEnd cell =
+content : Bool -> GridState -> Cell -> CellContent
+content debug gridState cell =
     case cell of
         Cell Flagged cellInner ->
-            if isGameEnd then
+            if gridState == WonGrid || gridState == LostGrid then
                 if cellInner == Mine then
                     correctFlag
                 else
@@ -182,7 +189,9 @@ content debug isGameEnd cell =
         Cell cellState Mine ->
             if cellState == Revealed then
                 detonatedMine
-            else if isGameEnd || debug then
+            else if gridState == WonGrid then
+                autoFlaggedMine
+            else if gridState == LostGrid || debug then
                 mine
             else
                 secret

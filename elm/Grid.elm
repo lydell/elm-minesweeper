@@ -323,11 +323,8 @@ isCellFlagged (Cell cellState _) =
 isCellCorrectlyMarked : Cell -> Bool
 isCellCorrectlyMarked cell =
     case cell of
-        Cell Flagged Mine ->
-            True
+        Cell cellState Mine ->
+            cellState /= Revealed
 
-        Cell Revealed (Hint _) ->
-            True
-
-        _ ->
-            False
+        Cell cellState (Hint _) ->
+            cellState == Revealed
