@@ -5,7 +5,6 @@ import Html
 import Matrix
 import Random.Pcg as Random
 import Regex exposing (Regex, HowMany(All))
-import Set
 import Task
 import Types exposing (..)
 import View
@@ -51,7 +50,8 @@ init flags =
         ( newSeed, grid ) =
             Grid.addRandomMinesAndUpdateNumbers
                 numMines
-                Set.empty
+                0
+                0
                 ( seed, emptyGrid )
 
         initialModel =
@@ -84,7 +84,8 @@ update msg model =
                         ( seed, gridWithMines ) =
                             Grid.addRandomMinesAndUpdateNumbers
                                 model.numMines
-                                (Set.singleton ( x, y ))
+                                x
+                                y
                                 ( model.seed, Grid.reset model.grid )
 
                         finalGrid =
@@ -120,8 +121,9 @@ update msg model =
 
                         ( seed, gridWithMines ) =
                             Grid.addRandomMinesAndUpdateNumbers
-                                model.numMines
-                                (Set.singleton ( x, y ))
+                                (model.numMines - 1)
+                                x
+                                y
                                 ( model.seed, newGrid )
                     in
                         ( { model | seed = seed, grid = gridWithMines }

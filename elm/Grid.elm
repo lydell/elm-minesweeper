@@ -35,7 +35,7 @@ minNumMines =
 
 maxNumMines : Int -> Int -> Int
 maxNumMines width height =
-    width * height - 1
+    width * height - 9
 
 
 {-| Suggests a number of mines for a given size of the grid.
@@ -108,11 +108,19 @@ reset grid =
 
 addRandomMinesAndUpdateNumbers :
     Int
-    -> Set ( Int, Int )
+    -> Int
+    -> Int
     -> ( Seed, Grid )
     -> ( Seed, Grid )
-addRandomMinesAndUpdateNumbers numMines excludedCoords ( seed, grid ) =
+addRandomMinesAndUpdateNumbers numMines x y ( seed, grid ) =
     let
+        neighbourCoords =
+            Matrix.Extra.indexedNeighbours x y grid
+                |> List.map Tuple.first
+
+        excludedCoords =
+            Set.fromList (( x, y ) :: neighbourCoords)
+
         ( newSeed, newGrid ) =
             addRandomMines numMines excludedCoords ( seed, grid )
     in
