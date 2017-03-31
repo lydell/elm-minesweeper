@@ -190,13 +190,39 @@ cellNumber x y grid =
 reveal : Int -> Int -> Grid -> Grid
 reveal x y grid =
     case Matrix.get x y grid of
-        Just (Cell _ (Hint 0)) ->
+        Just (Cell Unrevealed (Hint 0)) ->
             revealRecursively x y grid
 
-        Just _ ->
+        Just (Cell Unrevealed _) ->
             revealSingle x y grid
 
-        Nothing ->
+        _ ->
+            grid
+
+
+revealNeighbours : Int -> Int -> Grid -> Grid
+revealNeighbours x y grid =
+    case Matrix.get x y grid of
+        Just (Cell _ (Hint num)) ->
+            let
+                neighbours =
+                    Matrix.Extra.indexedNeighbours x y grid
+
+                neighbourCells =
+                    List.map Tuple.second neighbours
+
+                flags =
+                    List.filter isCellFlagged neighbourCells
+
+                neighbourCoords =
+                    List.map Tuple.first neighbours
+            in
+                if num == 0 || List.length flags /= num then
+                    grid
+                else
+                    List.foldl (uncurry reveal) grid neighbourCoords
+
+        _ ->
             grid
 
 
@@ -323,3 +349,8 @@ isCellCorrectlyMarked cell =
 
         Cell cellState (Hint _) ->
             cellState == Revealed
+
+
+isGameEnd : GridState -> Bool
+isGameEnd gridState =
+    gridState == WonGrid || gridState == LostGrid || gridState == GivenUpGrid

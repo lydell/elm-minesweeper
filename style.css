@@ -4,6 +4,7 @@
 
 html {
   --g-grey-leia: #f6f6f6;
+  --g-grey-wampa: #f1f1f1;
   --g-grey-luke: #ececec;
   --g-grey-lando: #a1a1a1;
   --g-white: white;
@@ -61,6 +62,28 @@ select:-moz-focusring {
   user-select: none
 }
 
+.GridContainer {
+  position: relative;
+}
+
+.GridContainer-tooltip {
+  position: absolute;
+  z-index: 1;
+  margin-left: 2px;
+  padding: 0.3em 0.5em;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: var(--g-white);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0ms;
+}
+
+.GridContainer-tooltip.is-visible {
+  opacity: 1;
+  transition-delay: 200ms;
+}
+
 .Grid {
   table-layout: fixed;
   border-spacing: 0;
@@ -68,6 +91,16 @@ select:-moz-focusring {
   padding: 1px;
   background-color: var(--g-white);
   cursor: default;
+  overflow: hidden;
+}
+
+.Grid:focus {
+  outline: none;
+  border-color: var(--g-blue);
+}
+
+.Grid:focus-within {
+  border-color: var(--g-blue);
 }
 
 .Grid td {
@@ -82,6 +115,7 @@ select:-moz-focusring {
   align-items: center;
   width: 100%;
   height: 100%;
+  margin: 0;
   padding: 1px;
   border: none;
   border-radius: 0;
@@ -101,8 +135,30 @@ select:-moz-focusring {
   outline: none;
 }
 
+.Cell.is-selected::before,
+.Cell.is-selected::after {
+  --d: 0;
+
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: var(--d);
+  bottom: var(--d);
+  left: var(--d);
+  right: var(--d);
+  border: 1px solid var(--g-blue);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.Cell.is-selected::after {
+  --d: calc(-100% + 1px);
+
+  opacity: 0.25;
+}
+
 button.Cell--unrevealed:active {
-  opacity: 0.5;
+  background-color: var(--g-grey-wampa);
 }
 
 .Cell--unrevealed {
@@ -214,12 +270,6 @@ button.Cell--unrevealed:active {
 }
 
 .InputWithIcon:hover,
-.InputWithIcon:focus,
-.InputWithIcon:active {
-  outline: none;
-}
-
-.InputWithIcon:hover,
 .InputWithIcon:focus-within {
   border-color: var(--g-blue);
 }
@@ -232,6 +282,12 @@ button.Cell--unrevealed:active {
   background: none;
   text-align: right;
   font-weight: bold;
+}
+
+.InputWithIcon-input:hover,
+.InputWithIcon-input:focus,
+.InputWithIcon-input:active {
+  outline: none;
 }
 
 .InputWithIcon-icon {

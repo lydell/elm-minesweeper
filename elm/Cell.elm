@@ -1,5 +1,6 @@
 module Cell exposing (..)
 
+import Dom
 import Html
     exposing
         ( Html
@@ -13,13 +14,14 @@ import Html.Attributes
         ( attribute
         , class
         , classList
+        , id
         , style
-        , title
         , type_
         )
-import Html.Events exposing (onClick)
-import Html.Events.Custom exposing (onRightClick)
+import Html.Events exposing (onBlur, onClick, onFocus, onMouseEnter, onMouseLeave)
+import Html.Events.Custom exposing (onKeydown, onRightClick)
 import Icon exposing (Icon)
+import Task
 import Types exposing (..)
 
 
@@ -127,51 +129,39 @@ overlay background foreground =
         ]
 
 
-view : Bool -> GridState -> Int -> Int -> Cell -> Html Msg
-view debug gridState x y ((Cell cellState cellInner) as cell) =
+cellId : Int -> Int -> Dom.Id
+cellId x y =
+    "cell-" ++ toString x ++ "-" ++ toString y
+
+
+view : Bool -> Bool -> GridState -> Int -> Int -> Cell -> Html Msg
+view debug isSelected gridState x y ((Cell cellState cellInner) as cell) =
     let
-        isGameEnd =
-            gridState == WonGrid || gridState == LostGrid || gridState == GivenUpGrid
-
-        isClickable =
-            not isGameEnd && (cellState == Unrevealed || cellState == Flagged)
-
         ( titleText, display ) =
             content debug gridState cell
-
-        useHoverTitle =
-            not (cellState == Unrevealed || cellState == Revealed)
-                || (cellInner == Mine)
-
-        titleAttribute =
-            if isGameEnd && useHoverTitle then
-                title titleText
-            else
-                attribute "aria-label" titleText
 
         classes =
             classList
                 [ ( "Cell", True )
                 , ( "Cell--unrevealed", cellState == Unrevealed )
                 , ( "Cell--revealedMine", cellState == Revealed && cellInner == Mine )
+                , ( "is-selected", isSelected )
                 ]
     in
-        if isClickable then
-            button
-                [ type_ "button"
-                , titleAttribute
-                , classes
-                , onClick (CellClick x y)
-                , onRightClick (CellRightClick x y)
-                ]
-                [ display ]
-        else
-            span
-                [ titleAttribute
-                , classes
-                , attribute "oncontextmenu" "return false"
-                ]
-                [ display ]
+        button
+            [ type_ "button"
+            , id (cellId x y)
+            , classes
+            , attribute "aria-label" titleText
+            , onClick (CellClick x y)
+            , onRightClick (CellRightClick x y)
+            , onMouseEnter (CellMouseEnter x y)
+            , onMouseLeave (CellMouseLeave x y)
+            , onFocus (CellFocus x y)
+            , onBlur (CellBlur x y)
+            , onKeydown (CellKeydown x y)
+            ]
+            [ display ]
 
 
 content : Bool -> GridState -> Cell -> CellContent
@@ -208,3 +198,14 @@ content debug gridState cell =
                     hint number
             else
                 secret
+
+
+getTitleText : Bool -> GridState -> Cell -> String
+getTitleText debug gridState cell =
+    content debug gridState cell
+        |> Tuple.first
+
+
+focus : Int -> Int -> Cmd Msg
+focus x y =
+    Task.attempt FocusResult (Dom.focus (cellId x y))

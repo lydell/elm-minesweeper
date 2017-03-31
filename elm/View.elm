@@ -1,4 +1,10 @@
-module View exposing (view, focusPlayAgainButton)
+module View
+    exposing
+        ( view
+        , focusGrid
+        , focusControls
+        , focusPlayAgainButton
+        )
 
 import Array
 import Dom
@@ -30,22 +36,17 @@ import Html.Attributes
         , selected
         , style
         , title
+        , tabindex
         , type_
         , value
         )
 import Html.Events exposing (onClick)
-import Html.Events.Custom exposing (onChange)
+import Html.Events.Custom exposing (onChange, onFocusIn, onFocusOut, onKeydown)
 import Icon
 import Matrix
 import Matrix.Custom
 import Task
 import Types exposing (..)
-
-
-{-
-   - mobile controls sizings and emoji
-   - mobile icons
--}
 
 
 controlsHeight : Float
@@ -87,6 +88,36 @@ fontSize model =
             |> min maxFontSize
 
 
+giveUpButtonId : Dom.Id
+giveUpButtonId =
+    "giveUpButtonId"
+
+
+playAgainButtonId : Dom.Id
+playAgainButtonId =
+    "playAgainButton"
+
+
+gridId : Dom.Id
+gridId =
+    "grid"
+
+
+widthSelectId : Dom.Id
+widthSelectId =
+    "widthInput"
+
+
+heightSelectId : Dom.Id
+heightSelectId =
+    "heightInput"
+
+
+minesInputId : Dom.Id
+minesInputId =
+    "minesInput"
+
+
 view : Model -> Html Msg
 view model =
     let
@@ -96,47 +127,131 @@ view model =
     in
         div [ class "Root", style styles ]
             [ div []
-                [ viewControls model.givenUp model.numMines model.grid
-                , viewGrid model.debug model.givenUp model.grid
+                [ viewControls model
+                , viewGrid model
                 ]
             ]
 
 
-viewGrid : Bool -> Bool -> Grid -> Html Msg
-viewGrid debug givenUp grid =
-    table [ class "Grid" ]
-        [ tbody []
-            (List.indexedMap
-                (viewRow debug (Grid.gridState givenUp grid))
-                (Matrix.Custom.toListOfLists grid)
+viewGrid : Model -> Html Msg
+viewGrid model =
+    let
+        gridState =
+            Grid.gridState model.givenUp model.grid
+
+        maybeCellWithCoords =
+            Maybe.andThen
+                (\( x, y ) ->
+                    Matrix.get x y model.grid
+                        |> Maybe.map ((,) ( x, y ))
+                )
+                model.selectedCell
+
+        tooltip =
+            case maybeCellWithCoords of
+                Just ( ( x, y ), (Cell cellState cellInner) as cell ) ->
+                    let
+                        isInteresting =
+                            not (cellState == Unrevealed || cellState == Revealed)
+                                || (cellInner == Mine)
+                    in
+                        [ viewTooltip
+                            (Grid.isGameEnd gridState && isInteresting)
+                            x
+                            y
+                            model
+                            (Cell.getTitleText model.debug gridState cell)
+                        ]
+
+                Nothing ->
+                    []
+    in
+        div [ class "GridContainer" ]
+            ([ table
+                [ class "Grid"
+                , id gridId
+                , tabindex -1
+                , onKeydown GridKeydown
+                ]
+                [ tbody []
+                    (List.indexedMap
+                        (viewRow model.debug model.selectedCell gridState)
+                        (Matrix.Custom.toListOfLists model.grid)
+                    )
+                ]
+             ]
+                ++ tooltip
             )
-        ]
 
 
-viewRow : Bool -> GridState -> Int -> List Cell -> Html Msg
-viewRow debug gridState y row =
+viewRow : Bool -> Maybe ( Int, Int ) -> GridState -> Int -> List Cell -> Html Msg
+viewRow debug selectedCell gridState y row =
     tr []
         (List.indexedMap
-            (\x cell -> viewCell debug gridState x y cell)
+            (\x cell -> viewCell debug selectedCell gridState x y cell)
             row
         )
 
 
-viewCell : Bool -> GridState -> Int -> Int -> Cell -> Html Msg
-viewCell debug gridState x y cell =
-    td [] [ Cell.view debug gridState x y cell ]
+viewCell : Bool -> Maybe ( Int, Int ) -> GridState -> Int -> Int -> Cell -> Html Msg
+viewCell debug selectedCell gridState x y cell =
+    let
+        isSelected =
+            case selectedCell of
+                Just ( selectedX, selectedY ) ->
+                    x == selectedX && y == selectedY
+
+                Nothing ->
+                    False
+    in
+        td [] [ Cell.view debug isSelected gridState x y cell ]
 
 
-viewControls : Bool -> Int -> Grid -> Html Msg
-viewControls givenUp numMines grid =
+viewTooltip : Bool -> Int -> Int -> Model -> String -> Html Msg
+viewTooltip visible x y model titleText =
+    let
+        classes =
+            classList
+                [ ( "GridContainer-tooltip", True )
+                , ( "is-visible", visible )
+                ]
+
+        fontSizeNum =
+            fontSize model
+
+        ( offset, translateX, origin ) =
+            if x <= Matrix.width model.grid // 2 then
+                ( 0, "0%", "left" )
+            else
+                ( 1, "-100%", "right" )
+
+        top =
+            y * fontSizeNum
+
+        left =
+            toFloat (x + offset) * toFloat fontSizeNum
+
+        styles =
+            [ ( "top", toString top ++ "px" )
+            , ( "left", toString left ++ "px" )
+            , ( "transform", "translate(" ++ translateX ++ ", -100%) scale(0.4)" )
+            , ( "transform-origin", origin ++ " bottom" )
+            ]
+    in
+        span [ classes, style styles ]
+            [ text titleText ]
+
+
+viewControls : Model -> Html Msg
+viewControls model =
     let
         ( leftContent, rightContent ) =
-            case Grid.gridState givenUp grid of
+            case Grid.gridState model.givenUp model.grid of
                 NewGrid ->
-                    ( sizeControls grid, viewMinesInput numMines )
+                    ( sizeControls model.grid, viewMinesInput model.numMines )
 
                 OngoingGrid ->
-                    ( giveUpButton, viewMinesCount numMines grid )
+                    ( giveUpButton, viewMinesCount model.numMines model.grid )
 
                 gridState ->
                     ( playAgainButton, viewGameEndMessage gridState )
@@ -145,7 +260,12 @@ viewControls givenUp numMines grid =
             [ ( "height", toString controlsHeight ++ "em" )
             ]
     in
-        div [ class "Controls", style styles ]
+        div
+            [ class "Controls"
+            , style styles
+            , onFocusIn ControlsFocus
+            , onFocusOut ControlsBlur
+            ]
             [ div [ class "Controls-inner" ]
                 [ leftContent
                 , rightContent
@@ -172,6 +292,7 @@ viewMinesInput numMines =
                 [ type_ "tel"
                 , value (toString numMines)
                 , onChange NumMinesChange
+                , id minesInputId
                 , class "InputWithIcon-input"
                 , style styles
                 ]
@@ -224,6 +345,7 @@ sizeControls grid =
     span []
         [ sizeSelect
             "Grid width"
+            widthSelectId
             Grid.minWidth
             Grid.maxWidth
             (Matrix.width grid)
@@ -232,6 +354,7 @@ sizeControls grid =
             [ text "×" ]
         , sizeSelect
             "Grid height"
+            heightSelectId
             Grid.minHeight
             Grid.maxHeight
             (Matrix.height grid)
@@ -239,14 +362,19 @@ sizeControls grid =
         ]
 
 
-sizeSelect : String -> Int -> Int -> Int -> (String -> msg) -> Html msg
-sizeSelect titleString minSize maxSize currentSize msg =
+sizeSelect : String -> Dom.Id -> Int -> Int -> Int -> (String -> msg) -> Html msg
+sizeSelect titleString idString minSize maxSize currentSize msg =
     let
         options =
             List.range minSize maxSize
                 |> List.map (sizeOption currentSize)
     in
-        select [ class "Select", title titleString, onChange msg ]
+        select
+            [ class "Select"
+            , id idString
+            , title titleString
+            , onChange msg
+            ]
             options
 
 
@@ -259,15 +387,11 @@ giveUpButton : Html Msg
 giveUpButton =
     button
         [ type_ "button"
+        , id giveUpButtonId
         , class "Button Button--muted"
         , onClick GiveUpButtonClick
         ]
         [ text "I give up!" ]
-
-
-playAgainButtonId : String
-playAgainButtonId =
-    "playAgainButton"
 
 
 playAgainButton : Html Msg
@@ -283,4 +407,26 @@ playAgainButton =
 
 focusPlayAgainButton : Cmd Msg
 focusPlayAgainButton =
-    Task.attempt PlayAgainButtonFocus (Dom.focus playAgainButtonId)
+    Task.attempt FocusResult (Dom.focus playAgainButtonId)
+
+
+focusControls : TabDirection -> Cmd Msg
+focusControls direction =
+    let
+        controlId =
+            case direction of
+                Forward ->
+                    widthSelectId
+
+                Backward ->
+                    minesInputId
+    in
+        Dom.focus giveUpButtonId
+            |> Task.onError (always (Dom.focus playAgainButtonId))
+            |> Task.onError (always (Dom.focus controlId))
+            |> Task.attempt FocusResult
+
+
+focusGrid : Cmd Msg
+focusGrid =
+    Task.attempt FocusResult (Dom.focus gridId)
