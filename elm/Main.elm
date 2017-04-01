@@ -117,31 +117,25 @@ update msg model =
             ( model, Cmd.none )
 
         WidthChange string ->
-            let
-                width =
-                    parseWidth model string
-
-                height =
-                    Matrix.height model.grid
-            in
-                ( updateGridSize width height model, Cmd.none )
+            ( updateGridSize
+                (parseWidth model string)
+                (Matrix.height model.grid)
+                model
+            , Cmd.none
+            )
 
         HeightChange string ->
-            let
-                width =
-                    Matrix.width model.grid
-
-                height =
-                    parseHeight model string
-            in
-                ( updateGridSize width height model, Cmd.none )
+            ( updateGridSize
+                (Matrix.width model.grid)
+                (parseHeight model string)
+                model
+            , Cmd.none
+            )
 
         NumMinesChange string ->
-            let
-                numMines =
-                    parseNumMines model string
-            in
-                ( updateNumMines numMines model, Cmd.none )
+            ( updateNumMines (parseNumMines model string) model
+            , Cmd.none
+            )
 
         ControlsBlur ->
             ( { model | focus = FocusNone }, Cmd.none )
@@ -184,6 +178,16 @@ parseNumMines model string =
             |> Grid.clampNumMines width height
 
 
+nonDigitRegex : Regex
+nonDigitRegex =
+    Regex.regex "\\D"
+
+
+removeNonDigits : String -> String
+removeNonDigits =
+    Regex.replace All nonDigitRegex (always "")
+
+
 updateGridSize : Int -> Int -> Model -> Model
 updateGridSize width height model =
     let
@@ -219,16 +223,6 @@ updateNumMines numMines model =
                 model.seed
     in
         { model | seed = seed, grid = grid }
-
-
-nonDigitRegex : Regex
-nonDigitRegex =
-    Regex.regex "\\D"
-
-
-removeNonDigits : String -> String
-removeNonDigits =
-    Regex.replace All nonDigitRegex (always "")
 
 
 reveal : Int -> Int -> Model -> ( Model, Cmd Msg )
@@ -406,7 +400,7 @@ moveFocus x y grid movement direction =
                     )
 
                 SkipBlanksMovement ->
-                    closestUnrevealedCell factorX factorY grid ( x, y )
+                    Grid.closestUnrevealedCell factorX factorY grid ( x, y )
 
         clampedX =
             clamp 0 (Matrix.width grid - 1) newX
@@ -418,26 +412,6 @@ moveFocus x y grid movement direction =
             Cmd.none
         else
             Cell.focus clampedX clampedY
-
-
-closestUnrevealedCell : Int -> Int -> Grid -> ( Int, Int ) -> ( Int, Int )
-closestUnrevealedCell dx dy grid ( x, y ) =
-    let
-        newX =
-            x + dx
-
-        newY =
-            y + dy
-    in
-        case Matrix.get newX newY grid of
-            Just (Cell Unrevealed _) ->
-                ( newX, newY )
-
-            Just _ ->
-                closestUnrevealedCell dx dy grid ( newX, newY )
-
-            Nothing ->
-                ( x, y )
 
 
 playAgain : Model -> ( Model, Cmd Msg )

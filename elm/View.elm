@@ -156,7 +156,7 @@ viewGrid model =
                                 || (cellInner == Mine)
 
                         titleText =
-                            Cell.getTitleText model.debug
+                            Cell.titleText model.debug
                                 model.givenUp
                                 x
                                 y

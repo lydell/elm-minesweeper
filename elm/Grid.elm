@@ -283,6 +283,11 @@ gridState givenUp grid =
         OngoingGrid
 
 
+isGameEnd : GridState -> Bool
+isGameEnd gameState =
+    gameState == WonGrid || gameState == LostGrid || gameState == GivenUpGrid
+
+
 isGridNew : Grid -> Bool
 isGridNew =
     Matrix.Custom.all isCellUnrevealed
@@ -328,6 +333,21 @@ isCellCorrectlyMarked cell =
             cellState == Revealed
 
 
-isGameEnd : GridState -> Bool
-isGameEnd gridState =
-    gridState == WonGrid || gridState == LostGrid || gridState == GivenUpGrid
+closestUnrevealedCell : Int -> Int -> Grid -> ( Int, Int ) -> ( Int, Int )
+closestUnrevealedCell dx dy grid ( x, y ) =
+    let
+        newX =
+            x + dx
+
+        newY =
+            y + dy
+    in
+        case Matrix.get newX newY grid of
+            Just (Cell Unrevealed _) ->
+                ( newX, newY )
+
+            Just _ ->
+                closestUnrevealedCell dx dy grid ( newX, newY )
+
+            Nothing ->
+                ( x, y )

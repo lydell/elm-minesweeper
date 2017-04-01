@@ -148,7 +148,7 @@ view debug givenUp isSelected x y grid =
                 Cell cellState cellInner ->
                     ( cellState, cellInner )
 
-        ( titleText, display ) =
+        ( titleText_, display ) =
             content debug givenUp x y grid
 
         classes =
@@ -163,7 +163,7 @@ view debug givenUp isSelected x y grid =
             [ type_ "button"
             , id (cellId x y)
             , classes
-            , attribute "aria-label" titleText
+            , attribute "aria-label" titleText_
             , onClick (CellClick x y)
             , onRightClick (CellRightClick x y)
             , onMouseEnter (CellMouseEnter x y)
@@ -222,8 +222,8 @@ content debug givenUp x y grid =
                 secret
 
 
-getTitleText : Bool -> Bool -> Int -> Int -> Grid -> String
-getTitleText debug givenUp x y grid =
+titleText : Bool -> Bool -> Int -> Int -> Grid -> String
+titleText debug givenUp x y grid =
     content debug givenUp x y grid
         |> Tuple.first
 
