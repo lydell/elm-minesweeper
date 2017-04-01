@@ -19,6 +19,13 @@ type alias Model =
     }
 
 
+type alias LocalStorageModel =
+    { givenUp : Bool
+    , grid : Grid
+    , selectedCell : Maybe ( Int, Int )
+    }
+
+
 type alias Grid =
     Matrix Cell
 

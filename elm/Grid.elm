@@ -91,6 +91,11 @@ toListOfLists =
     Matrix.Custom.toListOfLists
 
 
+fromList : List (List Cell) -> Maybe Grid
+fromList =
+    Matrix.fromList
+
+
 defaultGrid : Int -> Int -> Grid
 defaultGrid width height =
     Matrix.repeat width height defaultCell
@@ -99,6 +104,21 @@ defaultGrid width height =
 defaultCell : Cell
 defaultCell =
     Cell Unrevealed Hint
+
+
+initialGrid : Seed -> ( Seed, Grid )
+initialGrid seed =
+    let
+        width =
+            minWidth
+
+        height =
+            minHeight
+
+        numMines_ =
+            suggestNumMines width height
+    in
+        createGrid width height numMines_ Set.empty seed
 
 
 createGrid : Int -> Int -> Int -> Set ( Int, Int ) -> Seed -> ( Seed, Grid )

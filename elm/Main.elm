@@ -1,8 +1,12 @@
-module Main exposing (..)
+port module Main exposing (..)
 
+import Decoders
+import Encoders
 import Grid
 import Html
 import Html.Events.Custom exposing (KeyDetails)
+import Json.Decode
+import Json.Encode
 import Random.Pcg as Random
 import Regex exposing (Regex, HowMany(All))
 import Set
@@ -16,6 +20,7 @@ import Window
 type alias Flags =
     { debug : Bool
     , randomSeed : Int
+    , localStorageModelString : Maybe String
     }
 
 
@@ -23,7 +28,7 @@ main : Program Flags Model Msg
 main =
     Html.programWithFlags
         { init = init
-        , update = update
+        , update = updateWithLocalStorage
         , view = View.view
         , subscriptions = subscriptions
         }
@@ -35,24 +40,35 @@ init flags =
         seed =
             Random.initialSeed flags.randomSeed
 
-        width =
-            Grid.minWidth
+        localStorageModelResult =
+            case flags.localStorageModelString of
+                Just localStorageModelString ->
+                    Json.Decode.decodeString
+                        Decoders.localStorageModelDecoder
+                        localStorageModelString
+                        |> Result.mapError
+                            (Debug.log "Failed to decode localStorageModel")
 
-        height =
-            Grid.minHeight
+                Nothing ->
+                    Err "No localStorageModel provided. Using defaults."
 
-        numMines =
-            Grid.suggestNumMines width height
+        stored accessor default =
+            case localStorageModelResult of
+                Ok localStorageModel ->
+                    accessor localStorageModel
+
+                Err _ ->
+                    default
 
         ( newSeed, grid ) =
-            Grid.createGrid width height numMines Set.empty seed
+            Grid.initialGrid seed
 
         initialModel =
             { debug = flags.debug
             , seed = newSeed
-            , givenUp = False
-            , grid = grid
-            , selectedCell = Nothing
+            , givenUp = stored .givenUp False
+            , grid = stored .grid grid
+            , selectedCell = stored .selectedCell Nothing
             , focus = NoFocus
             , windowSize = { width = 0, height = 0 }
             }
@@ -69,6 +85,22 @@ init flags =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Window.resizes WindowSize
+
+
+updateWithLocalStorage : Msg -> Model -> ( Model, Cmd Msg )
+updateWithLocalStorage msg model =
+    let
+        ( newModel, cmd ) =
+            update msg model
+
+        localStorageCmd =
+            Json.Encode.encode 0 (Encoders.modelEncoder model)
+                |> setLocalStorageModel
+    in
+        ( newModel, Cmd.batch [ cmd, localStorageCmd ] )
+
+
+port setLocalStorageModel : String -> Cmd msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
