@@ -90,7 +90,7 @@ view model =
     in
         div [ class "Root", style styles ]
             [ div []
-                [ viewControls model
+                [ controls model
                 , viewGrid model
                 ]
             ]
@@ -110,7 +110,7 @@ viewGrid model =
                 )
                 model.selectedCell
 
-        tooltip =
+        tooltip_ =
             case maybeCellWithCoords of
                 Just ( ( x, y ), Cell cellState cellInner ) ->
                     let
@@ -124,7 +124,7 @@ viewGrid model =
                                 y
                                 model.grid
                     in
-                        [ viewTooltip
+                        [ tooltip
                             (Grid.isGameEnd gameState && isInteresting)
                             x
                             y
@@ -149,7 +149,7 @@ viewGrid model =
                     )
                 ]
              ]
-                ++ tooltip
+                ++ tooltip_
             )
 
 
@@ -176,8 +176,8 @@ viewCell model x y =
         td [] [ Cell.view model.debug model.givenUp isSelected x y model.grid ]
 
 
-viewTooltip : Bool -> Int -> Int -> Model -> String -> Html Msg
-viewTooltip visible x y model titleText =
+tooltip : Bool -> Int -> Int -> Model -> String -> Html Msg
+tooltip visible x y model titleText =
     let
         classes =
             classList
@@ -214,21 +214,21 @@ viewTooltip visible x y model titleText =
             [ text titleText ]
 
 
-viewControls : Model -> Html Msg
-viewControls model =
+controls : Model -> Html Msg
+controls model =
     let
         ( leftContent, rightContent ) =
             case Grid.gameState model.givenUp model.grid of
                 NewGame ->
                     ( sizeControls model.grid
-                    , viewMinesInput (Grid.numMines model.grid)
+                    , minesInput (Grid.numMines model.grid)
                     )
 
                 OngoingGame ->
-                    ( giveUpButton, viewMinesCount model.grid )
+                    ( giveUpButton, minesCount model.grid )
 
                 gameState ->
-                    ( playAgainButton, viewGameEndMessage gameState )
+                    ( playAgainButton, gameEndMessage gameState )
 
         styles =
             [ ( "height", toString controlsHeight ++ "em" )
@@ -247,8 +247,8 @@ viewControls model =
             ]
 
 
-viewMinesInput : Int -> Html Msg
-viewMinesInput numMines =
+minesInput : Int -> Html Msg
+minesInput numMines =
     let
         absoluteMaxNumMines =
             Grid.maxNumMines Grid.maxWidth Grid.maxHeight
@@ -276,8 +276,8 @@ viewMinesInput numMines =
             ]
 
 
-viewMinesCount : Grid -> Html Msg
-viewMinesCount grid =
+minesCount : Grid -> Html Msg
+minesCount grid =
     let
         count =
             (Grid.numMines grid) - (Grid.numFlags grid)
@@ -291,8 +291,8 @@ viewMinesCount grid =
             ]
 
 
-viewGameEndMessage : GameState -> Html Msg
-viewGameEndMessage gameState =
+gameEndMessage : GameState -> Html Msg
+gameEndMessage gameState =
     let
         ( titleText, emoji ) =
             case gameState of
