@@ -11,7 +11,6 @@ import Window exposing (Size)
 type alias Model =
     { debug : Bool
     , seed : Seed
-    , numMines : Int
     , grid : Matrix Cell
     , givenUp : Bool
     , selectedCell : Maybe ( Int, Int )

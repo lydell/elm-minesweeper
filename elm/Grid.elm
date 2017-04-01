@@ -1,5 +1,6 @@
 module Grid exposing (..)
 
+import Array
 import Matrix
 import Matrix.Custom
 import Matrix.Extra
@@ -74,6 +75,12 @@ suggestNumMines width height =
             toFloat (width * height)
     in
         a * x ^ 2 + b * x + c |> round |> clampNumMines width height
+
+
+numMines : Grid -> Int
+numMines grid =
+    Matrix.filter isCellMine grid
+        |> Array.length
 
 
 clampWidth : Int -> Int

@@ -248,10 +248,12 @@ viewControls model =
         ( leftContent, rightContent ) =
             case Grid.gridState model.givenUp model.grid of
                 NewGrid ->
-                    ( sizeControls model.grid, viewMinesInput model.numMines )
+                    ( sizeControls model.grid
+                    , viewMinesInput (Grid.numMines model.grid)
+                    )
 
                 OngoingGrid ->
-                    ( giveUpButton, viewMinesCount model.numMines model.grid )
+                    ( giveUpButton, viewMinesCount model.grid )
 
                 gridState ->
                     ( playAgainButton, viewGameEndMessage gridState )
@@ -302,9 +304,12 @@ viewMinesInput numMines =
             ]
 
 
-viewMinesCount : Int -> Grid -> Html Msg
-viewMinesCount numMines grid =
+viewMinesCount : Grid -> Html Msg
+viewMinesCount grid =
     let
+        numMines =
+            Grid.numMines grid
+
         flagged =
             Matrix.filter Grid.isCellFlagged grid
 
