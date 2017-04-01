@@ -1,4 +1,4 @@
-module Icon exposing (Icon, new, color, opacity, toHtml)
+module Icon exposing (Icon, color, new, opacity, toHtml)
 
 import Html exposing (Html, span, text)
 import Html.Attributes exposing (style)

@@ -1,44 +1,9 @@
-module View
-    exposing
-        ( view
-        , focusGrid
-        , focusControls
-        , focusPlayAgainButton
-        )
+module View exposing (focusControls, focusGrid, focusPlayAgainButton, view)
 
-import Array
 import Dom
 import Grid
-import Html
-    exposing
-        ( Html
-        , button
-        , div
-        , input
-        , label
-        , option
-        , p
-        , select
-        , span
-        , table
-        , tbody
-        , td
-        , text
-        , tr
-        )
-import Html.Attributes
-    exposing
-        ( attribute
-        , class
-        , classList
-        , id
-        , selected
-        , style
-        , title
-        , tabindex
-        , type_
-        , value
-        )
+import Html exposing (Html, button, div, input, label, option, p, select, span, table, tbody, td, text, tr)
+import Html.Attributes exposing (attribute, class, classList, id, selected, style, title, tabindex, type_, value)
 import Html.Events exposing (onClick)
 import Html.Events.Custom exposing (onChange, onFocusIn, onFocusOut, onKeydown)
 import Icon
@@ -150,8 +115,7 @@ viewGrid model =
                 Just ( ( x, y ), Cell cellState cellInner ) ->
                     let
                         isInteresting =
-                            not (cellState == Unrevealed || cellState == Revealed)
-                                || (cellInner == Mine)
+                            cellState == Flagged || cellInner == Mine
 
                         titleText =
                             Cell.titleText model.debug
@@ -236,10 +200,13 @@ viewTooltip visible x y model titleText =
         left =
             toFloat (x + offset) * toFloat fontSizeNum
 
+        transform =
+            "translate(" ++ translateX ++ ", -100%) scale(0.4)"
+
         styles =
             [ ( "top", toString top ++ "px" )
             , ( "left", toString left ++ "px" )
-            , ( "transform", "translate(" ++ translateX ++ ", -100%) scale(0.4)" )
+            , ( "transform", transform )
             , ( "transform-origin", origin ++ " bottom" )
             ]
     in
@@ -366,7 +333,14 @@ sizeControls grid =
         ]
 
 
-sizeSelect : String -> Dom.Id -> Int -> Int -> Int -> (String -> msg) -> Html msg
+sizeSelect :
+    String
+    -> Dom.Id
+    -> Int
+    -> Int
+    -> Int
+    -> (String -> msg)
+    -> Html msg
 sizeSelect titleString idString minSize maxSize currentSize msg =
     let
         options =
@@ -384,7 +358,8 @@ sizeSelect titleString idString minSize maxSize currentSize msg =
 
 sizeOption : Int -> Int -> Html msg
 sizeOption currentSize size =
-    option [ value (toString size), selected (size == currentSize) ] [ text (toString size) ]
+    option [ value (toString size), selected (size == currentSize) ]
+        [ text (toString size) ]
 
 
 giveUpButton : Html Msg

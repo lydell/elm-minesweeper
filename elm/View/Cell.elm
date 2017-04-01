@@ -2,23 +2,8 @@ module View.Cell exposing (..)
 
 import Dom
 import Grid
-import Html
-    exposing
-        ( Html
-        , button
-        , span
-        , strong
-        , text
-        )
-import Html.Attributes
-    exposing
-        ( attribute
-        , class
-        , classList
-        , id
-        , style
-        , type_
-        )
+import Html exposing (Html, button, span, strong, text)
+import Html.Attributes exposing (attribute, class, classList, id, style, type_)
 import Html.Events exposing (onBlur, onClick, onFocus, onMouseEnter, onMouseLeave)
 import Html.Events.Custom exposing (onKeydown, onRightClick)
 import Icon exposing (Icon)
@@ -86,8 +71,7 @@ hint : Int -> CellContent
 hint number =
     ( toString number
     , strong
-        [ style [ ( "color", numberColor number ) ]
-        ]
+        [ style [ ( "color", numberColor number ) ] ]
         [ text (toString number) ]
     )
 
@@ -154,7 +138,10 @@ view debug givenUp isSelected x y grid =
             classList
                 [ ( "Cell", True )
                 , ( "Cell--unrevealed", cellState == Unrevealed )
-                , ( "Cell--revealedMine", cellState == Revealed && cellInner == Mine )
+                , ( "Cell--revealedMine"
+                  , (cellState == Revealed)
+                        && (cellInner == Mine)
+                  )
                 , ( "is-selected", isSelected )
                 ]
     in
@@ -199,7 +186,11 @@ content debug givenUp x y grid =
                     detonatedMine
                 else if gameState == WonGame then
                     autoFlaggedMine
-                else if gameState == LostGame || gameState == GivenUpGame || debug then
+                else if
+                    (gameState == LostGame)
+                        || (gameState == GivenUpGame)
+                        || debug
+                then
                     mine
                 else
                     secret

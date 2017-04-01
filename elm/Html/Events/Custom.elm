@@ -1,12 +1,4 @@
-module Html.Events.Custom
-    exposing
-        ( KeyDetails
-        , onChange
-        , onFocusIn
-        , onFocusOut
-        , onKeydown
-        , onRightClick
-        )
+module Html.Events.Custom exposing (KeyDetails, onChange, onFocusIn, onFocusOut, onKeydown, onRightClick)
 
 {-|
 Custom HTML events.
