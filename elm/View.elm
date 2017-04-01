@@ -149,18 +149,25 @@ viewGrid model =
 
         tooltip =
             case maybeCellWithCoords of
-                Just ( ( x, y ), (Cell cellState cellInner) as cell ) ->
+                Just ( ( x, y ), Cell cellState cellInner ) ->
                     let
                         isInteresting =
                             not (cellState == Unrevealed || cellState == Revealed)
                                 || (cellInner == Mine)
+
+                        titleText =
+                            Cell.getTitleText model.debug
+                                model.givenUp
+                                x
+                                y
+                                model.grid
                     in
                         [ viewTooltip
                             (Grid.isGameEnd gridState && isInteresting)
                             x
                             y
                             model
-                            (Cell.getTitleText model.debug gridState cell)
+                            titleText
                         ]
 
                 Nothing ->
@@ -175,7 +182,7 @@ viewGrid model =
                 ]
                 [ tbody []
                     (List.indexedMap
-                        (viewRow model.debug model.selectedCell gridState)
+                        (viewRow model)
                         (Matrix.Custom.toListOfLists model.grid)
                     )
                 ]
@@ -184,27 +191,27 @@ viewGrid model =
             )
 
 
-viewRow : Bool -> Maybe ( Int, Int ) -> GridState -> Int -> List Cell -> Html Msg
-viewRow debug selectedCell gridState y row =
+viewRow : Model -> Int -> List Cell -> Html Msg
+viewRow model y row =
     tr []
         (List.indexedMap
-            (\x cell -> viewCell debug selectedCell gridState x y cell)
+            (\x _ -> viewCell model x y)
             row
         )
 
 
-viewCell : Bool -> Maybe ( Int, Int ) -> GridState -> Int -> Int -> Cell -> Html Msg
-viewCell debug selectedCell gridState x y cell =
+viewCell : Model -> Int -> Int -> Html Msg
+viewCell model x y =
     let
         isSelected =
-            case selectedCell of
+            case model.selectedCell of
                 Just ( selectedX, selectedY ) ->
                     x == selectedX && y == selectedY
 
                 Nothing ->
                     False
     in
-        td [] [ Cell.view debug isSelected gridState x y cell ]
+        td [] [ Cell.view model.debug model.givenUp isSelected x y model.grid ]
 
 
 viewTooltip : Bool -> Int -> Int -> Model -> String -> Html Msg

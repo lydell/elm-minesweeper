@@ -5,8 +5,10 @@ import Grid
 import Html
 import Html.Events.Custom exposing (KeyDetails)
 import Matrix
+import Matrix.Extra
 import Random.Pcg as Random
 import Regex exposing (Regex, HowMany(All))
+import Set
 import Task
 import Types exposing (..)
 import View
@@ -44,15 +46,8 @@ init flags =
         numMines =
             Grid.suggestNumMines width height
 
-        emptyGrid =
-            Grid.defaultGrid width height
-
         ( newSeed, grid ) =
-            Grid.addRandomMinesAndUpdateNumbers
-                numMines
-                0
-                0
-                ( seed, emptyGrid )
+            Grid.createGrid width height numMines Set.empty seed
 
         initialModel =
             { debug = flags.debug
@@ -145,15 +140,8 @@ update msg model =
             let
                 numMines =
                     parseNumMines model string
-
-                ( seed, gridWithMines ) =
-                    Grid.addRandomMinesAndUpdateNumbers
-                        numMines
-                        0
-                        0
-                        ( model.seed, Grid.reset model.grid )
             in
-                ( { model | seed = seed, grid = gridWithMines }, Cmd.none )
+                ( updateNumMines numMines model, Cmd.none )
 
         ControlsBlur ->
             ( { model | focus = FocusNone }, Cmd.none )
@@ -205,20 +193,32 @@ updateGridSize width height model =
         clampedHeight =
             Grid.clampHeight height
 
-        grid =
-            Grid.defaultGrid clampedWidth clampedHeight
-
         numMines =
             Grid.suggestNumMines clampedWidth clampedHeight
 
-        ( seed, gridWithMines ) =
-            Grid.addRandomMinesAndUpdateNumbers
+        ( seed, grid ) =
+            Grid.createGrid
+                clampedWidth
+                clampedHeight
                 numMines
-                0
-                0
-                ( model.seed, grid )
+                Set.empty
+                model.seed
     in
-        { model | seed = seed, grid = gridWithMines }
+        { model | seed = seed, grid = grid }
+
+
+updateNumMines : Int -> Model -> Model
+updateNumMines numMines model =
+    let
+        ( seed, grid ) =
+            Grid.createGrid
+                (Matrix.width model.grid)
+                (Matrix.height model.grid)
+                numMines
+                Set.empty
+                model.seed
+    in
+        { model | seed = seed, grid = grid }
 
 
 nonDigitRegex : Regex
@@ -236,15 +236,23 @@ reveal x y model =
     case Grid.gridState model.givenUp model.grid of
         NewGrid ->
             let
-                ( seed, gridWithMines ) =
-                    Grid.addRandomMinesAndUpdateNumbers
+                neighbourCoords =
+                    Matrix.Extra.indexedNeighbours x y model.grid
+                        |> List.map Tuple.first
+
+                excludedCoords =
+                    Set.fromList (( x, y ) :: neighbourCoords)
+
+                ( seed, grid ) =
+                    Grid.createGrid
+                        (Matrix.width model.grid)
+                        (Matrix.height model.grid)
                         (Grid.numMines model.grid)
-                        x
-                        y
-                        ( model.seed, Grid.reset model.grid )
+                        excludedCoords
+                        model.seed
 
                 finalGrid =
-                    Grid.reveal x y gridWithMines
+                    Grid.reveal x y grid
             in
                 ( { model | seed = seed, grid = finalGrid }
                 , View.focusPlayAgainButton
@@ -259,8 +267,8 @@ reveal x y model =
                     in
                         focusAfterCellChange x y { model | grid = newGrid }
 
-                Just (Cell Revealed (Hint num)) ->
-                    if num == 0 then
+                Just (Cell Revealed Hint) ->
+                    if Grid.cellNumber x y model.grid == 0 then
                         ( model, Cmd.none )
                     else
                         let
@@ -278,30 +286,17 @@ reveal x y model =
 
 flag : Int -> Int -> Model -> ( Model, Cmd Msg )
 flag x y model =
-    case Grid.gridState model.givenUp model.grid of
-        NewGrid ->
-            let
-                newGrid =
-                    Grid.flag x y (Grid.reset model.grid)
-
-                -- TODO: Allow a mine to spawn under the flag here.
-                ( seed, gridWithMines ) =
-                    Grid.addRandomMinesAndUpdateNumbers
-                        (Grid.numMines model.grid)
-                        x
-                        y
-                        ( model.seed, newGrid )
-            in
-                focusAfterCellChange x y { model | seed = seed, grid = gridWithMines }
-
-        OngoingGrid ->
+    let
+        gridState =
+            Grid.gridState model.givenUp model.grid
+    in
+        if gridState == NewGrid || gridState == OngoingGrid then
             let
                 newGrid =
                     Grid.flag x y model.grid
             in
                 focusAfterCellChange x y { model | grid = newGrid }
-
-        _ ->
+        else
             ( model, Cmd.none )
 
 
@@ -448,13 +443,14 @@ closestUnrevealedCell dx dy grid ( x, y ) =
 playAgain : Model -> ( Model, Cmd Msg )
 playAgain model =
     let
-        ( seed, gridWithMines ) =
-            Grid.addRandomMinesAndUpdateNumbers
+        ( seed, grid ) =
+            Grid.createGrid
+                (Matrix.width model.grid)
+                (Matrix.height model.grid)
                 (Grid.numMines model.grid)
-                0
-                0
-                ( model.seed, Grid.reset model.grid )
+                Set.empty
+                model.seed
     in
-        ( { model | seed = seed, grid = gridWithMines, givenUp = False }
+        ( { model | seed = seed, grid = grid, givenUp = False }
         , View.focusGrid
         )

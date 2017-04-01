@@ -1,6 +1,7 @@
 module Cell exposing (..)
 
 import Dom
+import Grid
 import Html
     exposing
         ( Html
@@ -21,6 +22,7 @@ import Html.Attributes
 import Html.Events exposing (onBlur, onClick, onFocus, onMouseEnter, onMouseLeave)
 import Html.Events.Custom exposing (onKeydown, onRightClick)
 import Icon exposing (Icon)
+import Matrix
 import Task
 import Types exposing (..)
 
@@ -134,11 +136,20 @@ cellId x y =
     "cell-" ++ toString x ++ "-" ++ toString y
 
 
-view : Bool -> Bool -> GridState -> Int -> Int -> Cell -> Html Msg
-view debug isSelected gridState x y ((Cell cellState cellInner) as cell) =
+view : Bool -> Bool -> Bool -> Int -> Int -> Grid -> Html Msg
+view debug givenUp isSelected x y grid =
     let
+        cell =
+            Matrix.get x y grid
+                |> Maybe.withDefault Grid.defaultCell
+
+        ( cellState, cellInner ) =
+            case cell of
+                Cell cellState cellInner ->
+                    ( cellState, cellInner )
+
         ( titleText, display ) =
-            content debug gridState cell
+            content debug givenUp x y grid
 
         classes =
             classList
@@ -164,45 +175,56 @@ view debug isSelected gridState x y ((Cell cellState cellInner) as cell) =
             [ display ]
 
 
-content : Bool -> GridState -> Cell -> CellContent
-content debug gridState cell =
-    case cell of
-        Cell Flagged cellInner ->
-            if
-                (gridState == WonGrid)
-                    || (gridState == LostGrid)
-                    || (gridState == GivenUpGrid)
-            then
-                if cellInner == Mine then
-                    correctFlag
+content : Bool -> Bool -> Int -> Int -> Grid -> CellContent
+content debug givenUp x y grid =
+    let
+        gridState =
+            Grid.gridState givenUp grid
+    in
+        case Matrix.get x y grid of
+            Just (Cell Flagged cellInner) ->
+                if
+                    (gridState == WonGrid)
+                        || (gridState == LostGrid)
+                        || (gridState == GivenUpGrid)
+                then
+                    if cellInner == Mine then
+                        correctFlag
+                    else
+                        incorrectFlag
                 else
-                    incorrectFlag
-            else
-                flag
+                    flag
 
-        Cell cellState Mine ->
-            if cellState == Revealed then
-                detonatedMine
-            else if gridState == WonGrid then
-                autoFlaggedMine
-            else if gridState == LostGrid || gridState == GivenUpGrid || debug then
-                mine
-            else
-                secret
-
-        Cell cellState (Hint number) ->
-            if cellState == Revealed || debug then
-                if number == 0 then
+            Just (Cell cellState Mine) ->
+                if cellState == Revealed then
+                    detonatedMine
+                else if gridState == WonGrid then
+                    autoFlaggedMine
+                else if gridState == LostGrid || gridState == GivenUpGrid || debug then
+                    mine
+                else
                     secret
-                else
-                    hint number
-            else
+
+            Just (Cell cellState Hint) ->
+                let
+                    number =
+                        Grid.cellNumber x y grid
+                in
+                    if cellState == Revealed || debug then
+                        if number == 0 then
+                            secret
+                        else
+                            hint number
+                    else
+                        secret
+
+            Nothing ->
                 secret
 
 
-getTitleText : Bool -> GridState -> Cell -> String
-getTitleText debug gridState cell =
-    content debug gridState cell
+getTitleText : Bool -> Bool -> Int -> Int -> Grid -> String
+getTitleText debug givenUp x y grid =
+    content debug givenUp x y grid
         |> Tuple.first
 
 

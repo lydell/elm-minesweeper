@@ -105,41 +105,20 @@ defaultGrid width height =
 
 defaultCell : Cell
 defaultCell =
-    Cell Unrevealed (Hint 0)
+    Cell Unrevealed Hint
 
 
-reset : Grid -> Grid
-reset grid =
-    defaultGrid (Matrix.width grid) (Matrix.height grid)
-
-
-addRandomMinesAndUpdateNumbers :
-    Int
-    -> Int
-    -> Int
-    -> ( Seed, Grid )
-    -> ( Seed, Grid )
-addRandomMinesAndUpdateNumbers numMines x y ( seed, grid ) =
-    let
-        neighbourCoords =
-            Matrix.Extra.indexedNeighbours x y grid
-                |> List.map Tuple.first
-
-        excludedCoords =
-            Set.fromList (( x, y ) :: neighbourCoords)
-
-        ( newSeed, newGrid ) =
-            addRandomMines numMines excludedCoords ( seed, grid )
-    in
-        ( newSeed, setGridNumbers newGrid )
+createGrid : Int -> Int -> Int -> Set ( Int, Int ) -> Seed -> ( Seed, Grid )
+createGrid width height numMines_ excludedCoords seed =
+    addRandomMines numMines_ excludedCoords ( seed, defaultGrid width height )
 
 
 addRandomMines : Int -> Set ( Int, Int ) -> ( Seed, Grid ) -> ( Seed, Grid )
-addRandomMines numMines excludedCoords ( seed, grid ) =
+addRandomMines numMines_ excludedCoords ( seed, grid ) =
     List.foldl
         (always (addRandomMine excludedCoords))
         ( seed, grid )
-        (List.range 1 numMines)
+        (List.range 1 numMines_)
 
 
 addRandomMine : Set ( Int, Int ) -> ( Seed, Grid ) -> ( Seed, Grid )
@@ -147,7 +126,7 @@ addRandomMine excludedCoords ( seed, grid ) =
     let
         isAvailable ( x, y ) =
             case Matrix.get x y grid of
-                Just (Cell Unrevealed (Hint _)) ->
+                Just (Cell Unrevealed Hint) ->
                     not (Set.member ( x, y ) excludedCoords)
 
                 _ ->
@@ -172,21 +151,6 @@ addRandomMine excludedCoords ( seed, grid ) =
         ( newSeed, newGrid )
 
 
-setGridNumbers : Grid -> Grid
-setGridNumbers grid =
-    Matrix.indexedMap (setCellNumber grid) grid
-
-
-setCellNumber : Grid -> Int -> Int -> Cell -> Cell
-setCellNumber grid x y cell =
-    case cell of
-        Cell _ Mine ->
-            cell
-
-        Cell cellState (Hint _) ->
-            Cell cellState (Hint (cellNumber x y grid))
-
-
 cellNumber : Int -> Int -> Grid -> Int
 cellNumber x y grid =
     Matrix.Extra.neighbours x y grid
@@ -197,11 +161,11 @@ cellNumber x y grid =
 reveal : Int -> Int -> Grid -> Grid
 reveal x y grid =
     case Matrix.get x y grid of
-        Just (Cell Unrevealed (Hint 0)) ->
-            revealRecursively x y grid
-
-        Just (Cell Unrevealed _) ->
-            revealSingle x y grid
+        Just (Cell Unrevealed cellInner) ->
+            if cellInner == Hint && cellNumber x y grid == 0 then
+                revealRecursively x y grid
+            else
+                revealSingle x y grid
 
         _ ->
             grid
@@ -210,8 +174,11 @@ reveal x y grid =
 revealNeighbours : Int -> Int -> Grid -> Grid
 revealNeighbours x y grid =
     case Matrix.get x y grid of
-        Just (Cell _ (Hint num)) ->
+        Just (Cell _ Hint) ->
             let
+                number =
+                    cellNumber x y grid
+
                 neighbours =
                     Matrix.Extra.indexedNeighbours x y grid
 
@@ -224,7 +191,7 @@ revealNeighbours x y grid =
                 neighbourCoords =
                     List.map Tuple.first neighbours
             in
-                if num == 0 || List.length flags /= num then
+                if number == 0 || List.length flags /= number then
                     grid
                 else
                     List.foldl (uncurry reveal) grid neighbourCoords
@@ -257,8 +224,11 @@ revealRecursivelyHelper x y ( visitedCoords, grid ) =
         ( visitedCoords, grid )
     else
         case Matrix.get x y grid of
-            Just (Cell Unrevealed (Hint number)) ->
+            Just (Cell Unrevealed Hint) ->
                 let
+                    number =
+                        cellNumber x y grid
+
                     newGrid =
                         revealSingle x y grid
 
@@ -354,7 +324,7 @@ isCellCorrectlyMarked cell =
         Cell cellState Mine ->
             cellState /= Revealed
 
-        Cell cellState (Hint _) ->
+        Cell cellState Hint ->
             cellState == Revealed
 
 

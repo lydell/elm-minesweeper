@@ -35,7 +35,7 @@ type CellState
 
 type CellInner
     = Mine
-    | Hint Int
+    | Hint
 
 
 type alias CellContent =
