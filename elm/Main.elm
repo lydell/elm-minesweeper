@@ -3,8 +3,6 @@ module Main exposing (..)
 import Grid
 import Html
 import Html.Events.Custom exposing (KeyDetails)
-import Matrix
-import Matrix.Extra
 import Random.Pcg as Random
 import Regex exposing (Regex, HowMany(All))
 import Set
@@ -119,14 +117,14 @@ update msg model =
         WidthChange string ->
             ( updateGridSize
                 (parseWidth model string)
-                (Matrix.height model.grid)
+                (Grid.height model.grid)
                 model
             , Cmd.none
             )
 
         HeightChange string ->
             ( updateGridSize
-                (Matrix.width model.grid)
+                (Grid.width model.grid)
                 (parseHeight model string)
                 model
             , Cmd.none
@@ -151,7 +149,7 @@ parseWidth : Model -> String -> Int
 parseWidth model string =
     removeNonDigits string
         |> String.toInt
-        |> Result.withDefault (Matrix.width model.grid)
+        |> Result.withDefault (Grid.width model.grid)
         |> Grid.clampWidth
 
 
@@ -159,23 +157,18 @@ parseHeight : Model -> String -> Int
 parseHeight model string =
     removeNonDigits string
         |> String.toInt
-        |> Result.withDefault (Matrix.height model.grid)
+        |> Result.withDefault (Grid.height model.grid)
         |> Grid.clampHeight
 
 
 parseNumMines : Model -> String -> Int
 parseNumMines model string =
-    let
-        width =
-            Matrix.width model.grid
-
-        height =
-            Matrix.height model.grid
-    in
-        removeNonDigits string
-            |> String.toInt
-            |> Result.withDefault (Grid.numMines model.grid)
-            |> Grid.clampNumMines width height
+    removeNonDigits string
+        |> String.toInt
+        |> Result.withDefault (Grid.numMines model.grid)
+        |> Grid.clampNumMines
+            (Grid.width model.grid)
+            (Grid.height model.grid)
 
 
 nonDigitRegex : Regex
@@ -216,8 +209,8 @@ updateNumMines numMines model =
     let
         ( seed, grid ) =
             Grid.createGrid
-                (Matrix.width model.grid)
-                (Matrix.height model.grid)
+                (Grid.width model.grid)
+                (Grid.height model.grid)
                 numMines
                 Set.empty
                 model.seed
@@ -231,7 +224,7 @@ reveal x y model =
         NewGame ->
             let
                 neighbourCoords =
-                    Matrix.Extra.indexedNeighbours x y model.grid
+                    Grid.indexedNeighbours x y model.grid
                         |> List.map Tuple.first
 
                 excludedCoords =
@@ -239,8 +232,8 @@ reveal x y model =
 
                 ( seed, grid ) =
                     Grid.createGrid
-                        (Matrix.width model.grid)
-                        (Matrix.height model.grid)
+                        (Grid.width model.grid)
+                        (Grid.height model.grid)
                         (Grid.numMines model.grid)
                         excludedCoords
                         model.seed
@@ -253,7 +246,7 @@ reveal x y model =
                 )
 
         OngoingGame ->
-            case Matrix.get x y model.grid of
+            case Grid.get x y model.grid of
                 Just (Cell Unrevealed _) ->
                     let
                         newGrid =
@@ -395,18 +388,18 @@ moveFocus x y grid movement direction =
                     ( x + num * factorX, y + num * factorY )
 
                 EdgeMovement ->
-                    ( x + (Matrix.width grid) * factorX
-                    , y + (Matrix.height grid) * factorY
+                    ( x + (Grid.width grid) * factorX
+                    , y + (Grid.height grid) * factorY
                     )
 
                 SkipBlanksMovement ->
                     Grid.closestUnrevealedCell factorX factorY grid ( x, y )
 
         clampedX =
-            clamp 0 (Matrix.width grid - 1) newX
+            clamp 0 (Grid.width grid - 1) newX
 
         clampedY =
-            clamp 0 (Matrix.height grid - 1) newY
+            clamp 0 (Grid.height grid - 1) newY
     in
         if clampedX == x && clampedY == y then
             Cmd.none
@@ -419,8 +412,8 @@ playAgain model =
     let
         ( seed, grid ) =
             Grid.createGrid
-                (Matrix.width model.grid)
-                (Matrix.height model.grid)
+                (Grid.width model.grid)
+                (Grid.height model.grid)
                 (Grid.numMines model.grid)
                 Set.empty
                 model.seed

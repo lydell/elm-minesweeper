@@ -22,7 +22,6 @@ import Html.Attributes
 import Html.Events exposing (onBlur, onClick, onFocus, onMouseEnter, onMouseLeave)
 import Html.Events.Custom exposing (onKeydown, onRightClick)
 import Icon exposing (Icon)
-import Matrix
 import Task
 import Types exposing (..)
 
@@ -140,7 +139,7 @@ view : Bool -> Bool -> Bool -> Int -> Int -> Grid -> Html Msg
 view debug givenUp isSelected x y grid =
     let
         cell =
-            Matrix.get x y grid
+            Grid.get x y grid
                 |> Maybe.withDefault Grid.defaultCell
 
         ( cellState, cellInner ) =
@@ -181,7 +180,7 @@ content debug givenUp x y grid =
         gameState =
             Grid.gameState givenUp grid
     in
-        case Matrix.get x y grid of
+        case Grid.get x y grid of
             Just (Cell Flagged cellInner) ->
                 if
                     (gameState == WonGame)

@@ -42,8 +42,6 @@ import Html.Attributes
 import Html.Events exposing (onClick)
 import Html.Events.Custom exposing (onChange, onFocusIn, onFocusOut, onKeydown)
 import Icon
-import Matrix
-import Matrix.Custom
 import Task
 import Types exposing (..)
 import View.Cell as Cell
@@ -71,10 +69,10 @@ fontSize : Model -> Int
 fontSize model =
     let
         gridWidth =
-            Matrix.width model.grid
+            Grid.width model.grid
 
         gridHeight =
-            Matrix.height model.grid
+            Grid.height model.grid
 
         maxWidth =
             (model.windowSize.width - gridMargin * 2) // gridWidth
@@ -142,7 +140,7 @@ viewGrid model =
         maybeCellWithCoords =
             Maybe.andThen
                 (\( x, y ) ->
-                    Matrix.get x y model.grid
+                    Grid.get x y model.grid
                         |> Maybe.map ((,) ( x, y ))
                 )
                 model.selectedCell
@@ -183,7 +181,7 @@ viewGrid model =
                 [ tbody []
                     (List.indexedMap
                         (viewRow model)
-                        (Matrix.Custom.toListOfLists model.grid)
+                        (Grid.toListOfLists model.grid)
                     )
                 ]
              ]
@@ -227,7 +225,7 @@ viewTooltip visible x y model titleText =
             fontSize model
 
         ( offset, translateX, origin ) =
-            if x <= Matrix.width model.grid // 2 then
+            if x <= Grid.width model.grid // 2 then
                 ( 0, "0%", "left" )
             else
                 ( 1, "-100%", "right" )
@@ -314,14 +312,8 @@ viewMinesInput numMines =
 viewMinesCount : Grid -> Html Msg
 viewMinesCount grid =
     let
-        numMines =
-            Grid.numMines grid
-
-        flagged =
-            Matrix.filter Grid.isCellFlagged grid
-
         count =
-            numMines - Array.length flagged
+            (Grid.numMines grid) - (Grid.numFlags grid)
     in
         span [ class "TextWithIcon" ]
             [ span [ class "TextWithIcon-inner" ]
@@ -360,7 +352,7 @@ sizeControls grid =
             widthSelectId
             Grid.minWidth
             Grid.maxWidth
-            (Matrix.width grid)
+            (Grid.width grid)
             WidthChange
         , span [ class "MultiplicationSign" ]
             [ text "×" ]
@@ -369,7 +361,7 @@ sizeControls grid =
             heightSelectId
             Grid.minHeight
             Grid.maxHeight
-            (Matrix.height grid)
+            (Grid.height grid)
             HeightChange
         ]
 
