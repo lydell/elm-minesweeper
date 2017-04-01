@@ -1,6 +1,5 @@
 module Main exposing (..)
 
-import Cell
 import Grid
 import Html
 import Html.Events.Custom exposing (KeyDetails)
@@ -12,6 +11,7 @@ import Set
 import Task
 import Types exposing (..)
 import View
+import View.Cell as Cell
 import Window
 
 

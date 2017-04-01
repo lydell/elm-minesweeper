@@ -8,7 +8,6 @@ module View
 
 import Array
 import Dom
-import Cell
 import Grid
 import Html
     exposing
@@ -47,6 +46,7 @@ import Matrix
 import Matrix.Custom
 import Task
 import Types exposing (..)
+import View.Cell as Cell
 
 
 controlsHeight : Float

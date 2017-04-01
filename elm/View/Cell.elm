@@ -1,4 +1,4 @@
-module Cell exposing (..)
+module View.Cell exposing (..)
 
 import Dom
 import Grid
