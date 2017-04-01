@@ -74,46 +74,6 @@ subscriptions model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Click_Cell x y ->
-            reveal x y model
-
-        RightClick_Cell x y ->
-            flag x y model
-
-        Blur_Cell _ _ ->
-            ( { model | selectedCell = Nothing, focus = NoFocus }, Cmd.none )
-
-        Focus_Cell x y ->
-            ( { model | selectedCell = Just ( x, y ), focus = CellFocus }, Cmd.none )
-
-        MouseEnter_Cell x y ->
-            let
-                cmd =
-                    if model.focus == ControlsFocus then
-                        Cmd.none
-                    else
-                        Cell.focus x y
-            in
-                ( { model | selectedCell = Just ( x, y ) }, cmd )
-
-        MouseLeave_Cell x y ->
-            ( { model | selectedCell = Nothing }, Cmd.none )
-
-        Keydown_Cell x y keyDetails ->
-            keydown x y keyDetails model
-
-        Keydown_Grid keyDetails ->
-            keydown -1 -1 keyDetails model
-
-        Click_GiveUpButton ->
-            ( { model | givenUp = True }, View.focusPlayAgainButton )
-
-        Click_PlayAgainButton ->
-            playAgain model
-
-        FocusResult e ->
-            ( model, Cmd.none )
-
         Change_WidthSelect string ->
             ( updateGridSize
                 (parseWidth model string)
@@ -135,11 +95,56 @@ update msg model =
             , Cmd.none
             )
 
-        FocusOut_Controls ->
-            ( { model | focus = NoFocus }, Cmd.none )
+        Click_Cell x y ->
+            reveal x y model
+
+        RightClick_Cell x y ->
+            flag x y model
+
+        MouseEnter_Cell x y ->
+            let
+                cmd =
+                    if model.focus == ControlsFocus then
+                        Cmd.none
+                    else
+                        Cell.focus x y
+            in
+                ( { model | selectedCell = Just ( x, y ) }, cmd )
+
+        MouseLeave_Cell x y ->
+            ( { model | selectedCell = Nothing }, Cmd.none )
+
+        Focus_Cell x y ->
+            ( { model
+                | selectedCell = Just ( x, y )
+                , focus = CellFocus
+              }
+            , Cmd.none
+            )
+
+        Blur_Cell _ _ ->
+            ( { model | selectedCell = Nothing, focus = NoFocus }, Cmd.none )
+
+        Keydown_Cell x y keyDetails ->
+            keydown x y keyDetails model
+
+        Keydown_Grid keyDetails ->
+            keydown -1 -1 keyDetails model
+
+        Click_GiveUpButton ->
+            ( { model | givenUp = True }, View.focusPlayAgainButton )
+
+        Click_PlayAgainButton ->
+            playAgain model
 
         FocusIn_Controls ->
             ( { model | focus = ControlsFocus }, Cmd.none )
+
+        FocusOut_Controls ->
+            ( { model | focus = NoFocus }, Cmd.none )
+
+        FocusResult _ ->
+            ( model, Cmd.none )
 
         WindowSize size ->
             ( { model | windowSize = size }, Cmd.none )
