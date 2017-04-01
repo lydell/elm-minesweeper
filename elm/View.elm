@@ -10,6 +10,7 @@ import Icon
 import Task
 import Types exposing (..)
 import View.Cell as Cell
+import View.HelpModal as HelpModal
 import Window
 
 
@@ -103,6 +104,7 @@ view model =
                 [ controls model.grid gameState
                 , viewGrid model gameState fontSizeNum
                 ]
+            , HelpModal.view model.helpVisible
             ]
 
 
@@ -246,6 +248,12 @@ controls grid gameState =
         styles =
             [ ( "height", toString controlsHeight ++ "em" )
             ]
+
+        helpButton_ =
+            if Grid.isGameEnd gameState then
+                []
+            else
+                [ helpButton (gameState == OngoingGame) ]
     in
         div
             [ class "Controls"
@@ -254,9 +262,11 @@ controls grid gameState =
             , onFocusOut FocusOut_Controls
             ]
             [ div [ class "Controls-inner" ]
-                [ leftContent
-                , rightContent
-                ]
+                ([ leftContent
+                 , rightContent
+                 ]
+                    ++ helpButton_
+                )
             ]
 
 
@@ -397,9 +407,23 @@ playAgainButton =
         [ text "Play again" ]
 
 
-focusPlayAgainButton : Cmd Msg
-focusPlayAgainButton =
-    Task.attempt FocusResult (Dom.focus playAgainButtonId)
+helpButton : Bool -> Html Msg
+helpButton muted =
+    let
+        classes =
+            classList
+                [ ( "Button", True )
+                , ( "Button--icon", True )
+                , ( "Button--muted", muted )
+                ]
+    in
+        button
+            [ type_ "button"
+            , classes
+            , onClick Click_HelpButton
+            , title "Help"
+            ]
+            [ text "❓" ]
 
 
 focusControls : TabDirection -> Cmd Msg
@@ -422,3 +446,8 @@ focusControls direction =
 focusGrid : Cmd Msg
 focusGrid =
     Task.attempt FocusResult (Dom.focus gridId)
+
+
+focusPlayAgainButton : Cmd Msg
+focusPlayAgainButton =
+    Task.attempt FocusResult (Dom.focus playAgainButtonId)

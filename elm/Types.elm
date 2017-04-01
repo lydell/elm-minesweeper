@@ -3,6 +3,7 @@ module Types exposing (..)
 import Dom
 import Html exposing (Html)
 import Html.Events.Custom exposing (KeyDetails)
+import Keyboard exposing (KeyCode)
 import Matrix exposing (Matrix)
 import Random.Pcg exposing (Seed)
 import Window
@@ -14,6 +15,7 @@ type alias Model =
     , givenUp : Bool
     , grid : Grid
     , selectedCell : Maybe ( Int, Int )
+    , helpVisible : Bool
     , focus : Focus
     , windowSize : Window.Size
     }
@@ -93,9 +95,13 @@ type Msg
     | Blur_Cell Int Int
     | Keydown_Cell Int Int KeyDetails
     | Keydown_Grid KeyDetails
+    | Click_HelpButton
     | Click_GiveUpButton
     | Click_PlayAgainButton
     | FocusIn_Controls
     | FocusOut_Controls
+    | Click_ModalBackdrop
+    | Click_ModalCloseButton
+    | Global_Keydown KeyCode
     | FocusResult (Result Dom.Error ())
     | WindowSize Window.Size

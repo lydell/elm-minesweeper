@@ -7,6 +7,7 @@ import Html
 import Html.Events.Custom exposing (KeyDetails)
 import Json.Decode
 import Json.Encode
+import Keyboard exposing (KeyCode)
 import Random.Pcg as Random
 import Regex exposing (Regex, HowMany(All))
 import Set
@@ -14,6 +15,7 @@ import Task
 import Types exposing (..)
 import View
 import View.Cell as Cell
+import View.HelpModal as HelpModal
 import Window
 
 
@@ -22,6 +24,11 @@ type alias Flags =
     , randomSeed : Int
     , localStorageModelString : Maybe String
     }
+
+
+keyCodeEscape : KeyCode
+keyCodeEscape =
+    27
 
 
 main : Program Flags Model Msg
@@ -69,6 +76,7 @@ init flags =
             , givenUp = stored .givenUp False
             , grid = stored .grid grid
             , selectedCell = stored .selectedCell Nothing
+            , helpVisible = False
             , focus = NoFocus
             , windowSize = { width = 0, height = 0 }
             }
@@ -84,7 +92,10 @@ init flags =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Window.resizes WindowSize
+    Sub.batch
+        [ Keyboard.downs Global_Keydown
+        , Window.resizes WindowSize
+        ]
 
 
 updateWithLocalStorage : Msg -> Model -> ( Model, Cmd Msg )
@@ -163,6 +174,9 @@ update msg model =
         Keydown_Grid keyDetails ->
             keydown -1 -1 keyDetails model
 
+        Click_HelpButton ->
+            ( { model | helpVisible = True }, HelpModal.focus )
+
         Click_GiveUpButton ->
             ( { model | givenUp = True }, View.focusPlayAgainButton )
 
@@ -174,6 +188,18 @@ update msg model =
 
         FocusOut_Controls ->
             ( { model | focus = NoFocus }, Cmd.none )
+
+        Click_ModalBackdrop ->
+            ( { model | helpVisible = False }, View.focusGrid )
+
+        Click_ModalCloseButton ->
+            ( { model | helpVisible = False }, View.focusGrid )
+
+        Global_Keydown keyCode ->
+            if keyCode == keyCodeEscape then
+                ( { model | helpVisible = False }, View.focusGrid )
+            else
+                ( model, Cmd.none )
 
         FocusResult _ ->
             ( model, Cmd.none )
