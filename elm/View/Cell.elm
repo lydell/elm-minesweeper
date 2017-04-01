@@ -163,13 +163,13 @@ view debug givenUp isSelected x y grid =
             , id (cellId x y)
             , classes
             , attribute "aria-label" titleText_
-            , onClick (CellClick x y)
-            , onRightClick (CellRightClick x y)
-            , onMouseEnter (CellMouseEnter x y)
-            , onMouseLeave (CellMouseLeave x y)
-            , onFocus (CellFocus x y)
-            , onBlur (CellBlur x y)
-            , onKeydown (CellKeydown x y)
+            , onClick (Click_Cell x y)
+            , onRightClick (RightClick_Cell x y)
+            , onMouseEnter (MouseEnter_Cell x y)
+            , onMouseLeave (MouseLeave_Cell x y)
+            , onFocus (Focus_Cell x y)
+            , onBlur (Blur_Cell x y)
+            , onKeydown (Keydown_Cell x y)
             ]
             [ display ]
 

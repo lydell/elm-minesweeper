@@ -176,7 +176,7 @@ viewGrid model =
                 [ class "Grid"
                 , id gridId
                 , tabindex -1
-                , onKeydown GridKeydown
+                , onKeydown Keydown_Grid
                 ]
                 [ tbody []
                     (List.indexedMap
@@ -270,8 +270,8 @@ viewControls model =
         div
             [ class "Controls"
             , style styles
-            , onFocusIn ControlsFocus
-            , onFocusOut ControlsBlur
+            , onFocusIn FocusIn_Controls
+            , onFocusOut FocusOut_Controls
             ]
             [ div [ class "Controls-inner" ]
                 [ leftContent
@@ -298,7 +298,7 @@ viewMinesInput numMines =
             [ input
                 [ type_ "tel"
                 , value (toString numMines)
-                , onChange NumMinesChange
+                , onChange Change_NumMinesInput
                 , id minesInputId
                 , class "InputWithIcon-input"
                 , style styles
@@ -353,7 +353,7 @@ sizeControls grid =
             Grid.minWidth
             Grid.maxWidth
             (Grid.width grid)
-            WidthChange
+            Change_WidthSelect
         , span [ class "MultiplicationSign" ]
             [ text "×" ]
         , sizeSelect
@@ -362,7 +362,7 @@ sizeControls grid =
             Grid.minHeight
             Grid.maxHeight
             (Grid.height grid)
-            HeightChange
+            Change_HeightSelect
         ]
 
 
@@ -393,7 +393,7 @@ giveUpButton =
         [ type_ "button"
         , id giveUpButtonId
         , class "Button Button--muted"
-        , onClick GiveUpButtonClick
+        , onClick Click_GiveUpButton
         ]
         [ text "I give up!" ]
 
@@ -404,7 +404,7 @@ playAgainButton =
         [ type_ "button"
         , id playAgainButtonId
         , class "Button"
-        , onClick PlayAgainButtonClick
+        , onClick Click_PlayAgainButton
         ]
         [ text "Play again" ]
 

@@ -50,10 +50,10 @@ init flags =
         initialModel =
             { debug = flags.debug
             , seed = newSeed
-            , grid = grid
             , givenUp = False
+            , grid = grid
             , selectedCell = Nothing
-            , focus = FocusNone
+            , focus = NoFocus
             , windowSize = { width = 0, height = 0 }
             }
 
@@ -74,47 +74,47 @@ subscriptions model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        CellClick x y ->
+        Click_Cell x y ->
             reveal x y model
 
-        CellRightClick x y ->
+        RightClick_Cell x y ->
             flag x y model
 
-        CellBlur _ _ ->
-            ( { model | selectedCell = Nothing, focus = FocusNone }, Cmd.none )
+        Blur_Cell _ _ ->
+            ( { model | selectedCell = Nothing, focus = NoFocus }, Cmd.none )
 
-        CellFocus x y ->
-            ( { model | selectedCell = Just ( x, y ), focus = FocusCell }, Cmd.none )
+        Focus_Cell x y ->
+            ( { model | selectedCell = Just ( x, y ), focus = CellFocus }, Cmd.none )
 
-        CellMouseEnter x y ->
+        MouseEnter_Cell x y ->
             let
                 cmd =
-                    if model.focus == FocusControls then
+                    if model.focus == ControlsFocus then
                         Cmd.none
                     else
                         Cell.focus x y
             in
                 ( { model | selectedCell = Just ( x, y ) }, cmd )
 
-        CellMouseLeave x y ->
+        MouseLeave_Cell x y ->
             ( { model | selectedCell = Nothing }, Cmd.none )
 
-        CellKeydown x y keyDetails ->
+        Keydown_Cell x y keyDetails ->
             keydown x y keyDetails model
 
-        GridKeydown keyDetails ->
+        Keydown_Grid keyDetails ->
             keydown -1 -1 keyDetails model
 
-        GiveUpButtonClick ->
+        Click_GiveUpButton ->
             ( { model | givenUp = True }, View.focusPlayAgainButton )
 
-        PlayAgainButtonClick ->
+        Click_PlayAgainButton ->
             playAgain model
 
         FocusResult e ->
             ( model, Cmd.none )
 
-        WidthChange string ->
+        Change_WidthSelect string ->
             ( updateGridSize
                 (parseWidth model string)
                 (Grid.height model.grid)
@@ -122,7 +122,7 @@ update msg model =
             , Cmd.none
             )
 
-        HeightChange string ->
+        Change_HeightSelect string ->
             ( updateGridSize
                 (Grid.width model.grid)
                 (parseHeight model string)
@@ -130,16 +130,16 @@ update msg model =
             , Cmd.none
             )
 
-        NumMinesChange string ->
+        Change_NumMinesInput string ->
             ( updateNumMines (parseNumMines model string) model
             , Cmd.none
             )
 
-        ControlsBlur ->
-            ( { model | focus = FocusNone }, Cmd.none )
+        FocusOut_Controls ->
+            ( { model | focus = NoFocus }, Cmd.none )
 
-        ControlsFocus ->
-            ( { model | focus = FocusControls }, Cmd.none )
+        FocusIn_Controls ->
+            ( { model | focus = ControlsFocus }, Cmd.none )
 
         WindowSize size ->
             ( { model | windowSize = size }, Cmd.none )
@@ -418,6 +418,6 @@ playAgain model =
                 Set.empty
                 model.seed
     in
-        ( { model | seed = seed, grid = grid, givenUp = False }
+        ( { model | seed = seed, givenUp = False, grid = grid }
         , View.focusGrid
         )

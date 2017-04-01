@@ -11,8 +11,8 @@ import Window exposing (Size)
 type alias Model =
     { debug : Bool
     , seed : Seed
-    , grid : Grid
     , givenUp : Bool
+    , grid : Grid
     , selectedCell : Maybe ( Int, Int )
     , focus : Focus
     , windowSize : Size
@@ -51,9 +51,9 @@ type GameState
 
 
 type Focus
-    = FocusNone
-    | FocusControls
-    | FocusCell
+    = NoFocus
+    | ControlsFocus
+    | CellFocus
 
 
 type Movement
@@ -75,20 +75,20 @@ type TabDirection
 
 
 type Msg
-    = WidthChange String
-    | HeightChange String
-    | NumMinesChange String
-    | CellClick Int Int
-    | CellRightClick Int Int
-    | CellMouseEnter Int Int
-    | CellMouseLeave Int Int
-    | CellFocus Int Int
-    | CellBlur Int Int
-    | CellKeydown Int Int KeyDetails
-    | GridKeydown KeyDetails
-    | GiveUpButtonClick
-    | PlayAgainButtonClick
+    = Change_WidthSelect String
+    | Change_HeightSelect String
+    | Change_NumMinesInput String
+    | Click_Cell Int Int
+    | RightClick_Cell Int Int
+    | MouseEnter_Cell Int Int
+    | MouseLeave_Cell Int Int
+    | Focus_Cell Int Int
+    | Blur_Cell Int Int
+    | Keydown_Cell Int Int KeyDetails
+    | Keydown_Grid KeyDetails
+    | Click_GiveUpButton
+    | Click_PlayAgainButton
+    | FocusIn_Controls
+    | FocusOut_Controls
     | FocusResult (Result Dom.Error ())
-    | ControlsFocus
-    | ControlsBlur
     | WindowSize Size
