@@ -152,7 +152,7 @@ update msg model =
         NumMinesChange string ->
             let
                 numMines =
-                    parseNumDigits model string
+                    parseNumMines model string
             in
                 ( { model | numMines = numMines }, Cmd.none )
 
@@ -182,8 +182,8 @@ parseHeight model string =
         |> Grid.clampHeight
 
 
-parseNumDigits : Model -> String -> Int
-parseNumDigits model string =
+parseNumMines : Model -> String -> Int
+parseNumMines model string =
     let
         width =
             Matrix.width model.grid
