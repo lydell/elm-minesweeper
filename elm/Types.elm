@@ -42,12 +42,12 @@ type alias CellContent =
     ( String, Html Msg )
 
 
-type GridState
-    = NewGrid
-    | OngoingGrid
-    | WonGrid
-    | LostGrid
-    | GivenUpGrid
+type GameState
+    = NewGame
+    | OngoingGame
+    | WonGame
+    | LostGame
+    | GivenUpGame
 
 
 type Focus

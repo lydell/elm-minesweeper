@@ -227,8 +227,8 @@ updateNumMines numMines model =
 
 reveal : Int -> Int -> Model -> ( Model, Cmd Msg )
 reveal x y model =
-    case Grid.gridState model.givenUp model.grid of
-        NewGrid ->
+    case Grid.gameState model.givenUp model.grid of
+        NewGame ->
             let
                 neighbourCoords =
                     Matrix.Extra.indexedNeighbours x y model.grid
@@ -252,7 +252,7 @@ reveal x y model =
                 , View.focusPlayAgainButton
                 )
 
-        OngoingGrid ->
+        OngoingGame ->
             case Matrix.get x y model.grid of
                 Just (Cell Unrevealed _) ->
                     let
@@ -281,10 +281,10 @@ reveal x y model =
 flag : Int -> Int -> Model -> ( Model, Cmd Msg )
 flag x y model =
     let
-        gridState =
-            Grid.gridState model.givenUp model.grid
+        gameState =
+            Grid.gameState model.givenUp model.grid
     in
-        if gridState == NewGrid || gridState == OngoingGrid then
+        if gameState == NewGame || gameState == OngoingGame then
             let
                 newGrid =
                     Grid.flag x y model.grid
@@ -296,7 +296,7 @@ flag x y model =
 
 focusAfterCellChange : Int -> Int -> Model -> ( Model, Cmd Msg )
 focusAfterCellChange x y model =
-    if Grid.isGameEnd (Grid.gridState model.givenUp model.grid) then
+    if Grid.isGameEnd (Grid.gameState model.givenUp model.grid) then
         ( model, View.focusPlayAgainButton )
     else
         ( model, Cell.focus x y )

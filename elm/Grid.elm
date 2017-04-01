@@ -269,23 +269,23 @@ setCellState cellState (Cell _ cellInner) =
     Cell cellState cellInner
 
 
-gridState : Bool -> Grid -> GridState
-gridState givenUp grid =
+gameState : Bool -> Grid -> GameState
+gameState givenUp grid =
     if givenUp then
-        GivenUpGrid
+        GivenUpGame
     else if isGridNew grid then
-        NewGrid
+        NewGame
     else if isGridWon grid then
-        WonGrid
+        WonGame
     else if isGridLost grid then
-        LostGrid
+        LostGame
     else
-        OngoingGrid
+        OngoingGame
 
 
-isGameEnd : GridState -> Bool
+isGameEnd : GameState -> Bool
 isGameEnd gameState =
-    gameState == WonGrid || gameState == LostGrid || gameState == GivenUpGrid
+    gameState == WonGame || gameState == LostGame || gameState == GivenUpGame
 
 
 isGridNew : Grid -> Bool

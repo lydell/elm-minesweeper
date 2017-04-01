@@ -136,8 +136,8 @@ view model =
 viewGrid : Model -> Html Msg
 viewGrid model =
     let
-        gridState =
-            Grid.gridState model.givenUp model.grid
+        gameState =
+            Grid.gameState model.givenUp model.grid
 
         maybeCellWithCoords =
             Maybe.andThen
@@ -163,7 +163,7 @@ viewGrid model =
                                 model.grid
                     in
                         [ viewTooltip
-                            (Grid.isGameEnd gridState && isInteresting)
+                            (Grid.isGameEnd gameState && isInteresting)
                             x
                             y
                             model
@@ -253,17 +253,17 @@ viewControls : Model -> Html Msg
 viewControls model =
     let
         ( leftContent, rightContent ) =
-            case Grid.gridState model.givenUp model.grid of
-                NewGrid ->
+            case Grid.gameState model.givenUp model.grid of
+                NewGame ->
                     ( sizeControls model.grid
                     , viewMinesInput (Grid.numMines model.grid)
                     )
 
-                OngoingGrid ->
+                OngoingGame ->
                     ( giveUpButton, viewMinesCount model.grid )
 
-                gridState ->
-                    ( playAgainButton, viewGameEndMessage gridState )
+                gameState ->
+                    ( playAgainButton, viewGameEndMessage gameState )
 
         styles =
             [ ( "height", toString controlsHeight ++ "em" )
@@ -332,18 +332,18 @@ viewMinesCount grid =
             ]
 
 
-viewGameEndMessage : GridState -> Html Msg
-viewGameEndMessage gridState =
+viewGameEndMessage : GameState -> Html Msg
+viewGameEndMessage gameState =
     let
         ( titleText, emoji ) =
-            case gridState of
-                WonGrid ->
+            case gameState of
+                WonGame ->
                     ( "You won!", "🎉" )
 
-                LostGrid ->
+                LostGame ->
                     ( "You lost!", "☢️" )
 
-                GivenUpGrid ->
+                GivenUpGame ->
                     ( "You gave up!", "🏳" )
 
                 _ ->

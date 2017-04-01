@@ -178,15 +178,15 @@ view debug givenUp isSelected x y grid =
 content : Bool -> Bool -> Int -> Int -> Grid -> CellContent
 content debug givenUp x y grid =
     let
-        gridState =
-            Grid.gridState givenUp grid
+        gameState =
+            Grid.gameState givenUp grid
     in
         case Matrix.get x y grid of
             Just (Cell Flagged cellInner) ->
                 if
-                    (gridState == WonGrid)
-                        || (gridState == LostGrid)
-                        || (gridState == GivenUpGrid)
+                    (gameState == WonGame)
+                        || (gameState == LostGame)
+                        || (gameState == GivenUpGame)
                 then
                     if cellInner == Mine then
                         correctFlag
@@ -198,9 +198,9 @@ content debug givenUp x y grid =
             Just (Cell cellState Mine) ->
                 if cellState == Revealed then
                     detonatedMine
-                else if gridState == WonGrid then
+                else if gameState == WonGame then
                     autoFlaggedMine
-                else if gridState == LostGrid || gridState == GivenUpGrid || debug then
+                else if gameState == LostGame || gameState == GivenUpGame || debug then
                     mine
                 else
                     secret
