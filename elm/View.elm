@@ -10,6 +10,7 @@ import Icon
 import Task
 import Types exposing (..)
 import View.Cell as Cell
+import Window
 
 
 controlsHeight : Float
@@ -30,20 +31,20 @@ maxFontSize =
     48
 
 
-fontSize : Model -> Int
-fontSize model =
+fontSize : Grid -> Window.Size -> Int
+fontSize grid windowSize =
     let
         gridWidth =
-            Grid.width model.grid
+            Grid.width grid
 
         gridHeight =
-            Grid.height model.grid
+            Grid.height grid
 
         maxWidth =
-            (model.windowSize.width - gridMargin * 2) // gridWidth
+            (windowSize.width - gridMargin * 2) // gridWidth
 
         maxHeight =
-            toFloat (model.windowSize.height - gridMargin * 2)
+            toFloat (windowSize.height - gridMargin * 2)
                 / (toFloat gridHeight + controlsHeight)
                 |> floor
     in
@@ -84,24 +85,30 @@ minesInputId =
 view : Model -> Html Msg
 view model =
     let
+        fontSizeNum =
+            fontSize model.grid model.windowSize
+
         styles =
-            [ ( "font-size", toString (fontSize model) ++ "px" )
+            [ ( "font-size", toString fontSizeNum ++ "px" )
             ]
+
+        -- `gameState` is expensive to calculate, so it is calculated once here
+        -- at the top and passed down instead of letting functions calculate it
+        -- on their own.
+        gameState =
+            Grid.gameState model.givenUp model.grid
     in
         div [ class "Root", style styles ]
             [ div []
-                [ controls model
-                , viewGrid model
+                [ controls model.grid gameState
+                , viewGrid model gameState fontSizeNum
                 ]
             ]
 
 
-viewGrid : Model -> Html Msg
-viewGrid model =
+viewGrid : Model -> GameState -> Int -> Html Msg
+viewGrid model gameState fontSizeNum =
     let
-        gameState =
-            Grid.gameState model.givenUp model.grid
-
         maybeCellWithCoords =
             Maybe.andThen
                 (\( x, y ) ->
@@ -120,15 +127,17 @@ viewGrid model =
                         titleText =
                             Cell.titleText model.debug
                                 model.givenUp
+                                gameState
                                 x
                                 y
                                 model.grid
                     in
                         [ tooltip
                             (Grid.isGameEnd gameState && isInteresting)
+                            (Grid.width model.grid)
+                            fontSizeNum
                             x
                             y
-                            model
                             titleText
                         ]
 
@@ -144,7 +153,7 @@ viewGrid model =
                 ]
                 [ tbody []
                     (List.indexedMap
-                        (viewRow model)
+                        (viewRow model gameState)
                         (Grid.toListOfLists model.grid)
                     )
                 ]
@@ -153,17 +162,17 @@ viewGrid model =
             )
 
 
-viewRow : Model -> Int -> List Cell -> Html Msg
-viewRow model y row =
+viewRow : Model -> GameState -> Int -> List Cell -> Html Msg
+viewRow model gameState y row =
     tr []
         (List.indexedMap
-            (\x _ -> viewCell model x y)
+            (\x _ -> viewCell model gameState x y)
             row
         )
 
 
-viewCell : Model -> Int -> Int -> Html Msg
-viewCell model x y =
+viewCell : Model -> GameState -> Int -> Int -> Html Msg
+viewCell model gameState x y =
     let
         isSelected =
             case model.selectedCell of
@@ -173,11 +182,20 @@ viewCell model x y =
                 Nothing ->
                     False
     in
-        td [] [ Cell.view model.debug model.givenUp isSelected x y model.grid ]
+        td []
+            [ Cell.view
+                model.debug
+                model.givenUp
+                isSelected
+                gameState
+                x
+                y
+                model.grid
+            ]
 
 
-tooltip : Bool -> Int -> Int -> Model -> String -> Html Msg
-tooltip visible x y model titleText =
+tooltip : Bool -> Int -> Int -> Int -> Int -> String -> Html Msg
+tooltip visible gridWidth fontSizeNum x y titleText =
     let
         classes =
             classList
@@ -185,11 +203,8 @@ tooltip visible x y model titleText =
                 , ( "is-visible", visible )
                 ]
 
-        fontSizeNum =
-            fontSize model
-
         ( offset, translateX, origin ) =
-            if x <= Grid.width model.grid // 2 then
+            if x <= gridWidth // 2 then
                 ( 0, "0%", "left" )
             else
                 ( 1, "-100%", "right" )
@@ -214,21 +229,19 @@ tooltip visible x y model titleText =
             [ text titleText ]
 
 
-controls : Model -> Html Msg
-controls model =
+controls : Grid -> GameState -> Html Msg
+controls grid gameState =
     let
         ( leftContent, rightContent ) =
-            case Grid.gameState model.givenUp model.grid of
+            case gameState of
                 NewGame ->
-                    ( sizeControls model.grid
-                    , minesInput (Grid.numMines model.grid)
-                    )
+                    ( sizeControls grid, minesInput (Grid.numMines grid) )
 
                 OngoingGame ->
-                    ( giveUpButton, minesCount model.grid )
+                    ( giveUpButton, minesCount grid )
 
-                gameState ->
-                    ( playAgainButton, gameEndMessage gameState )
+                gameState_ ->
+                    ( playAgainButton, gameEndMessage gameState_ )
 
         styles =
             [ ( "height", toString controlsHeight ++ "em" )

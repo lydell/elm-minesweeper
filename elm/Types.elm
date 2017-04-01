@@ -5,7 +5,7 @@ import Html exposing (Html)
 import Html.Events.Custom exposing (KeyDetails)
 import Matrix exposing (Matrix)
 import Random.Pcg exposing (Seed)
-import Window exposing (Size)
+import Window
 
 
 type alias Model =
@@ -15,7 +15,7 @@ type alias Model =
     , grid : Grid
     , selectedCell : Maybe ( Int, Int )
     , focus : Focus
-    , windowSize : Size
+    , windowSize : Window.Size
     }
 
 
@@ -91,4 +91,4 @@ type Msg
     | FocusIn_Controls
     | FocusOut_Controls
     | FocusResult (Result Dom.Error ())
-    | WindowSize Size
+    | WindowSize Window.Size

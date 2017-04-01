@@ -119,8 +119,8 @@ cellId x y =
     "cell-" ++ toString x ++ "-" ++ toString y
 
 
-view : Bool -> Bool -> Bool -> Int -> Int -> Grid -> Html Msg
-view debug givenUp isSelected x y grid =
+view : Bool -> Bool -> Bool -> GameState -> Int -> Int -> Grid -> Html Msg
+view debug givenUp isSelected gameState x y grid =
     let
         cell =
             Grid.get x y grid
@@ -132,7 +132,7 @@ view debug givenUp isSelected x y grid =
                     ( cellState, cellInner )
 
         ( titleText_, display ) =
-            content debug givenUp x y grid
+            content debug givenUp gameState x y grid
 
         classes =
             classList
@@ -161,60 +161,56 @@ view debug givenUp isSelected x y grid =
             [ display ]
 
 
-content : Bool -> Bool -> Int -> Int -> Grid -> CellContent
-content debug givenUp x y grid =
-    let
-        gameState =
-            Grid.gameState givenUp grid
-    in
-        case Grid.get x y grid of
-            Just (Cell Flagged cellInner) ->
-                if
-                    (gameState == WonGame)
-                        || (gameState == LostGame)
-                        || (gameState == GivenUpGame)
-                then
-                    if cellInner == Mine then
-                        correctFlag
-                    else
-                        incorrectFlag
+content : Bool -> Bool -> GameState -> Int -> Int -> Grid -> CellContent
+content debug givenUp gameState x y grid =
+    case Grid.get x y grid of
+        Just (Cell Flagged cellInner) ->
+            if
+                (gameState == WonGame)
+                    || (gameState == LostGame)
+                    || (gameState == GivenUpGame)
+            then
+                if cellInner == Mine then
+                    correctFlag
                 else
-                    flag
+                    incorrectFlag
+            else
+                flag
 
-            Just (Cell cellState Mine) ->
-                if cellState == Revealed then
-                    detonatedMine
-                else if gameState == WonGame then
-                    autoFlaggedMine
-                else if
-                    (gameState == LostGame)
-                        || (gameState == GivenUpGame)
-                        || debug
-                then
-                    mine
+        Just (Cell cellState Mine) ->
+            if cellState == Revealed then
+                detonatedMine
+            else if gameState == WonGame then
+                autoFlaggedMine
+            else if
+                (gameState == LostGame)
+                    || (gameState == GivenUpGame)
+                    || debug
+            then
+                mine
+            else
+                secret
+
+        Just (Cell cellState Hint) ->
+            let
+                number =
+                    Grid.cellNumber x y grid
+            in
+                if cellState == Revealed || debug then
+                    if number == 0 then
+                        secret
+                    else
+                        hint number
                 else
                     secret
 
-            Just (Cell cellState Hint) ->
-                let
-                    number =
-                        Grid.cellNumber x y grid
-                in
-                    if cellState == Revealed || debug then
-                        if number == 0 then
-                            secret
-                        else
-                            hint number
-                    else
-                        secret
-
-            Nothing ->
-                secret
+        Nothing ->
+            secret
 
 
-titleText : Bool -> Bool -> Int -> Int -> Grid -> String
-titleText debug givenUp x y grid =
-    content debug givenUp x y grid
+titleText : Bool -> Bool -> GameState -> Int -> Int -> Grid -> String
+titleText debug givenUp gameState x y grid =
+    content debug givenUp gameState x y grid
         |> Tuple.first
 
 
