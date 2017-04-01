@@ -309,6 +309,13 @@ focusAfterCellChange x y model =
 keydown : Int -> Int -> KeyDetails -> Model -> ( Model, Cmd Msg )
 keydown x y { key, altKey, ctrlKey, metaKey, shiftKey } model =
     let
+        jumpHack =
+            if x == -1 && y == -1 then
+                -- When the grid is focused but there's no selected cell.
+                1
+            else
+                0
+
         modifiers =
             [ altKey, ctrlKey, metaKey, shiftKey ]
 
@@ -322,7 +329,7 @@ keydown x y { key, altKey, ctrlKey, metaKey, shiftKey } model =
                 else if shiftKey then
                     SkipBlanksMovement
                 else
-                    FixedMovement 4
+                    FixedMovement (4 + jumpHack)
             else
                 FixedMovement 1
 
