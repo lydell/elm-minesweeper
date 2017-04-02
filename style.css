@@ -295,7 +295,6 @@ button.Cell--unrevealed:active {
   display: flex;
   align-items: center;
   margin: 0;
-  margin-right: 0.1em;
   padding: 0.1em;
   padding-left: 0.15em;
   padding-right: calc(0.4em + 1.5ch);
