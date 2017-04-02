@@ -145,10 +145,16 @@ viewGrid model gameState fontSizeNum =
 
                 Nothing ->
                     []
+
+        classes =
+            classList
+                [ ( "Grid", True )
+                , ( "is-focusWithin", model.focus == CellFocus )
+                ]
     in
         div [ class "GridContainer" ]
             ([ table
-                [ class "Grid"
+                [ classes
                 , id gridId
                 , tabindex -1
                 , onKeydown Keydown_Grid
@@ -287,17 +293,17 @@ minesInput grid =
             , ( "width", toString maxWidth ++ "ch" )
             ]
     in
-        label [ class "InputWithIcon", title "Number of mines" ]
+        label [ class "TextWithIcon", title "Number of mines" ]
             [ input
                 [ type_ "tel"
                 , value (toString numMines)
                 , onChange Change_NumMinesInput
                 , id minesInputId
-                , class "InputWithIcon-input"
+                , class "TextWithIcon-text TextWithIcon-text--input"
                 , style styles
                 ]
                 []
-            , span [ class "InputWithIcon-icon" ]
+            , span [ class "TextWithIcon-icon" ]
                 [ Icon.toHtml Cell.mineIcon ]
             ]
 
@@ -309,11 +315,10 @@ minesCount grid =
             (Grid.numMines grid) - (Grid.numFlags grid)
     in
         span [ class "TextWithIcon" ]
-            [ span [ class "TextWithIcon-inner" ]
-                [ span [ class "TextWithIcon-text" ]
-                    [ text (toString count) ]
-                , Icon.toHtml Cell.mineIcon
-                ]
+            [ span [ class "TextWithIcon-text" ]
+                [ text (toString count) ]
+            , span [ class "TextWithIcon-icon" ]
+                [ Icon.toHtml Cell.mineIcon ]
             ]
 
 

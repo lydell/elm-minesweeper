@@ -98,12 +98,9 @@ select:-moz-focusring {
   overflow: hidden;
 }
 
-.Grid:focus {
+.Grid:focus,
+.Grid.is-focusWithin {
   outline: none;
-  border-color: var(--g-blue);
-}
-
-.Grid:focus-within {
   border-color: var(--g-blue);
 }
 
@@ -287,58 +284,49 @@ button.Cell--unrevealed:active {
   outline: none;
 }
 
-.InputWithIcon {
+.TextWithIcon {
   display: flex;
   margin: 0;
+  cursor: text;
+  position: relative;
+}
+
+.TextWithIcon-text {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  margin-right: 0.1em;
   padding: 0.1em;
-  padding: 0.15em;
-  border: 1px solid var(--g-grey-lando);
+  padding-left: 0.15em;
+  padding-right: calc(0.4em + 1.5ch);
+  border: 1px solid transparent;
+  border-radius: 0;
+  text-align: right;
+  font-weight: bold;
+  cursor: default;
+}
+
+.TextWithIcon-text--input {
+  border-color: var(--g-grey-lando);
   background: var(--g-white);
   cursor: text;
 }
 
-.InputWithIcon:hover,
-.InputWithIcon:focus-within {
+.TextWithIcon-text--input:hover,
+.TextWithIcon-text--input:focus,
+.TextWithIcon-text--input:active {
+  outline: none;
   border-color: var(--g-blue);
 }
 
-.InputWithIcon-input {
-  margin: 0;
-  margin-right: 0.1em;
-  padding: 0;
-  border: none;
-  background: none;
-  text-align: right;
-  font-weight: bold;
-}
-
-.InputWithIcon-input:hover,
-.InputWithIcon-input:focus,
-.InputWithIcon-input:active {
-  outline: none;
-}
-
-.InputWithIcon-icon {
+.TextWithIcon-icon {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.TextWithIcon {
-  display: flex;
-  padding: calc(0.1em + 1px);
-}
-
-.TextWithIcon-inner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.TextWithIcon-text {
-  margin-right: 0.1em;
-  font-weight: bold;
-  text-align: right;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0.2em;
 }
 
 .Modal {
