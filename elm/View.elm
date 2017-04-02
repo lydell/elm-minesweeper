@@ -237,7 +237,7 @@ controls grid gameState =
         ( leftContent, rightContent ) =
             case gameState of
                 NewGame ->
-                    ( sizeControls grid, minesInput (Grid.numMines grid) )
+                    ( sizeControls grid, minesInput grid )
 
                 OngoingGame ->
                     ( giveUpButton, minesCount grid )
@@ -270,14 +270,17 @@ controls grid gameState =
             ]
 
 
-minesInput : Int -> Html Msg
-minesInput numMines =
+minesInput : Grid -> Html Msg
+minesInput grid =
     let
-        absoluteMaxNumMines =
-            Grid.maxNumMines Grid.maxWidth Grid.maxHeight
+        numMines =
+            Grid.numMines grid
+
+        maxNumMines =
+            Grid.maxNumMines (Grid.width grid) (Grid.height grid)
 
         maxWidth =
-            absoluteMaxNumMines |> toString |> String.length
+            maxNumMines |> toString |> String.length
 
         styles =
             [ ( "box-sizing", "content-box" )

@@ -203,6 +203,7 @@ button.Cell--unrevealed:active {
 
 .Controls-inner > *:not(:first-child) {
   margin-left: 0.5em;
+  min-height: 0;
 }
 
 .Controls-inner > *:nth-child(2):not(:last-child) {
@@ -262,6 +263,8 @@ button.Cell--unrevealed:active {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  box-sizing: content-box;
+  width: 2.5ch;
   margin: 0;
   padding: 0.1em;
   padding-right: 0.9em;
@@ -281,12 +284,14 @@ button.Cell--unrevealed:active {
 .Select:focus,
 .Select:active {
   border-color: var(--g-blue);
+  outline: none;
 }
 
 .InputWithIcon {
   display: flex;
   margin: 0;
   padding: 0.1em;
+  padding: 0.15em;
   border: 1px solid var(--g-grey-lando);
   background: var(--g-white);
   cursor: text;
