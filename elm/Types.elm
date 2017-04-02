@@ -102,6 +102,6 @@ type Msg
     | FocusOut_Controls
     | Click_ModalBackdrop
     | Click_ModalCloseButton
-    | Global_Keydown KeyCode
+    | Keydown_Global KeyCode
     | FocusResult (Result Dom.Error ())
     | WindowSize Window.Size

@@ -93,7 +93,7 @@ init flags =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Keyboard.downs Global_Keydown
+        [ Keyboard.downs Keydown_Global
         , Window.resizes WindowSize
         ]
 
@@ -195,7 +195,7 @@ update msg model =
         Click_ModalCloseButton ->
             ( { model | helpVisible = False }, View.focusGrid )
 
-        Global_Keydown keyCode ->
+        Keydown_Global keyCode ->
             if keyCode == keyCodeEscape then
                 ( { model | helpVisible = False }, View.focusGrid )
             else
