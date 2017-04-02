@@ -6,6 +6,7 @@ import Html exposing (Html, button, div, input, label, option, p, select, span, 
 import Html.Attributes exposing (attribute, class, classList, id, selected, style, title, tabindex, type_, value)
 import Html.Events exposing (onClick)
 import Html.Events.Custom exposing (onChange, onFocusIn, onFocusOut, onKeydown)
+import Html.Lazy exposing (lazy)
 import Icon
 import Task
 import Types exposing (..)
@@ -243,7 +244,8 @@ controls grid gameState =
         ( leftContent, rightContent ) =
             case gameState of
                 NewGame ->
-                    ( sizeControls grid, minesInput grid )
+                    -- `minesInput` has to be lazy because of `Keyboard.downs`.
+                    ( sizeControls grid, lazy minesInput grid )
 
                 OngoingGame ->
                     ( giveUpButton, minesCount grid )
