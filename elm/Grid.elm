@@ -278,6 +278,36 @@ flag x y grid =
             grid
 
 
+flagNeighbours : Int -> Int -> Grid -> Grid
+flagNeighbours x y grid =
+    case Matrix.get x y grid of
+        Just (Cell Revealed Hint) ->
+            let
+                number =
+                    cellNumber x y grid
+
+                neighbours =
+                    Matrix.Extra.indexedNeighbours x y grid
+
+                flags =
+                    List.filter (Tuple.second >> isCellFlagged) neighbours
+
+                unrevealedCoords =
+                    List.filter (Tuple.second >> isCellUnrevealed) neighbours
+                        |> List.map Tuple.first
+
+                canAutoFlag =
+                    List.length flags + List.length unrevealedCoords == number
+            in
+                if canAutoFlag then
+                    List.foldl (uncurry flag) grid unrevealedCoords
+                else
+                    grid
+
+        _ ->
+            grid
+
+
 setCellState : CellState -> Cell -> Cell
 setCellState cellState (Cell _ cellInner) =
     Cell cellState cellInner

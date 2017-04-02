@@ -72,12 +72,6 @@ view visible =
             [ text
                 "You can place flags to help remember where the mines must be."
             ]
-        , p []
-            [ text <|
-                "Clicking (or tapping etc.) on a number surrounded by exactly "
-                    ++ "that number of flags is a shortcut to reveal all other "
-                    ++ "neighbors."
-            ]
         , h2 []
             [ text "Mouse" ]
         , action "Reveal" "Click."
@@ -99,6 +93,17 @@ view visible =
             , li []
                 [ text "Alt or Meta: Jump 4 steps." ]
             ]
+        , h2 []
+            [ text "Shortcuts" ]
+        , p []
+            [ text <|
+                "Revaling and flagging on already revealed numbers operates "
+                    ++ "on all unrevealed neighbors instead."
+            ]
+        , action "Reveal" "If surrounded by exactly that number of flags."
+        , action "Flag" <|
+            "If there is only one way to surround with exactly that number of "
+                ++ "flags."
         ]
 
 
