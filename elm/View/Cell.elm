@@ -6,9 +6,9 @@ import Html exposing (Html, button, span, strong, text)
 import Html.Attributes exposing (attribute, class, classList, id, style, type_)
 import Html.Events exposing (onBlur, onClick, onFocus, onMouseEnter, onMouseLeave)
 import Html.Events.Custom exposing (onKeydown, onRightClick)
-import Icon exposing (Icon)
 import Task
 import Types exposing (..)
+import View.Icon as Icon exposing (Icon)
 
 
 numberColor : Int -> String

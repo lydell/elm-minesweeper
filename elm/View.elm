@@ -7,11 +7,11 @@ import Html.Attributes exposing (attribute, class, classList, id, selected, styl
 import Html.Events exposing (onClick)
 import Html.Events.Custom exposing (onChange, onFocusIn, onFocusOut, onKeydown)
 import Html.Lazy exposing (lazy)
-import Icon
 import Task
 import Types exposing (..)
 import View.Cell as Cell
 import View.HelpModal as HelpModal
+import View.Icon as Icon
 import Window
 
 
