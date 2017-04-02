@@ -342,17 +342,17 @@ flag x y model =
     in
         if gameState == NewGame || gameState == OngoingGame then
             case Grid.get x y model.grid of
-                Just (Cell Unrevealed _) ->
-                    let
-                        newGrid =
-                            Grid.flag x y model.grid
-                    in
-                        focusAfterCellChange x y { model | grid = newGrid }
-
                 Just (Cell Revealed Hint) ->
                     let
                         newGrid =
                             Grid.flagNeighbours x y model.grid
+                    in
+                        focusAfterCellChange x y { model | grid = newGrid }
+
+                Just (Cell _ _) ->
+                    let
+                        newGrid =
+                            Grid.flag x y model.grid
                     in
                         focusAfterCellChange x y { model | grid = newGrid }
 
