@@ -4,6 +4,7 @@ import Dom
 import Grid
 import Html exposing (Html, button, div, input, label, option, p, select, span, table, tbody, td, text, tr)
 import Html.Attributes exposing (attribute, class, classList, id, selected, style, title, tabindex, type_, value)
+import Html.Custom exposing (none)
 import Html.Events exposing (onClick)
 import Html.Events.Custom exposing (onChange, onFocusIn, onFocusOut, onKeydown)
 import Html.Lazy exposing (lazy)
@@ -135,17 +136,16 @@ viewGrid model gameState fontSizeNum =
                                 y
                                 model.grid
                     in
-                        [ tooltip
+                        tooltip
                             (Grid.isGameEnd gameState && isInteresting)
                             (Grid.width model.grid)
                             fontSizeNum
                             x
                             y
                             titleText
-                        ]
 
                 Nothing ->
-                    []
+                    none
 
         classes =
             classList
@@ -154,7 +154,7 @@ viewGrid model gameState fontSizeNum =
                 ]
     in
         div [ class "GridContainer" ]
-            ([ table
+            [ table
                 [ classes
                 , id gridId
                 , tabindex -1
@@ -166,9 +166,8 @@ viewGrid model gameState fontSizeNum =
                         (Grid.toListOfLists model.grid)
                     )
                 ]
-             ]
-                ++ tooltip_
-            )
+            , tooltip_
+            ]
 
 
 viewRow : Model -> GameState -> Int -> List Cell -> Html Msg
@@ -259,9 +258,9 @@ controls grid gameState =
 
         helpButton_ =
             if Grid.isGameEnd gameState then
-                []
+                none
             else
-                [ helpButton (gameState == OngoingGame) ]
+                helpButton (gameState == OngoingGame)
     in
         div
             [ class "Controls"
@@ -270,11 +269,10 @@ controls grid gameState =
             , onFocusOut FocusOut_Controls
             ]
             [ div [ class "Controls-inner" ]
-                ([ leftContent
-                 , rightContent
-                 ]
-                    ++ helpButton_
-                )
+                [ leftContent
+                , rightContent
+                , helpButton_
+                ]
             ]
 
 
