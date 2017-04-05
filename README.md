@@ -7,7 +7,8 @@ The classic game MineSweeper made with Elm. **[Play it.][play]**
 ## Development
 
 1. `npm install`
-2. `npm start`
+2. `npm run build:css`
+3. `npm start`
 
 Add `?debug=1` to the URL to run in debug mode.
 

@@ -3,11 +3,12 @@ module View exposing (focusControls, focusGrid, focusPlayAgainButton, view)
 import Dom
 import Grid
 import Html exposing (Html, button, div, input, label, option, p, select, span, table, tbody, td, text, tr)
-import Html.Attributes exposing (attribute, class, classList, id, selected, style, title, tabindex, type_, value)
+import Html.Attributes exposing (attribute, id, selected, style, title, tabindex, type_, value)
 import Html.Custom exposing (none)
 import Html.Events exposing (onClick)
 import Html.Events.Custom exposing (onChange, onFocusIn, onFocusOut, onKeydown)
 import Html.Lazy exposing (lazy)
+import Styles.Classes as Classes exposing (class, classList)
 import Task
 import Types exposing (..)
 import View.Cell as Cell
@@ -101,7 +102,7 @@ view model =
         gameState =
             Grid.gameState model.givenUp model.grid
     in
-        div [ class "Root", style styles ]
+        div [ class [ Classes.Root ], style styles ]
             [ div []
                 [ controls model.grid gameState
                 , viewGrid model gameState fontSizeNum
@@ -149,11 +150,11 @@ viewGrid model gameState fontSizeNum =
 
         classes =
             classList
-                [ ( "Grid", True )
-                , ( "is-focusWithin", model.focus == CellFocus )
+                [ ( Classes.Grid, True )
+                , ( Classes.Is_focusWithin, model.focus == CellFocus )
                 ]
     in
-        div [ class "GridContainer" ]
+        div [ class [ Classes.GridContainer ] ]
             [ table
                 [ classes
                 , id gridId
@@ -207,8 +208,8 @@ tooltip visible gridWidth fontSizeNum x y titleText =
     let
         classes =
             classList
-                [ ( "GridContainer-tooltip", True )
-                , ( "is-visible", visible )
+                [ ( Classes.GridContainer_tooltip, True )
+                , ( Classes.Is_visible, visible )
                 ]
 
         ( offset, translateX, origin ) =
@@ -252,6 +253,13 @@ controls grid gameState =
                 gameState_ ->
                     ( playAgainButton, gameEndMessage gameState_ )
 
+        spacer =
+            span
+                [ class [ Classes.Controls_spacer ]
+                , attribute "aria-hidden" "true"
+                ]
+                []
+
         styles =
             [ ( "height", toString controlsHeight ++ "em" )
             ]
@@ -263,13 +271,14 @@ controls grid gameState =
                 helpButton (gameState == OngoingGame)
     in
         div
-            [ class "Controls"
+            [ class [ Classes.Controls ]
             , style styles
             , onFocusIn FocusIn_Controls
             , onFocusOut FocusOut_Controls
             ]
-            [ div [ class "Controls-inner" ]
+            [ div [ class [ Classes.Controls_inner ] ]
                 [ leftContent
+                , spacer
                 , rightContent
                 , helpButton_
                 ]
@@ -293,17 +302,20 @@ minesInput grid =
             , ( "width", toString maxWidth ++ "ch" )
             ]
     in
-        label [ class "TextWithIcon", title "Number of mines" ]
+        label [ class [ Classes.TextWithIcon ], title "Number of mines" ]
             [ input
                 [ type_ "tel"
                 , value (toString numMines)
                 , onChange Change_NumMinesInput
                 , id minesInputId
-                , class "TextWithIcon-text TextWithIcon-text--input"
+                , class
+                    [ Classes.TextWithIcon_text
+                    , Classes.TextWithIcon_text__input
+                    ]
                 , style styles
                 ]
                 []
-            , span [ class "TextWithIcon-icon" ]
+            , span [ class [ Classes.TextWithIcon_icon ] ]
                 [ Icon.toHtml Cell.mineIcon ]
             ]
 
@@ -314,10 +326,10 @@ minesCount grid =
         count =
             (Grid.numMines grid) - (Grid.numFlags grid)
     in
-        span [ class "TextWithIcon" ]
-            [ span [ class "TextWithIcon-text" ]
+        span [ class [ Classes.TextWithIcon ] ]
+            [ span [ class [ Classes.TextWithIcon_text ] ]
                 [ text (toString count) ]
-            , span [ class "TextWithIcon-icon" ]
+            , span [ class [ Classes.TextWithIcon_icon ] ]
                 [ Icon.toHtml Cell.mineIcon ]
             ]
 
@@ -339,7 +351,11 @@ gameEndMessage gameState =
                 _ ->
                     ( "You managed to break the game!", "❓" )
     in
-        span [ class "Controls-emoji", title titleText ] [ text emoji ]
+        span
+            [ class [ Classes.Controls_emoji ]
+            , title titleText
+            ]
+            [ text emoji ]
 
 
 sizeControls : Grid -> Html Msg
@@ -352,7 +368,7 @@ sizeControls grid =
             Grid.maxWidth
             (Grid.width grid)
             Change_WidthSelect
-        , span [ class "MultiplicationSign" ]
+        , span [ class [ Classes.MultiplicationSign ] ]
             [ text "×" ]
         , sizeSelect
             "Grid height"
@@ -379,7 +395,7 @@ sizeSelect titleString idString minSize maxSize currentSize msg =
                 |> List.map (sizeOption currentSize)
     in
         select
-            [ class "Select"
+            [ class [ Classes.Select ]
             , id idString
             , title titleString
             , onChange msg
@@ -398,7 +414,7 @@ giveUpButton =
     button
         [ type_ "button"
         , id giveUpButtonId
-        , class "Button Button--muted"
+        , class [ Classes.Button, Classes.Button__muted ]
         , onClick Click_GiveUpButton
         ]
         [ text "I give up!" ]
@@ -409,7 +425,7 @@ playAgainButton =
     button
         [ type_ "button"
         , id playAgainButtonId
-        , class "Button"
+        , class [ Classes.Button ]
         , onClick Click_PlayAgainButton
         ]
         [ text "Play again" ]
@@ -420,9 +436,9 @@ helpButton muted =
     let
         classes =
             classList
-                [ ( "Button", True )
-                , ( "Button--icon", True )
-                , ( "Button--muted", muted )
+                [ ( Classes.Button, True )
+                , ( Classes.Button__icon, True )
+                , ( Classes.Button__muted, muted )
                 ]
     in
         button

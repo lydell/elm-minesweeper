@@ -2,8 +2,9 @@ module View.HelpModal exposing (view, focus)
 
 import Dom
 import Html exposing (Html, button, div, h1, h2, li, p, strong, text, ul)
-import Html.Attributes exposing (attribute, class, classList, id, style, title, tabindex, type_)
+import Html.Attributes exposing (attribute, id, style, title, tabindex, type_)
 import Html.Events exposing (onClick)
+import Styles.Classes as Classes exposing (class, classList)
 import Task
 import Types exposing (..)
 
@@ -18,8 +19,8 @@ modal visible idString content =
     let
         classes =
             classList
-                [ ( "Modal", True )
-                , ( "is-visible", visible )
+                [ ( Classes.Modal, True )
+                , ( Classes.Is_visible, visible )
                 ]
     in
         div
@@ -28,17 +29,25 @@ modal visible idString content =
             , tabindex -1
             , attribute "aria-hidden" (toString (not visible))
             ]
-            [ div [ class "Modal-backdrop", onClick Click_ModalBackdrop ] []
-            , div [ class "Modal-inner" ]
+            [ div
+                [ class [ Classes.Modal_backdrop ]
+                , onClick Click_ModalBackdrop
+                ]
+                []
+            , div [ class [ Classes.Modal_inner ] ]
                 [ button
                     [ type_ "button"
                     , title "Close"
-                    , class "Button Button--icon Modal-closeButton"
+                    , class
+                        [ Classes.Button
+                        , Classes.Button__icon
+                        , Classes.Modal_closeButton
+                        ]
                     , onClick Click_ModalCloseButton
                     ]
                     [ text "❌" ]
-                , div [ class "Modal-scroll" ]
-                    [ div [ class "Modal-content" ]
+                , div [ class [ Classes.Modal_scroll ] ]
+                    [ div [ class [ Classes.Modal_content ] ]
                         content
                     ]
                 ]
