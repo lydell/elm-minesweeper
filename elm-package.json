@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
-    "summary": "iOS-style calculator",
-    "repository": "https://github.com/lydell/elm-calculator.git",
+    "summary": "The classic game MineSweeper made with Elm.",
+    "repository": "https://github.com/lydell/elm-minesweeper.git",
     "license": "MIT",
     "source-directories": [
         "elm"
