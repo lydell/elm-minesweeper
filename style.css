@@ -104,12 +104,12 @@ select:-moz-focusring {
   border-color: var(--g-blue);
 }
 
-.Grid td {
+/*.Grid td {
   width: 1em;
   height: 1em;
   padding: 0;
 }
-
+*/
 .Cell {
   display: flex;
   justify-content: center;

@@ -1,0 +1,10 @@
+body {
+    margin: 0px;
+    background-color: rgb(255, 0, 0);
+}
+
+.MineSweeperGrid  td {
+    width: 1em;
+    height: 1em;
+    padding: 0px;
+}
