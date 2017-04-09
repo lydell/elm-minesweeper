@@ -6,6 +6,7 @@ import Html exposing (Html, button, span, strong, text)
 import Html.Attributes exposing (attribute, class, classList, id, style, type_)
 import Html.Events exposing (onBlur, onClick, onFocus, onMouseEnter, onMouseLeave)
 import Html.Events.Custom exposing (onKeydown, onRightClick)
+import Styles.Colors as Colors
 import Task
 import Types exposing (..)
 import View.Icon as Icon exposing (Icon)
@@ -15,28 +16,28 @@ numberColor : Int -> String
 numberColor number =
     case number of
         1 ->
-            "#0000ff"
+            Colors.blue
 
         2 ->
-            "#007b00"
+            Colors.green
 
         3 ->
-            "#ff0000"
+            Colors.red
 
         4 ->
-            "#00007b"
+            Colors.purple
 
         5 ->
-            "#7b0000"
+            Colors.brown
 
         6 ->
-            "#007b7b"
+            Colors.mint
 
         7 ->
-            "#000000"
+            Colors.black
 
         8 ->
-            "#7b7b7b"
+            Colors.greyBoba
 
         _ ->
             "inherit"
@@ -49,7 +50,7 @@ mineIcon =
 
 flagIcon : Icon
 flagIcon =
-    Icon.new "🚩" |> Icon.color "#ff0000"
+    Icon.new "🚩" |> Icon.color Colors.red
 
 
 correctFlagIconHtml : Html Msg
@@ -59,7 +60,7 @@ correctFlagIconHtml =
 
 crossIcon : Icon
 crossIcon =
-    Icon.new "❌" |> Icon.color "#ff0000"
+    Icon.new "❌" |> Icon.color Colors.red
 
 
 secret : CellContent

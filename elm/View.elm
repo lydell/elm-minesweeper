@@ -8,29 +8,13 @@ import Html.Custom exposing (none)
 import Html.Events exposing (onClick)
 import Html.Events.Custom exposing (onChange, onFocusIn, onFocusOut, onKeydown)
 import Html.Lazy exposing (lazy)
-import Html.CssHelpers
-import MyCss
+import Styles.Classes
 import Task
 import Types exposing (..)
 import View.Cell as Cell
 import View.HelpModal as HelpModal
 import View.Icon as Icon
 import Window
-
-
-foo : Html.CssHelpers.Namespace String class id msg
-foo =
-    Html.CssHelpers.withNamespace MyCss.namespace
-
-
-class2 : List class -> Html.Attribute msg
-class2 =
-    foo.class
-
-
-classList2 : List ( class, Bool ) -> Html.Attribute msg
-classList2 =
-    foo.classList
 
 
 controlsHeight : Float
@@ -165,8 +149,8 @@ viewGrid model gameState fontSizeNum =
                     none
 
         classes =
-            classList2
-                [ ( MyCss.Grid, True )
+            Styles.Classes.classList
+                [ ( Styles.Classes.Grid, True )
                 ]
     in
         div [ class "GridContainer" ]
