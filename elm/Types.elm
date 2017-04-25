@@ -95,6 +95,7 @@ type Msg
     | Blur_Cell Int Int
     | Keydown_Cell Int Int KeyDetails
     | Keydown_Grid KeyDetails
+    | Keydown_NumMinesInput KeyDetails
     | Click_HelpButton
     | Click_GiveUpButton
     | Click_PlayAgainButton

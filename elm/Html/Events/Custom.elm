@@ -1,4 +1,4 @@
-module Html.Events.Custom exposing (KeyDetails, onChange, onFocusIn, onFocusOut, onKeydown, onRightClick)
+module Html.Events.Custom exposing (KeyDetails, onChange, onFocusIn, onFocusOut, onKeydown, onKeydownWithOptions, onRightClick)
 
 {-|
 Custom HTML events.
@@ -13,11 +13,11 @@ Custom HTML events.
 @docs onFocusIn, onFocusOut
 
 # Keyboard Helpers
-@docs onKeydown
+@docs onKeydown, onKeydownWithOptions
 -}
 
 import Html exposing (Attribute)
-import Html.Events
+import Html.Events exposing (Options)
 import Json.Decode as Decode exposing (Decoder)
 
 
@@ -61,10 +61,14 @@ type alias KeyDetails =
 
 {-| -}
 onKeydown : (KeyDetails -> msg) -> Attribute msg
-onKeydown tagger =
-    Html.Events.onWithOptions "keydown"
-        { stopPropagation = True, preventDefault = True }
-        (Decode.map tagger keyDecoder)
+onKeydown =
+    onKeydownWithOptions { stopPropagation = True, preventDefault = True }
+
+
+{-| -}
+onKeydownWithOptions : Options -> (KeyDetails -> msg) -> Attribute msg
+onKeydownWithOptions options tagger =
+    Html.Events.onWithOptions "keydown" options (Decode.map tagger keyDecoder)
 
 
 keyDecoder : Decoder KeyDetails

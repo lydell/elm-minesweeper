@@ -174,6 +174,12 @@ update msg model =
         Keydown_Grid keyDetails ->
             keydown -1 -1 keyDetails model
 
+        Keydown_NumMinesInput keyDetails ->
+            if keyDetails.key == "Enter" then
+                ( model, View.focusGrid )
+            else
+                ( model, Cmd.none )
+
         Click_HelpButton ->
             ( { model | helpVisible = True }, HelpModal.focus )
 
