@@ -5,8 +5,8 @@ import Encoders
 import Grid
 import Html
 import Html.Events.Custom exposing (KeyDetails)
-import Json.Decode
-import Json.Encode
+import Json.Decode as Decode
+import Json.Encode as Encode
 import Keyboard exposing (KeyCode)
 import Random.Pcg as Random
 import Regex exposing (Regex, HowMany(All))
@@ -50,7 +50,7 @@ init flags =
         localStorageModelResult =
             case flags.localStorageModelString of
                 Just localStorageModelString ->
-                    Json.Decode.decodeString
+                    Decode.decodeString
                         Decoders.localStorageModelDecoder
                         localStorageModelString
                         |> Result.mapError
@@ -105,7 +105,7 @@ updateWithLocalStorage msg model =
             update msg model
 
         localStorageCmd =
-            Json.Encode.encode 0 (Encoders.modelEncoder model)
+            Encode.encode 0 (Encoders.modelEncoder model)
                 |> setLocalStorageModel
     in
         ( newModel, Cmd.batch [ cmd, localStorageCmd ] )
@@ -173,6 +173,12 @@ update msg model =
 
         Keydown_Grid keyDetails ->
             keydown -1 -1 keyDetails model
+
+        Keydown_NumMinesInput keyDetails ->
+            if keyDetails.key == "Enter" then
+                ( model, View.focusGrid )
+            else
+                ( model, Cmd.none )
 
         Click_HelpButton ->
             ( { model | helpVisible = True }, HelpModal.focus )

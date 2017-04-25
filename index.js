@@ -2,7 +2,13 @@ var LOCAL_STORAGE_MODEL_KEY = "localStorageModel";
 
 // eslint-disable-next-line no-unused-vars
 function setup() {
+  removeLoader();
   setupElm();
+}
+
+function removeLoader() {
+  var loader = document.getElementById("loader");
+  loader.parentNode.removeChild(loader);
 }
 
 function setupElm() {

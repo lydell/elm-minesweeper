@@ -1,6 +1,6 @@
 module View.Icon exposing (Icon, color, new, opacity, toHtml)
 
-import Html exposing (Html, span, text)
+import Html exposing (..)
 import Html.Attributes exposing (style)
 
 

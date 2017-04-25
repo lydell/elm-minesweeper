@@ -2,7 +2,7 @@ module View.Cell exposing (..)
 
 import Dom
 import Grid
-import Html exposing (Html, button, span, strong, text)
+import Html exposing (..)
 import Html.Attributes exposing (attribute, id, style, type_)
 import Html.Events exposing (onBlur, onClick, onFocus, onMouseEnter, onMouseLeave)
 import Html.Events.Custom exposing (onKeydown, onRightClick)

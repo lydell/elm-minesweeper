@@ -2,11 +2,11 @@ module View exposing (focusControls, focusGrid, focusPlayAgainButton, view)
 
 import Dom
 import Grid
-import Html exposing (Html, button, div, input, label, option, p, select, span, table, tbody, td, text, tr)
+import Html exposing (..)
 import Html.Attributes exposing (attribute, id, selected, style, title, tabindex, type_, value)
 import Html.Custom exposing (none)
-import Html.Events exposing (onClick)
-import Html.Events.Custom exposing (onChange, onFocusIn, onFocusOut, onKeydown)
+import Html.Events exposing (defaultOptions, onClick)
+import Html.Events.Custom exposing (onChange, onFocusIn, onFocusOut, onKeydown, onKeydownWithOptions)
 import Html.Lazy exposing (lazy)
 import Styles.Classes as Classes exposing (class, classList)
 import Task
@@ -307,6 +307,7 @@ minesInput grid =
                 [ type_ "tel"
                 , value (toString numMines)
                 , onChange Change_NumMinesInput
+                , onKeydownWithOptions defaultOptions Keydown_NumMinesInput
                 , id minesInputId
                 , class
                     [ Classes.TextWithIcon_text

@@ -1,7 +1,7 @@
 module View.HelpModal exposing (view, focus)
 
 import Dom
-import Html exposing (Html, button, div, h1, h2, li, p, strong, text, ul)
+import Html exposing (..)
 import Html.Attributes exposing (attribute, id, style, title, tabindex, type_)
 import Html.Events exposing (onClick)
 import Styles.Classes as Classes exposing (class, classList)
@@ -113,6 +113,21 @@ view visible =
         , action "Flag" <|
             "If there is only one way to surround with exactly that number of "
                 ++ "flags."
+        , h2 []
+            [ text "Increasing the difficulty" ]
+        , p []
+            [ text <|
+                "Besides tweaking the size and the number of mines, here are "
+                    ++ "a few tips for increasingly difficult game play:"
+            ]
+        , ol []
+            [ li []
+                [ text "Don’t use the auto-flag shortcut." ]
+            , li []
+                [ text "Don’t use the auto-reveal shortcut." ]
+            , li []
+                [ text "Don’t use any flags at all." ]
+            ]
         ]
 
 
