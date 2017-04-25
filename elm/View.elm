@@ -2,7 +2,7 @@ module View exposing (focusControls, focusGrid, focusPlayAgainButton, view)
 
 import Dom
 import Grid
-import Html exposing (Html, button, div, input, label, option, p, select, span, table, tbody, td, text, tr)
+import Html exposing (..)
 import Html.Attributes exposing (attribute, id, selected, style, title, tabindex, type_, value)
 import Html.Custom exposing (none)
 import Html.Events exposing (onClick)
