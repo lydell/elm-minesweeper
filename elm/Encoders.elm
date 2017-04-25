@@ -1,14 +1,14 @@
 module Encoders exposing (..)
 
 import Grid
-import Json.Encode as Json exposing (Value)
+import Json.Encode as Encode exposing (Value)
 import Types exposing (..)
 
 
 modelEncoder : Model -> Value
 modelEncoder model =
-    Json.object
-        [ ( "givenUp", Json.bool model.givenUp )
+    Encode.object
+        [ ( "givenUp", Encode.bool model.givenUp )
         , ( "grid", gridEncoder model.grid )
         , ( "selectedCell", selectedCellEncoder model.selectedCell )
         ]
@@ -18,21 +18,21 @@ gridEncoder : Grid -> Value
 gridEncoder grid =
     Grid.toListOfLists grid
         |> List.map rowEncoder
-        |> Json.list
+        |> Encode.list
 
 
 rowEncoder : List Cell -> Value
 rowEncoder row =
     row
         |> List.map cellEncoder
-        |> Json.list
+        |> Encode.list
 
 
 cellEncoder : Cell -> Value
 cellEncoder (Cell cellState cellInner) =
-    Json.list
-        [ Json.string (toString cellState)
-        , Json.string (toString cellInner)
+    Encode.list
+        [ Encode.string (toString cellState)
+        , Encode.string (toString cellInner)
         ]
 
 
@@ -40,7 +40,7 @@ selectedCellEncoder : Maybe ( Int, Int ) -> Value
 selectedCellEncoder selectedCell =
     case selectedCell of
         Just ( x, y ) ->
-            Json.list [ Json.int x, Json.int y ]
+            Encode.list [ Encode.int x, Encode.int y ]
 
         Nothing ->
-            Json.null
+            Encode.null

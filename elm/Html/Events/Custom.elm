@@ -18,7 +18,7 @@ Custom HTML events.
 
 import Html exposing (Attribute)
 import Html.Events
-import Json.Decode exposing (Decoder)
+import Json.Decode as Decode exposing (Decoder)
 
 
 {-| -}
@@ -26,7 +26,7 @@ onRightClick : msg -> Attribute msg
 onRightClick tagger =
     Html.Events.onWithOptions "contextmenu"
         { stopPropagation = True, preventDefault = True }
-        (Json.Decode.succeed tagger)
+        (Decode.succeed tagger)
 
 
 {-| Like `onInput`, but only afte the input has been blurred.
@@ -34,19 +34,19 @@ onRightClick tagger =
 onChange : (String -> msg) -> Attribute msg
 onChange tagger =
     Html.Events.on "change"
-        (Json.Decode.map tagger Html.Events.targetValue)
+        (Decode.map tagger Html.Events.targetValue)
 
 
 {-| -}
 onFocusIn : msg -> Attribute msg
 onFocusIn tagger =
-    Html.Events.on "focusin" (Json.Decode.succeed tagger)
+    Html.Events.on "focusin" (Decode.succeed tagger)
 
 
 {-| -}
 onFocusOut : msg -> Attribute msg
 onFocusOut tagger =
-    Html.Events.on "focusout" (Json.Decode.succeed tagger)
+    Html.Events.on "focusout" (Decode.succeed tagger)
 
 
 {-| -}
@@ -64,14 +64,14 @@ onKeydown : (KeyDetails -> msg) -> Attribute msg
 onKeydown tagger =
     Html.Events.onWithOptions "keydown"
         { stopPropagation = True, preventDefault = True }
-        (Json.Decode.map tagger keyDecoder)
+        (Decode.map tagger keyDecoder)
 
 
 keyDecoder : Decoder KeyDetails
 keyDecoder =
-    Json.Decode.map5 KeyDetails
-        (Json.Decode.field "key" Json.Decode.string)
-        (Json.Decode.field "altKey" Json.Decode.bool)
-        (Json.Decode.field "ctrlKey" Json.Decode.bool)
-        (Json.Decode.field "metaKey" Json.Decode.bool)
-        (Json.Decode.field "shiftKey" Json.Decode.bool)
+    Decode.map5 KeyDetails
+        (Decode.field "key" Decode.string)
+        (Decode.field "altKey" Decode.bool)
+        (Decode.field "ctrlKey" Decode.bool)
+        (Decode.field "metaKey" Decode.bool)
+        (Decode.field "shiftKey" Decode.bool)
