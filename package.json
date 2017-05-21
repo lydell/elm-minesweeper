@@ -4,6 +4,7 @@
     "start": "elm-live elm/Main.elm --output=elm.js --open -- --debug",
     "format": "elm-format elm/",
     "analyse": "elm-analyse --serve",
+    "eslint": "eslint .",
     "build:elm": "elm-make elm/Main.elm --output=elm.temp.js",
     "build:css": "elm-css elm/Stylesheets.elm",
     "build:minify": "google-closure-compiler-js elm.temp.js > elm.js",

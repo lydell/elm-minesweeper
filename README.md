@@ -14,12 +14,14 @@ Additional tasks:
 
 - `yarn run format` runs [elm-format].
 - `yarn run analyse` runs [elm-analyse].
+- `yarn run eslint` runs [ESLint]. `yarn run eslint -- --fix` fixes most errors.
 - `yarn run build` makes a production build.
 
 ## License
 
 [MIT](LICENSE)
 
+[ESLint]: http://eslint.org/
 [elm-analyse]: https://github.com/stil4m/elm-analyse
 [elm-format]: https://github.com/avh4/elm-format
 [play]: https://lydell.github.io/elm-minesweeper
