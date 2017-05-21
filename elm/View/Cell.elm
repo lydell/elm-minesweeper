@@ -147,20 +147,20 @@ view debug isSelected gameState x y grid =
                 , ( Classes.Is_selected, isSelected )
                 ]
     in
-        button
-            [ type_ "button"
-            , id (cellId x y)
-            , classes
-            , attribute "aria-label" titleText_
-            , onClick (Click_Cell x y)
-            , onRightClick (RightClick_Cell x y)
-            , onMouseEnter (MouseEnter_Cell x y)
-            , onMouseLeave (MouseLeave_Cell x y)
-            , onFocus (Focus_Cell x y)
-            , onBlur (Blur_Cell x y)
-            , onKeydown (Keydown_Cell x y)
-            ]
-            [ display ]
+    button
+        [ type_ "button"
+        , id (cellId x y)
+        , classes
+        , attribute "aria-label" titleText_
+        , onClick (Click_Cell x y)
+        , onRightClick (RightClick_Cell x y)
+        , onMouseEnter (MouseEnter_Cell x y)
+        , onMouseLeave (MouseLeave_Cell x y)
+        , onFocus (Focus_Cell x y)
+        , onBlur (Blur_Cell x y)
+        , onKeydown (Keydown_Cell x y)
+        ]
+        [ display ]
 
 
 content : Bool -> GameState -> Int -> Int -> Grid -> CellContent
@@ -198,13 +198,13 @@ content debug gameState x y grid =
                 number =
                     Grid.cellNumber x y grid
             in
-                if cellState == Revealed || debug then
-                    if number == 0 then
-                        secret
-                    else
-                        hint number
-                else
+            if cellState == Revealed || debug then
+                if number == 0 then
                     secret
+                else
+                    hint number
+            else
+                secret
 
         Nothing ->
             secret

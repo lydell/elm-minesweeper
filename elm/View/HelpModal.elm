@@ -1,8 +1,8 @@
-module View.HelpModal exposing (view, focus)
+module View.HelpModal exposing (focus, view)
 
 import Dom
 import Html exposing (..)
-import Html.Attributes exposing (attribute, id, title, tabindex, type_)
+import Html.Attributes exposing (attribute, id, tabindex, title, type_)
 import Html.Events exposing (onClick)
 import Styles.Classes as Classes exposing (class, classList)
 import Task
@@ -23,35 +23,35 @@ modal visible idString content =
                 , ( Classes.Is_visible, visible )
                 ]
     in
-        div
-            [ classes
-            , id idString
-            , tabindex -1
-            , attribute "aria-hidden" (toString (not visible))
+    div
+        [ classes
+        , id idString
+        , tabindex -1
+        , attribute "aria-hidden" (toString (not visible))
+        ]
+        [ div
+            [ class [ Classes.Modal_backdrop ]
+            , onClick Click_ModalBackdrop
             ]
-            [ div
-                [ class [ Classes.Modal_backdrop ]
-                , onClick Click_ModalBackdrop
+            []
+        , div [ class [ Classes.Modal_inner ] ]
+            [ button
+                [ type_ "button"
+                , title "Close"
+                , class
+                    [ Classes.Button
+                    , Classes.Button__icon
+                    , Classes.Modal_closeButton
+                    ]
+                , onClick Click_ModalCloseButton
                 ]
-                []
-            , div [ class [ Classes.Modal_inner ] ]
-                [ button
-                    [ type_ "button"
-                    , title "Close"
-                    , class
-                        [ Classes.Button
-                        , Classes.Button__icon
-                        , Classes.Modal_closeButton
-                        ]
-                    , onClick Click_ModalCloseButton
-                    ]
-                    [ text "❌" ]
-                , div [ class [ Classes.Modal_scroll ] ]
-                    [ div [ class [ Classes.Modal_content ] ]
-                        content
-                    ]
+                [ text "❌" ]
+            , div [ class [ Classes.Modal_scroll ] ]
+                [ div [ class [ Classes.Modal_content ] ]
+                    content
                 ]
             ]
+        ]
 
 
 view : Bool -> Html Msg

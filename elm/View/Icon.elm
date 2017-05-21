@@ -31,4 +31,4 @@ toHtml (Icon iconData) =
             , ( "opacity", toString iconData.opacity )
             ]
     in
-        span [ style styles ] [ text iconData.emoji ]
+    span [ style styles ] [ text iconData.emoji ]

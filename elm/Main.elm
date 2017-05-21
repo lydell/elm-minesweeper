@@ -9,7 +9,7 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 import Keyboard exposing (KeyCode)
 import Random.Pcg as Random
-import Regex exposing (Regex, HowMany(All))
+import Regex exposing (HowMany(All), Regex)
 import Set
 import Task
 import Types exposing (..)
@@ -87,7 +87,7 @@ init flags =
                 , View.focusGrid
                 ]
     in
-        ( initialModel, initialCmd )
+    ( initialModel, initialCmd )
 
 
 subscriptions : Model -> Sub Msg
@@ -108,7 +108,7 @@ updateWithLocalStorage msg model =
             Encode.encode 0 (Encoders.modelEncoder model)
                 |> setLocalStorageModel
     in
-        ( newModel, Cmd.batch [ cmd, localStorageCmd ] )
+    ( newModel, Cmd.batch [ cmd, localStorageCmd ] )
 
 
 port setLocalStorageModel : String -> Cmd msg
@@ -152,7 +152,7 @@ update msg model =
                     else
                         Cell.focus x y
             in
-                ( { model | selectedCell = Just ( x, y ) }, cmd )
+            ( { model | selectedCell = Just ( x, y ) }, cmd )
 
         MouseLeave_Cell _ _ ->
             ( { model | selectedCell = Nothing }, Cmd.none )
@@ -270,7 +270,7 @@ updateGridSize width height model =
                 Set.empty
                 model.seed
     in
-        { model | seed = seed, grid = grid }
+    { model | seed = seed, grid = grid }
 
 
 updateNumMines : Int -> Model -> Model
@@ -284,7 +284,7 @@ updateNumMines numMines model =
                 Set.empty
                 model.seed
     in
-        { model | seed = seed, grid = grid }
+    { model | seed = seed, grid = grid }
 
 
 reveal : Int -> Int -> Model -> ( Model, Cmd Msg )
@@ -310,9 +310,9 @@ reveal x y model =
                 finalGrid =
                     Grid.reveal x y grid
             in
-                ( { model | seed = seed, grid = finalGrid }
-                , View.focusPlayAgainButton
-                )
+            ( { model | seed = seed, grid = finalGrid }
+            , View.focusPlayAgainButton
+            )
 
         OngoingGame ->
             case Grid.get x y model.grid of
@@ -321,7 +321,7 @@ reveal x y model =
                         newGrid =
                             Grid.reveal x y model.grid
                     in
-                        focusAfterCellChange x y { model | grid = newGrid }
+                    focusAfterCellChange x y { model | grid = newGrid }
 
                 Just (Cell Revealed Hint) ->
                     if Grid.cellNumber x y model.grid == 0 then
@@ -331,7 +331,7 @@ reveal x y model =
                             newGrid =
                                 Grid.revealNeighbours x y model.grid
                         in
-                            focusAfterCellChange x y { model | grid = newGrid }
+                        focusAfterCellChange x y { model | grid = newGrid }
 
                 _ ->
                     ( model, Cmd.none )
@@ -346,26 +346,26 @@ flag x y model =
         gameState =
             Grid.gameState model.givenUp model.grid
     in
-        if gameState == NewGame || gameState == OngoingGame then
-            case Grid.get x y model.grid of
-                Just (Cell Revealed Hint) ->
-                    let
-                        newGrid =
-                            Grid.flagNeighbours x y model.grid
-                    in
-                        focusAfterCellChange x y { model | grid = newGrid }
+    if gameState == NewGame || gameState == OngoingGame then
+        case Grid.get x y model.grid of
+            Just (Cell Revealed Hint) ->
+                let
+                    newGrid =
+                        Grid.flagNeighbours x y model.grid
+                in
+                focusAfterCellChange x y { model | grid = newGrid }
 
-                Just (Cell _ _) ->
-                    let
-                        newGrid =
-                            Grid.flag x y model.grid
-                    in
-                        focusAfterCellChange x y { model | grid = newGrid }
+            Just (Cell _ _) ->
+                let
+                    newGrid =
+                        Grid.flag x y model.grid
+                in
+                focusAfterCellChange x y { model | grid = newGrid }
 
-                _ ->
-                    ( model, Cmd.none )
-        else
-            ( model, Cmd.none )
+            _ ->
+                ( model, Cmd.none )
+    else
+        ( model, Cmd.none )
 
 
 focusAfterCellChange : Int -> Int -> Model -> ( Model, Cmd Msg )
@@ -406,44 +406,44 @@ keydown x y { key, altKey, ctrlKey, metaKey, shiftKey } model =
         moveFocusHelper direction =
             ( model, moveFocus x y model.grid movement direction )
     in
-        case key of
-            "ArrowLeft" ->
-                moveFocusHelper Left
+    case key of
+        "ArrowLeft" ->
+            moveFocusHelper Left
 
-            "ArrowRight" ->
-                moveFocusHelper Right
+        "ArrowRight" ->
+            moveFocusHelper Right
 
-            "ArrowUp" ->
-                moveFocusHelper Up
+        "ArrowUp" ->
+            moveFocusHelper Up
 
-            "ArrowDown" ->
-                moveFocusHelper Down
+        "ArrowDown" ->
+            moveFocusHelper Down
 
-            "Tab" ->
-                if List.all not modifiers then
-                    ( model, View.focusControls Forward )
-                else if onlyOneModifier && shiftKey then
-                    ( model, View.focusControls Backward )
-                else
-                    ( model, Cmd.none )
+        "Tab" ->
+            if List.all not modifiers then
+                ( model, View.focusControls Forward )
+            else if onlyOneModifier && shiftKey then
+                ( model, View.focusControls Backward )
+            else
+                ( model, Cmd.none )
 
-            "Enter" ->
-                reveal x y model
+        "Enter" ->
+            reveal x y model
 
-            " " ->
-                reveal x y model
+        " " ->
+            reveal x y model
 
-            "Backspace" ->
+        "Backspace" ->
+            flag x y model
+
+        "Delete" ->
+            flag x y model
+
+        _ ->
+            if String.length key == 1 then
                 flag x y model
-
-            "Delete" ->
-                flag x y model
-
-            _ ->
-                if String.length key == 1 then
-                    flag x y model
-                else
-                    ( model, Cmd.none )
+            else
+                ( model, Cmd.none )
 
 
 moveFocus : Int -> Int -> Grid -> Movement -> Direction -> Cmd Msg
@@ -469,8 +469,8 @@ moveFocus x y grid movement direction =
                     ( x + num * factorX, y + num * factorY )
 
                 EdgeMovement ->
-                    ( x + (Grid.width grid) * factorX
-                    , y + (Grid.height grid) * factorY
+                    ( x + Grid.width grid * factorX
+                    , y + Grid.height grid * factorY
                     )
 
                 SkipBlanksMovement ->
@@ -482,10 +482,10 @@ moveFocus x y grid movement direction =
         clampedY =
             clamp 0 (Grid.height grid - 1) newY
     in
-        if clampedX == x && clampedY == y then
-            Cmd.none
-        else
-            Cell.focus clampedX clampedY
+    if clampedX == x && clampedY == y then
+        Cmd.none
+    else
+        Cell.focus clampedX clampedY
 
 
 playAgain : Model -> ( Model, Cmd Msg )
@@ -499,6 +499,6 @@ playAgain model =
                 Set.empty
                 model.seed
     in
-        ( { model | seed = seed, givenUp = False, grid = grid }
-        , View.focusGrid
-        )
+    ( { model | seed = seed, givenUp = False, grid = grid }
+    , View.focusGrid
+    )

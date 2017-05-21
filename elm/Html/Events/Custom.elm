@@ -1,19 +1,27 @@
 module Html.Events.Custom exposing (KeyDetails, onChange, onFocusIn, onFocusOut, onKeydown, onKeydownWithOptions, onRightClick)
 
-{-|
-Custom HTML events.
+{-| Custom HTML events.
+
 
 # Mouse Helpers
+
 @docs onRightClick
 
+
 # Form Helpers
+
 @docs onChange
 
+
 # Focus Helpers
+
 @docs onFocusIn, onFocusOut
 
+
 # Keyboard Helpers
+
 @docs onKeydown, onKeydownWithOptions
+
 -}
 
 import Html exposing (Attribute)

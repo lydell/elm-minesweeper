@@ -119,7 +119,7 @@ initialGrid seed =
         numMines_ =
             suggestNumMines width height
     in
-        createGrid width height numMines_ Set.empty seed
+    createGrid width height numMines_ Set.empty seed
 
 
 createGrid : Int -> Int -> Int -> Set ( Int, Int ) -> Seed -> ( Seed, Grid )
@@ -162,7 +162,7 @@ addRandomMine excludedCoords ( seed, grid ) =
         newGrid =
             Matrix.update x y (always (Cell Unrevealed Mine)) grid
     in
-        ( newSeed, newGrid )
+    ( newSeed, newGrid )
 
 
 cellNumber : Int -> Int -> Grid -> Int
@@ -205,10 +205,10 @@ revealNeighbours x y grid =
                 neighbourCoords =
                     List.map Tuple.first neighbours
             in
-                if number == 0 || List.length flags /= number then
-                    grid
-                else
-                    List.foldl (uncurry reveal) grid neighbourCoords
+            if number == 0 || List.length flags /= number then
+                grid
+            else
+                List.foldl (uncurry reveal) grid neighbourCoords
 
         _ ->
             grid
@@ -225,7 +225,7 @@ revealRecursively x y grid =
         ( _, newGrid ) =
             revealRecursivelyHelper x y ( Set.empty, grid )
     in
-        newGrid
+    newGrid
 
 
 revealRecursivelyHelper :
@@ -253,13 +253,13 @@ revealRecursivelyHelper x y ( visitedCoords, grid ) =
                         Matrix.Extra.indexedNeighbours x y newGrid
                             |> List.map Tuple.first
                 in
-                    if number == 0 then
-                        List.foldl
-                            (uncurry revealRecursivelyHelper)
-                            ( newVisitedCoords, newGrid )
-                            neighbours
-                    else
+                if number == 0 then
+                    List.foldl
+                        (uncurry revealRecursivelyHelper)
                         ( newVisitedCoords, newGrid )
+                        neighbours
+                else
+                    ( newVisitedCoords, newGrid )
 
             _ ->
                 ( visitedCoords, grid )
@@ -299,10 +299,10 @@ flagNeighbours x y grid =
                 canAutoFlag =
                     List.length flags + List.length unrevealedCoords == number
             in
-                if canAutoFlag then
-                    List.foldl (uncurry flag) grid unrevealedCoords
-                else
-                    grid
+            if canAutoFlag then
+                List.foldl (uncurry flag) grid unrevealedCoords
+            else
+                grid
 
         _ ->
             grid
@@ -386,36 +386,37 @@ closestUnrevealedCell dx dy grid ( x, y ) =
         newY =
             y + dy
     in
-        case Matrix.get newX newY grid of
-            Just (Cell Unrevealed _) ->
-                ( newX, newY )
+    case Matrix.get newX newY grid of
+        Just (Cell Unrevealed _) ->
+            ( newX, newY )
 
-            Just _ ->
-                closestUnrevealedCell dx dy grid ( newX, newY )
+        Just _ ->
+            closestUnrevealedCell dx dy grid ( newX, newY )
 
-            Nothing ->
-                ( x, y )
+        Nothing ->
+            ( x, y )
 
 
 {-| Suggests a number of mines for a given size of the grid.
 
 The original game has these presets:
 
-preset       | width | height | # cells | # mines
+preset | width | height | # cells | # mines
 :------------|------:|-------:|--------:|-------:
-Beginner     |     9 |      9 |      81 |     10
-Intermediate |    16 |     16 |     256 |     40
-Expert       |    30 |     16 |     480 |     99
+Beginner | 9 | 9 | 81 | 10
+Intermediate | 16 | 16 | 256 | 40
+Expert | 30 | 16 | 480 | 99
 
 The number of mines can be described as a function of the number of cells:
 
-    y(x) = ax² + bx + c
+y(x) = ax² + bx + c
 
 Solving the following equation system gives the values of a, b and c:
 
-    y(81) = 10
-    y(256) = 40
-    y(480) = 99
+y(81) = 10
+y(256) = 40
+y(480) = 99
+
 -}
 suggestNumMines : Int -> Int -> Int
 suggestNumMines width height =
@@ -432,4 +433,4 @@ suggestNumMines width height =
         x =
             toFloat (width * height)
     in
-        a * x ^ 2 + b * x + c |> round |> clampNumMines width height
+    a * x ^ 2 + b * x + c |> round |> clampNumMines width height

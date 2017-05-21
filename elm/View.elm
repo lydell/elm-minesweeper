@@ -3,7 +3,7 @@ module View exposing (focusControls, focusGrid, focusPlayAgainButton, view)
 import Dom
 import Grid
 import Html exposing (..)
-import Html.Attributes exposing (attribute, id, selected, style, title, tabindex, type_, value)
+import Html.Attributes exposing (attribute, id, selected, style, tabindex, title, type_, value)
 import Html.Custom exposing (none)
 import Html.Events exposing (defaultOptions, onClick)
 import Html.Events.Custom exposing (onChange, onFocusIn, onFocusOut, onKeydown, onKeydownWithOptions)
@@ -52,8 +52,8 @@ fontSize grid windowSize =
                 / (toFloat gridHeight + controlsHeight)
                 |> floor
     in
-        min maxWidth maxHeight
-            |> min maxFontSize
+    min maxWidth maxHeight
+        |> min maxFontSize
 
 
 giveUpButtonId : Dom.Id
@@ -102,13 +102,13 @@ view model =
         gameState =
             Grid.gameState model.givenUp model.grid
     in
-        div [ class [ Classes.Root ], style styles ]
-            [ div []
-                [ controls model.grid gameState
-                , viewGrid model gameState fontSizeNum
-                ]
-            , HelpModal.view model.helpVisible
+    div [ class [ Classes.Root ], style styles ]
+        [ div []
+            [ controls model.grid gameState
+            , viewGrid model gameState fontSizeNum
             ]
+        , HelpModal.view model.helpVisible
+        ]
 
 
 viewGrid : Model -> GameState -> Int -> Html Msg
@@ -136,13 +136,13 @@ viewGrid model gameState fontSizeNum =
                                 y
                                 model.grid
                     in
-                        tooltip
-                            (Grid.isGameEnd gameState && isInteresting)
-                            (Grid.width model.grid)
-                            fontSizeNum
-                            x
-                            y
-                            titleText
+                    tooltip
+                        (Grid.isGameEnd gameState && isInteresting)
+                        (Grid.width model.grid)
+                        fontSizeNum
+                        x
+                        y
+                        titleText
 
                 Nothing ->
                     none
@@ -153,21 +153,21 @@ viewGrid model gameState fontSizeNum =
                 , ( Classes.Is_focusWithin, model.focus == CellFocus )
                 ]
     in
-        div [ class [ Classes.GridContainer ] ]
-            [ table
-                [ classes
-                , id gridId
-                , tabindex -1
-                , onKeydown Keydown_Grid
-                ]
-                [ tbody []
-                    (List.indexedMap
-                        (viewRow model gameState)
-                        (Grid.toListOfLists model.grid)
-                    )
-                ]
-            , tooltip_
+    div [ class [ Classes.GridContainer ] ]
+        [ table
+            [ classes
+            , id gridId
+            , tabindex -1
+            , onKeydown Keydown_Grid
             ]
+            [ tbody []
+                (List.indexedMap
+                    (viewRow model gameState)
+                    (Grid.toListOfLists model.grid)
+                )
+            ]
+        , tooltip_
+        ]
 
 
 viewRow : Model -> GameState -> Int -> List Cell -> Html Msg
@@ -190,15 +190,15 @@ viewCell model gameState x y =
                 Nothing ->
                     False
     in
-        td []
-            [ Cell.view
-                model.debug
-                isSelected
-                gameState
-                x
-                y
-                model.grid
-            ]
+    td []
+        [ Cell.view
+            model.debug
+            isSelected
+            gameState
+            x
+            y
+            model.grid
+        ]
 
 
 tooltip : Bool -> Int -> Int -> Int -> Int -> String -> Html Msg
@@ -232,8 +232,8 @@ tooltip visible gridWidth fontSizeNum x y titleText =
             , ( "transform-origin", origin ++ " bottom" )
             ]
     in
-        span [ classes, style styles ]
-            [ text titleText ]
+    span [ classes, style styles ]
+        [ text titleText ]
 
 
 controls : Grid -> GameState -> Html Msg
@@ -268,19 +268,19 @@ controls grid gameState =
             else
                 helpButton (gameState == OngoingGame)
     in
-        div
-            [ class [ Classes.Controls ]
-            , style styles
-            , onFocusIn FocusIn_Controls
-            , onFocusOut FocusOut_Controls
+    div
+        [ class [ Classes.Controls ]
+        , style styles
+        , onFocusIn FocusIn_Controls
+        , onFocusOut FocusOut_Controls
+        ]
+        [ div [ class [ Classes.Controls_inner ] ]
+            [ leftContent
+            , spacer
+            , rightContent
+            , helpButton_
             ]
-            [ div [ class [ Classes.Controls_inner ] ]
-                [ leftContent
-                , spacer
-                , rightContent
-                , helpButton_
-                ]
-            ]
+        ]
 
 
 minesInput : Grid -> Html Msg
@@ -300,23 +300,23 @@ minesInput grid =
             , ( "width", toString maxWidth ++ "ch" )
             ]
     in
-        label [ class [ Classes.TextWithIcon ], title "Number of mines" ]
-            [ input
-                [ type_ "tel"
-                , value (toString numMines)
-                , onChange Change_NumMinesInput
-                , onKeydownWithOptions defaultOptions Keydown_NumMinesInput
-                , id minesInputId
-                , class
-                    [ Classes.TextWithIcon_text
-                    , Classes.TextWithIcon_text__input
-                    ]
-                , style styles
+    label [ class [ Classes.TextWithIcon ], title "Number of mines" ]
+        [ input
+            [ type_ "tel"
+            , value (toString numMines)
+            , onChange Change_NumMinesInput
+            , onKeydownWithOptions defaultOptions Keydown_NumMinesInput
+            , id minesInputId
+            , class
+                [ Classes.TextWithIcon_text
+                , Classes.TextWithIcon_text__input
                 ]
-                []
-            , span [ class [ Classes.TextWithIcon_icon ] ]
-                [ Icon.toHtml Cell.mineIcon ]
+            , style styles
             ]
+            []
+        , span [ class [ Classes.TextWithIcon_icon ] ]
+            [ Icon.toHtml Cell.mineIcon ]
+        ]
 
 
 minesCount : Grid -> Html Msg
@@ -325,12 +325,12 @@ minesCount grid =
         count =
             Grid.numMines grid - Grid.numFlags grid
     in
-        span [ class [ Classes.TextWithIcon ] ]
-            [ span [ class [ Classes.TextWithIcon_text ] ]
-                [ text (toString count) ]
-            , span [ class [ Classes.TextWithIcon_icon ] ]
-                [ Icon.toHtml Cell.mineIcon ]
-            ]
+    span [ class [ Classes.TextWithIcon ] ]
+        [ span [ class [ Classes.TextWithIcon_text ] ]
+            [ text (toString count) ]
+        , span [ class [ Classes.TextWithIcon_icon ] ]
+            [ Icon.toHtml Cell.mineIcon ]
+        ]
 
 
 gameEndMessage : GameState -> Html Msg
@@ -350,11 +350,11 @@ gameEndMessage gameState =
                 _ ->
                     ( "You managed to break the game!", "❓" )
     in
-        span
-            [ class [ Classes.Controls_emoji ]
-            , title titleText
-            ]
-            [ text emoji ]
+    span
+        [ class [ Classes.Controls_emoji ]
+        , title titleText
+        ]
+        [ text emoji ]
 
 
 sizeControls : Grid -> Html Msg
@@ -393,13 +393,13 @@ sizeSelect titleString idString minSize maxSize currentSize msg =
             List.range minSize maxSize
                 |> List.map (sizeOption currentSize)
     in
-        select
-            [ class [ Classes.Select ]
-            , id idString
-            , title titleString
-            , onChange msg
-            ]
-            options
+    select
+        [ class [ Classes.Select ]
+        , id idString
+        , title titleString
+        , onChange msg
+        ]
+        options
 
 
 sizeOption : Int -> Int -> Html msg
@@ -440,13 +440,13 @@ helpButton muted =
                 , ( Classes.Button__muted, muted )
                 ]
     in
-        button
-            [ type_ "button"
-            , classes
-            , onClick Click_HelpButton
-            , title "Help"
-            ]
-            [ text "❓" ]
+    button
+        [ type_ "button"
+        , classes
+        , onClick Click_HelpButton
+        , title "Help"
+        ]
+        [ text "❓" ]
 
 
 focusControls : TabDirection -> Cmd Msg
@@ -460,10 +460,10 @@ focusControls direction =
                 Backward ->
                     minesInputId
     in
-        Dom.focus giveUpButtonId
-            |> Task.onError (always (Dom.focus playAgainButtonId))
-            |> Task.onError (always (Dom.focus controlId))
-            |> Task.attempt FocusResult
+    Dom.focus giveUpButtonId
+        |> Task.onError (always (Dom.focus playAgainButtonId))
+        |> Task.onError (always (Dom.focus controlId))
+        |> Task.attempt FocusResult
 
 
 focusGrid : Cmd Msg
