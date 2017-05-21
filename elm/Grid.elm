@@ -132,7 +132,7 @@ addRandomMines numMines_ excludedCoords ( seed, grid ) =
     List.foldl
         (always (addRandomMine excludedCoords))
         ( seed, grid )
-        (List.range 1 numMines_)
+        (List.repeat numMines_ ())
 
 
 addRandomMine : Set ( Int, Int ) -> ( Seed, Grid ) -> ( Seed, Grid )
