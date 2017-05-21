@@ -16,10 +16,10 @@
     "elm-format": "^0.7.0-exp",
     "elm-live": "^2.7.4",
     "eslint": "^3.17.1",
-    "eslint-config-prettier": "^1.5.0",
+    "eslint-config-prettier": "^2.1.1",
     "eslint-config-strict": "^13.0.0",
     "eslint-plugin-prettier": "^2.0.1",
-    "google-closure-compiler-js": "^20170218.0.0",
-    "prettier": "^0.22.0"
+    "google-closure-compiler-js": "^20170423.0.0",
+    "prettier": "^1.3.1"
   }
 }
