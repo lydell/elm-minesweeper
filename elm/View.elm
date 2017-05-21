@@ -131,7 +131,6 @@ viewGrid model gameState fontSizeNum =
 
                         titleText =
                             Cell.titleText model.debug
-                                model.givenUp
                                 gameState
                                 x
                                 y
@@ -194,7 +193,6 @@ viewCell model gameState x y =
         td []
             [ Cell.view
                 model.debug
-                model.givenUp
                 isSelected
                 gameState
                 x
@@ -325,7 +323,7 @@ minesCount : Grid -> Html Msg
 minesCount grid =
     let
         count =
-            (Grid.numMines grid) - (Grid.numFlags grid)
+            Grid.numMines grid - Grid.numFlags grid
     in
         span [ class [ Classes.TextWithIcon ] ]
             [ span [ class [ Classes.TextWithIcon_text ] ]

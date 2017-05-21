@@ -1,0 +1,8 @@
+{
+  "checks": {
+    "CoreArrayUsage": false,
+    "ExposeAll": false,
+    "ImportAll": false
+  },
+  "LineLengthExceeded": 80
+}

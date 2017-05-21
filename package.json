@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "start": "elm-live elm/Main.elm --output=elm.js --open -- --debug",
+    "analyse": "elm-analyse --serve",
     "build:elm": "elm-make elm/Main.elm --output=elm.temp.js",
     "build:css": "elm-css elm/Stylesheets.elm",
     "build:minify": "google-closure-compiler-js elm.temp.js > elm.js",
@@ -9,6 +10,7 @@
   },
   "devDependencies": {
     "elm": "^0.18.0",
+    "elm-analyse": "^0.7.0",
     "elm-css": "^0.6.0",
     "elm-live": "^2.7.4",
     "eslint": "^3.17.1",

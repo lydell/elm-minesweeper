@@ -121,8 +121,8 @@ cellId x y =
     "cell-" ++ toString x ++ "-" ++ toString y
 
 
-view : Bool -> Bool -> Bool -> GameState -> Int -> Int -> Grid -> Html Msg
-view debug givenUp isSelected gameState x y grid =
+view : Bool -> Bool -> GameState -> Int -> Int -> Grid -> Html Msg
+view debug isSelected gameState x y grid =
     let
         cell =
             Grid.get x y grid
@@ -130,11 +130,11 @@ view debug givenUp isSelected gameState x y grid =
 
         ( cellState, cellInner ) =
             case cell of
-                Cell cellState cellInner ->
-                    ( cellState, cellInner )
+                Cell cellState_ cellInner_ ->
+                    ( cellState_, cellInner_ )
 
         ( titleText_, display ) =
-            content debug givenUp gameState x y grid
+            content debug gameState x y grid
 
         classes =
             classList
@@ -163,8 +163,8 @@ view debug givenUp isSelected gameState x y grid =
             [ display ]
 
 
-content : Bool -> Bool -> GameState -> Int -> Int -> Grid -> CellContent
-content debug givenUp gameState x y grid =
+content : Bool -> GameState -> Int -> Int -> Grid -> CellContent
+content debug gameState x y grid =
     case Grid.get x y grid of
         Just (Cell Flagged cellInner) ->
             if
@@ -210,9 +210,9 @@ content debug givenUp gameState x y grid =
             secret
 
 
-titleText : Bool -> Bool -> GameState -> Int -> Int -> Grid -> String
-titleText debug givenUp gameState x y grid =
-    content debug givenUp gameState x y grid
+titleText : Bool -> GameState -> Int -> Int -> Grid -> String
+titleText debug gameState x y grid =
+    content debug gameState x y grid
         |> Tuple.first
 
 

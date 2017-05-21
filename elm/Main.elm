@@ -91,7 +91,7 @@ init flags =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.batch
         [ Keyboard.downs Keydown_Global
         , Window.resizes WindowSize
@@ -154,7 +154,7 @@ update msg model =
             in
                 ( { model | selectedCell = Just ( x, y ) }, cmd )
 
-        MouseLeave_Cell x y ->
+        MouseLeave_Cell _ _ ->
             ( { model | selectedCell = Nothing }, Cmd.none )
 
         Focus_Cell x y ->

@@ -2,7 +2,7 @@ module View.HelpModal exposing (view, focus)
 
 import Dom
 import Html exposing (..)
-import Html.Attributes exposing (attribute, id, style, title, tabindex, type_)
+import Html.Attributes exposing (attribute, id, title, tabindex, type_)
 import Html.Events exposing (onClick)
 import Styles.Classes as Classes exposing (class, classList)
 import Task
