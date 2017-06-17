@@ -37,7 +37,7 @@ minNumMines =
 maxNumMines : Int -> Int -> Int
 maxNumMines width height =
     -- `9` because the first clicked cell is always empty.
-    width * height - 9
+    max minNumMines (width * height - 9)
 
 
 clampWidth : Int -> Int

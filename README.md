@@ -15,6 +15,7 @@ Additional tasks:
 - `yarn run format` runs [elm-format].
 - `yarn run analyse` runs [elm-analyse].
 - `yarn run eslint` runs [ESLint]. `yarn run eslint -- --fix` fixes most errors.
+- `yarn test` runs [elm-verify-examples] and [elm-test].
 - `yarn run build` makes a production build.
 
 ## License
@@ -24,4 +25,6 @@ Additional tasks:
 [ESLint]: http://eslint.org/
 [elm-analyse]: https://github.com/stil4m/elm-analyse
 [elm-format]: https://github.com/avh4/elm-format
+[elm-test]: https://github.com/elm-community/elm-test/
+[elm-verify-examples]: https://github.com/stoeffel/elm-verify-examples
 [play]: https://lydell.github.io/elm-minesweeper
