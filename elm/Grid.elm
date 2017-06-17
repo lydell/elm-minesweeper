@@ -422,7 +422,7 @@ closestUnrevealedCell dx dy grid ( x, y ) =
 The original game has these presets:
 
 preset | width | height | # cells | # mines
-:------------|------:|-------:|--------:|-------:
+:------|------:|-------:|--------:|-------:
 Beginner | 9 | 9 | 81 | 10
 Intermediate | 16 | 16 | 256 | 40
 Expert | 30 | 16 | 480 | 99
