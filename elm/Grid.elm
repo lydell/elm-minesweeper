@@ -332,6 +332,26 @@ isGameEnd gameState =
     gameState == WonGame || gameState == LostGame || gameState == GivenUpGame
 
 
+isGridValid : Grid -> Bool
+isGridValid grid =
+    let
+        width_ =
+            width grid
+
+        height_ =
+            height grid
+
+        numMines_ =
+            numMines grid
+    in
+    (width_ >= minWidth)
+        && (width_ <= maxWidth)
+        && (height_ >= minHeight)
+        && (height_ <= maxHeight)
+        && (numMines_ >= minNumMines)
+        && (numMines_ <= maxNumMines width_ height_)
+
+
 isGridNew : Grid -> Bool
 isGridNew =
     Matrix.Custom.all isCellUnrevealed

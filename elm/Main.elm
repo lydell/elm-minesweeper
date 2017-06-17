@@ -59,10 +59,17 @@ init flags =
                 Nothing ->
                     Err "No localStorageModel provided. Using defaults."
 
-        stored accessor default =
+        stored accessor default validator =
             case localStorageModelResult of
                 Ok localStorageModel ->
-                    accessor localStorageModel
+                    let
+                        value =
+                            accessor localStorageModel
+                    in
+                    if validator value then
+                        value
+                    else
+                        default
 
                 Err _ ->
                     default
@@ -73,9 +80,9 @@ init flags =
         initialModel =
             { debug = flags.debug
             , seed = newSeed
-            , givenUp = stored .givenUp False
-            , grid = stored .grid grid
-            , selectedCell = stored .selectedCell Nothing
+            , givenUp = stored .givenUp False (always True)
+            , grid = stored .grid grid Grid.isGridValid
+            , selectedCell = stored .selectedCell Nothing (always True)
             , helpVisible = False
             , focus = NoFocus
             , windowSize = { width = 0, height = 0 }
