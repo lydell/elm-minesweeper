@@ -1,0 +1,6 @@
+{
+  "root": "../elm",
+  "tests": [
+    "Matrix.Custom"
+  ]
+}
