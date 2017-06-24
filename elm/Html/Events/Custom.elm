@@ -37,7 +37,7 @@ onRightClick tagger =
         (Decode.succeed tagger)
 
 
-{-| Like `onInput`, but only afte the input has been blurred.
+{-| Like `onInput`, but only after the input has been blurred.
 -}
 onChange : (String -> msg) -> Attribute msg
 onChange tagger =
