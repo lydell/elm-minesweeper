@@ -21,7 +21,7 @@ gridDecoder =
 gridMapper : List (List Cell) -> Grid
 gridMapper listOfLists =
     Grid.fromList listOfLists
-        |> Maybe.withDefault (Grid.defaultGrid Grid.minWidth Grid.maxWidth)
+        |> Maybe.withDefault (Grid.defaultGrid Grid.minWidth Grid.minHeight)
 
 
 rowDecoder : Decoder (List Cell)
